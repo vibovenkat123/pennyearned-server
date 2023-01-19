@@ -3,3 +3,5 @@ run:
 	@./scripts/run.sh
 build:
 	@./scripts/build.sh
+runbuild:
+	@./scripts/runbuild.sh

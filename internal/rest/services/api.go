@@ -5,14 +5,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
+	expenseHandler "github.com/vibovenkat123/pennyearned-server/internal/rest/services/handlers/expenses"
 	"log"
 	"net/http"
 	"os"
 	"time"
-    expenseHandler "github.com/vibovenkat123/pennyearned-server/internal/rest/services/handlers/expenses"
 )
 
 var logger = log.New(os.Stdout, "", log.Ldate|log.Ltime)
+
 // function to expose all the api routes
 func Expose() {
 	port := 4000
@@ -26,9 +27,9 @@ func Expose() {
 	r.Route("/api/expenses", func(r chi.Router) {
 		r.Route("/{ownerId}", func(r chi.Router) {
 			r.Use(expenseHandler.ExpensesCtx)
-            r.Get("/", expenseHandler.GetExpenses)
+			r.Get("/", expenseHandler.GetExpenses)
 		})
 	})
-    fmt.Printf("listening on port %v\n", port)
-    http.ListenAndServe(fmt.Sprintf(":%v", port), r)
+	fmt.Printf("listening on port %v\n", port)
+	http.ListenAndServe(fmt.Sprintf(":%v", port), r)
 }

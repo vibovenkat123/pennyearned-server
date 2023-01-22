@@ -14,14 +14,14 @@ func ResetToSchema(db DatabaseType) {
 	fmt.Println("Resetted!!")
 }
 func GetExpensesByOwnerId(ownerid string) []Expenses {
-    expenses := []Expenses{}
-    Db.Select(&expenses, "SELECT * FROM expenses where owner_id=$1", ownerid)
-    return expenses
+	expenses := []Expenses{}
+	Db.Select(&expenses, "SELECT * FROM expenses where owner_id=$1", ownerid)
+	return expenses
 }
-func GetOwnerById(ownerid string) User{
-    user  := User{}
-    Db.Select(&user, "SELECT * FROM users where _id=$1", ownerid)
-    return user 
+func GetOwnerById(ownerid string) User {
+	user := User{}
+	Db.Select(&user, "SELECT * FROM users where _id=$1", ownerid)
+	return user
 }
 func ExecMultiple(e DatabaseType, query string) {
 	statements := strings.Split(query, "\n")

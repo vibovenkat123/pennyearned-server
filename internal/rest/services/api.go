@@ -24,7 +24,7 @@ func Expose() {
 	r.Use(render.SetContentType(render.ContentTypeJSON))
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Route("/api/expenses", func(r chi.Router) {
-		r.Route("/{expensesID}", func(r chi.Router) {
+		r.Route("/{ownerId}", func(r chi.Router) {
 			r.Use(expenseHandler.ExpensesCtx)
             r.Get("/", expenseHandler.GetExpenses)
 		})

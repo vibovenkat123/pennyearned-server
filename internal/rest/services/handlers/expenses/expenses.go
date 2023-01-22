@@ -15,8 +15,8 @@ func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
 func ExpensesCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var expense []dbHelpers.Expenses
-		if eID := chi.URLParam(r, "expensesID"); eID != "" {
-            expense = dbHelpers.GetExpensesByOwnerId(eID) 
+		if uID := chi.URLParam(r, "ownerId"); uID != "" {
+            expense = dbHelpers.GetExpensesByOwnerId(uID) 
 		} else {
           render.Render(w, r, ErrNotFound)
           return

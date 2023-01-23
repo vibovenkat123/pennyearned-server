@@ -1,4 +1,5 @@
 package dbHelpers
+
 var defaultSchema = Schema{
 	create: `
 CREATE TABLE IF NOT EXISTS users (

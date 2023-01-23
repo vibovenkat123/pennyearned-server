@@ -7,10 +7,11 @@ package graph
 import (
 	"context"
 	"fmt"
-	database "github.com/vibovenkat123/pennyearned-server/internal/db/services"
 	"github.com/vibovenkat123/pennyearned-server/graph/model"
-"github.com/vibovenkat123/pennyearned-server/internal/db/helpers"
+	"github.com/vibovenkat123/pennyearned-server/internal/db/helpers"
+	database "github.com/vibovenkat123/pennyearned-server/internal/db/services"
 )
+
 // CreateExpense is the resolver for the createExpense field.
 func (r *mutationResolver) CreateExpense(ctx context.Context, input model.NewExpense) (*model.Expense, error) {
 	panic(fmt.Errorf("not implemented: CreateExpense - createExpense"))
@@ -23,27 +24,27 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-    var arr []*model.User
-    _, err := database.Connect()
-    dbHelpers.Db.Select(&arr, "SELECT * FROM users")
-    return arr, err
+	var arr []*model.User
+	_, err := database.Connect()
+	dbHelpers.Db.Select(&arr, "SELECT * FROM users")
+	return arr, err
 }
 
 // Expenses is the resolver for the expenses field.
 func (r *queryResolver) Expenses(ctx context.Context) ([]*model.Expense, error) {
-    var arr []*model.Expense
-    data := []dbHelpers.Expense{}
-    _, err := database.Connect()
-    dbHelpers.Db.Select(&data, "SELECT * FROM expenses")
-    for _, r := range data {
-        arr = append(arr, &model.Expense{
-            ID: r.ID,
-            OwnerID: r.OwnerID,
-            Name: r.Name,
-            Spent: r.Spent,
-        })
-    } 
-    return arr, err
+	var arr []*model.Expense
+	data := []dbHelpers.Expense{}
+	_, err := database.Connect()
+	dbHelpers.Db.Select(&data, "SELECT * FROM expenses")
+	for _, r := range data {
+		arr = append(arr, &model.Expense{
+			ID:      r.ID,
+			OwnerID: r.OwnerID,
+			Name:    r.Name,
+			Spent:   r.Spent,
+		})
+	}
+	return arr, err
 }
 
 // Mutation returns MutationResolver implementation.

@@ -5,11 +5,12 @@ import (
 	"log"
 	"strings"
 )
+
 func Migrate() {
-    fmt.Println("Migrating...")
-    Db.MustExec(defaultSchema.create)
-    ExecMultiple(Db, defaultSchema.alter)
-    fmt.Println("Migrated!!")
+	fmt.Println("Migrating...")
+	Db.MustExec(defaultSchema.create)
+	ExecMultiple(Db, defaultSchema.alter)
+	fmt.Println("Migrated!!")
 }
 func ResetToSchema() {
 	fmt.Println("Resetting...")

@@ -5,16 +5,26 @@ import (
 	"log"
 	"strings"
 )
-
-func ResetToSchema(db DatabaseType) {
+func Migrate() {
+    fmt.Println("Migrating...")
+    Db.MustExec(defaultSchema.create)
+    ExecMultiple(Db, defaultSchema.alter)
+    fmt.Println("Migrated!!")
+}
+func ResetToSchema() {
 	fmt.Println("Resetting...")
-	ExecMultiple(db, defaultSchema.drop)
-	db.MustExec(defaultSchema.create)
-	ExecMultiple(db, defaultSchema.alter)
+	ExecMultiple(Db, defaultSchema.drop)
+	Db.MustExec(defaultSchema.create)
+	ExecMultiple(Db, defaultSchema.alter)
 	fmt.Println("Resetted!!")
 }
-func GetExpensesByOwnerId(ownerid string) []Expenses {
-	expenses := []Expenses{}
+func GetExpenseById(expenseId string) Expense {
+	expense := Expense{}
+	Db.Get(&expense, "SELECT * FROM expenses where id=$1", expenseId)
+	return expense
+}
+func GetExpensesByOwnerId(ownerid string) []Expense {
+	expenses := []Expense{}
 	Db.Select(&expenses, "SELECT * FROM expenses where owner_id=$1", ownerid)
 	return expenses
 }

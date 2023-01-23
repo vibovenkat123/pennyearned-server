@@ -3,10 +3,14 @@ package dbHelpers
 import (
 	"github.com/jmoiron/sqlx"
 )
-
-type Expenses struct {
+type Schema struct {
+    create string
+    drop string
+    alter string
+}
+type Expense struct {
 	ID      string `db:"id"`
-	OwnerId string `db:"owner_id"`
+	OwnerID string `db:"owner_id"`
 	Name    string `db:"name"`
 	Spent   int    `db:"spent"`
 }
@@ -16,9 +20,9 @@ type User struct {
 	Email string `db:"email"`
 }
 
-var Db *sqlx.DB
-
 type DatabaseType = *sqlx.DB
+var Db DatabaseType 
+
 type Info struct {
 	Host     string
 	Port     int

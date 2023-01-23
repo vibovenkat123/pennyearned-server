@@ -1,11 +1,4 @@
 package dbHelpers
-
-type Schema struct {
-	create string
-	drop   string
-	alter  string
-}
-
 var defaultSchema = Schema{
 	create: `
 CREATE TABLE IF NOT EXISTS users (

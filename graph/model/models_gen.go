@@ -2,11 +2,16 @@
 
 package model
 
+type DeleteExpense struct {
+	ID string `json:"id"`
+}
+
 type Expense struct {
 	ID      string `json:"id"`
 	OwnerID string `json:"owner_id"`
 	Name    string `json:"name"`
 	Spent   int    `json:"spent"`
+	Date    string `json:"date"`
 }
 
 type NewExpense struct {
@@ -20,8 +25,16 @@ type NewUser struct {
 	Email string `json:"email"`
 }
 
+type UpdateExpenseInput struct {
+	OwnerID *string `json:"owner_id"`
+	ID      string  `json:"id"`
+	Name    *string `json:"name"`
+	Spent   *int    `json:"spent"`
+}
+
 type User struct {
 	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
+	Date  string `json:"date"`
 }

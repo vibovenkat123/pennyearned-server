@@ -5,14 +5,16 @@ var defaultSchema = Schema{
 CREATE TABLE IF NOT EXISTS users (
     id text DEFAULT gen_random_uuid() PRIMARY KEY,
     name varchar(255) NOT NULL,
-    email varchar(255) NOT NULL UNIQUE
+    email varchar(255) NOT NULL UNIQUE,
+    date_created DATE DEFAULT CURRENT_DATE
 );
 
 CREATE TABLE IF NOT EXISTS expenses (
     id text DEFAULT gen_random_uuid() PRIMARY KEY,
     owner_id text REFERENCES users(id) NOT NULL,
     name varchar(255) NOT NULL,
-    spent integer DEFAULT 0 NOT NULL
+    spent integer DEFAULT 0 NOT NULL,
+    date_created DATE DEFAULT CURRENT_DATE
 );`,
 
 	drop: `

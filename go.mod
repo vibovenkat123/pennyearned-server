@@ -9,14 +9,12 @@ require (
 
 require (
 	github.com/99designs/gqlgen v0.17.22
-	github.com/go-chi/chi/v5 v5.0.8
-	github.com/go-chi/render v1.0.2
+	github.com/google/uuid v1.3.0
 	github.com/vektah/gqlparser/v2 v2.5.1
 )
 
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
-	github.com/ajg/form v1.5.1 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect

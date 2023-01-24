@@ -7,14 +7,21 @@ package graph
 import (
 	"context"
 	"fmt"
+
 	"github.com/vibovenkat123/pennyearned-server/graph/model"
-	"github.com/vibovenkat123/pennyearned-server/internal/db/helpers"
-	database "github.com/vibovenkat123/pennyearned-server/internal/db/services"
+	dbHelpers "github.com/vibovenkat123/pennyearned-server/internal/db/helpers"
 )
 
 // CreateExpense is the resolver for the createExpense field.
 func (r *mutationResolver) CreateExpense(ctx context.Context, input model.NewExpense) (*model.Expense, error) {
-	panic(fmt.Errorf("not implemented: CreateExpense - createExpense"))
+	expense := dbHelpers.NewExpense(input.OwnerID, input.Name, input.Spent)
+	data := &model.Expense{
+		ID:      expense.ID,
+		OwnerID: expense.OwnerID,
+		Name:    expense.Name,
+		Spent:   expense.Spent,
+	}
+	return data, nil
 }
 
 // CreateUser is the resolver for the createUser field.
@@ -22,29 +29,79 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
 }
 
+// UpdateExpense is the resolver for the updateExpense field.
+func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.UpdateExpenseInput) (*model.Expense, error) {
+	original := dbHelpers.GetExpenseById(input.ID)
+	id := input.ID
+	ownerId := input.OwnerID
+	name := input.Name
+	spent := input.Spent
+	if ownerId == nil {
+		ownerId = &original.OwnerID
+	}
+	if name == nil {
+		name = &original.Name
+	}
+	if spent == nil {
+		spent = &original.Spent
+	}
+	expense := dbHelpers.Expense{
+		ID:      id,
+		Name:    *name,
+		Spent:   *spent,
+		OwnerID: *ownerId,
+	}
+	expense = dbHelpers.UpdateExpense(expense)
+	data := &model.Expense{
+		ID:      expense.ID,
+		OwnerID: expense.OwnerID,
+		Name:    expense.Name,
+		Spent:   expense.Spent,
+	}
+	return data, nil
+}
+
+// DeleteExpense is the resolver for the deleteExpense field.
+func (r *mutationResolver) DeleteExpense(ctx context.Context, input model.DeleteExpense) (*model.Expense, error) {
+	expense := dbHelpers.DeleteExpense(input.ID)
+	data := &model.Expense{
+		ID:      expense.ID,
+		OwnerID: expense.OwnerID,
+		Name:    expense.Name,
+		Spent:   expense.Spent,
+	}
+	return data, nil
+}
+
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*model.User, error) {
-	var arr []*model.User
-	_, err := database.Connect()
-	dbHelpers.Db.Select(&arr, "SELECT * FROM users")
-	return arr, err
+	var data []*model.User
+	arr := dbHelpers.GetAllUsers()
+	for _, r := range arr {
+		data = append(data, &model.User{
+			ID:    r.ID,
+			Name:  r.Name,
+			Email: r.Email,
+			Date:  r.Date,
+		})
+	}
+	return data, nil
 }
 
 // Expenses is the resolver for the expenses field.
 func (r *queryResolver) Expenses(ctx context.Context) ([]*model.Expense, error) {
 	var arr []*model.Expense
-	data := []dbHelpers.Expense{}
-	_, err := database.Connect()
-	dbHelpers.Db.Select(&data, "SELECT * FROM expenses")
+	data := dbHelpers.GetAllExpenses()
 	for _, r := range data {
 		arr = append(arr, &model.Expense{
 			ID:      r.ID,
 			OwnerID: r.OwnerID,
 			Name:    r.Name,
 			Spent:   r.Spent,
+			Date:    r.Date,
 		})
 	}
-	return arr, err
+	return arr, nil
 }
 
 // Mutation returns MutationResolver implementation.

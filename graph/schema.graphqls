@@ -5,6 +5,7 @@ type User {
     id: ID!
     name: String!
     email: String!
+    date: String!
 }
 
 type Expense {
@@ -12,6 +13,7 @@ type Expense {
     owner_id: String!
     name: String!
     spent: Int!
+    date: String!
 }
 
 type Query {
@@ -25,6 +27,15 @@ input NewExpense {
   spent: Int!
 }
 
+input DeleteExpense {
+    id: ID!
+}
+input UpdateExpenseInput {
+    owner_id: String
+    id: ID!
+    name: String
+    spent: Int
+}
 input NewUser {
     name: String!
     email: String!
@@ -33,5 +44,7 @@ input NewUser {
 type Mutation {
   createExpense(input: NewExpense!): Expense!
   createUser(input: NewUser!): User!
+  updateExpense(input: UpdateExpenseInput!): Expense!
+  deleteExpense(input: DeleteExpense!): Expense!
 }
 

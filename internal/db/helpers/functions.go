@@ -7,15 +7,53 @@ import (
     "github.com/google/uuid"
 //    "reflect"
 )
-func GetAllUsers() []User {
-    var arr []User
-	Db.Select(&arr, "SELECT * FROM users ORDER BY name ASC")
-    return arr
-}
 func GetAllExpenses() []Expense {
-    var arr []Expense
-	Db.Select(&arr, "SELECT * FROM expenses ORDER BY name ASC")
-    return arr
+    var expenses []Expense Db.Select(&expenses, "SELECT * FROM expenses ORDER BY date_created ASC")
+    return expenses
+}
+func MostExpensiveExpense(ownerid string) Expense{
+    expensesData := GetExpensesByOwnerId(ownerid)
+    mostExpensive := expensesData[0].Spent
+    id := expensesData[0].ID
+    for _, i := range expensesData[1:] {
+        if i.Spent > mostExpensive{
+            mostExpensive = i.Spent
+            id = i.ID
+        }
+    }
+    return GetExpenseById(id)
+}
+func LeastExpensiveExpense(ownerid string) Expense{
+    expensesData := GetExpensesByOwnerId(ownerid)
+    leastExpensive := expensesData[0].Spent
+    id := expensesData[0].ID
+    for _, i := range expensesData[1:] {
+        if i.Spent < leastExpensive{
+            leastExpensive = i.Spent
+            id = i.ID
+        }
+    }
+    return GetExpenseById(id)
+}
+func ExpensesLowerThan(spent int, ownerid string) []Expense {
+    var expenses []Expense
+    expensesData := GetExpensesByOwnerId(ownerid)
+    for _, i := range expensesData {
+        if i.Spent < spent{
+            expenses = append(expenses, i)
+        }
+    }
+    return expenses
+}
+func ExpensesHigherThan(spent int, ownerid string) []Expense {
+    var expenses []Expense
+    expensesData := GetExpensesByOwnerId(ownerid)
+    for _, i := range expensesData {
+        if i.Spent > spent{
+            expenses = append(expenses, i)
+        }
+    }
+    return expenses
 }
 func NewExpense(ownerid string, name string, spent int) Expense{
     tx := Db.MustBegin()
@@ -26,13 +64,6 @@ func NewExpense(ownerid string, name string, spent int) Expense{
 }
 func DeleteExpense(id string) Expense{
     expense := GetExpenseById(id)
-    if expense.ID == "" {
-        expense.ID = "not found"
-        expense.Name = "not found"
-        expense.OwnerID= "not found"
-        expense.Spent = 42
-        return expense
-    }
     Db.MustExec(`DELETE FROM expenses WHERE id=$1`, id)
     return expense
 }

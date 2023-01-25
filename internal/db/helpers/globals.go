@@ -14,13 +14,15 @@ type Expense struct {
 	OwnerID string `db:"owner_id"`
 	Name    string `db:"name"`
 	Spent   int    `db:"spent"`
-    Date string `db:"date_created"`
+    DateCreated string `db:"date_created"`
+    DateUpdated string `db:"date_updated"`
 }
 type User struct {
 	ID    string `db:"id"`
 	Name  string `db:"name"`
 	Email string `db:"email"`
-    Date string `db:"date_created"`
+    DateCreated string `db:"date_created"`
+    DateUpdated string `db:"date_updated"`
 }
 
 type DatabaseType = *sqlx.DB

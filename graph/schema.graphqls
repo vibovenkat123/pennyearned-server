@@ -1,24 +1,31 @@
 # GraphQL schema example
 #
 # https://gqlgen.com/getting-started/
-type User {
-    id: ID!
-    name: String!
-    email: String!
-    date: String!
-}
 
 type Expense {
     id: ID!
     owner_id: String!
     name: String!
     spent: Int!
-    date: String!
+    dateCreated: String!
+}
+
+type User {
+    id: ID!
+    name: String!
+    username: String! @unique
+    password: String!
+    dateCreated: String!    
 }
 
 type Query {
-  users: [User!]!
   expenses: [Expense!]!
+  expense(id: ID!): Expense
+  expensesHigherThan(spent: Int!, owner_id: String!): [Expense]
+  expensesLowerThan(spent: Int!, owner_id: String!): [Expense]
+  mostExpensiveExpense(owner_id: String!): Expense
+  leastExpensiveExpense(owner_id: String!): Expense
+  expensesFromOwner(id: String!): [Expense!]!
 }
 
 input NewExpense {
@@ -36,15 +43,10 @@ input UpdateExpenseInput {
     name: String
     spent: Int
 }
-input NewUser {
-    name: String!
-    email: String!
-}
 
 type Mutation {
   createExpense(input: NewExpense!): Expense!
-  createUser(input: NewUser!): User!
-  updateExpense(input: UpdateExpenseInput!): Expense!
-  deleteExpense(input: DeleteExpense!): Expense!
+  updateExpense(input: UpdateExpenseInput!): Expense
+  deleteExpense(input: DeleteExpense!): Expense
 }
 

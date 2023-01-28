@@ -7,11 +7,28 @@ package graph
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/vibovenkat123/pennyearned-server/graph/model"
 	dbHelpers "github.com/vibovenkat123/pennyearned-server/internal/db/helpers"
 )
+
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
+	user, err := dbHelpers.SignUp(input.Name, input.Username, input.Email, input.Password)
+	if err != nil {
+		return nil, err
+	}
+	data := &model.User{
+		ID:          user.ID,
+		Name:        user.Name,
+		Email:       user.Email,
+		DateCreated: user.DateCreated,
+		DateUpdated: user.DateUpdated,
+		Username:    user.Username,
+		Password:    input.Password,
+	}
+	return data, nil
+}
 
 // CreateExpense is the resolver for the createExpense field.
 func (r *mutationResolver) CreateExpense(ctx context.Context, input model.NewExpense) (*model.Expense, error) {
@@ -49,10 +66,12 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.Update
 	}
 	expense = dbHelpers.UpdateExpense(expense)
 	data := &model.Expense{
-		ID:      expense.ID,
-		OwnerID: expense.OwnerID,
-		Name:    expense.Name,
-		Spent:   expense.Spent,
+		ID:          expense.ID,
+		OwnerID:     expense.OwnerID,
+		Name:        expense.Name,
+		Spent:       expense.Spent,
+		DateCreated: expense.DateCreated,
+		DateUpdated: expense.DateUpdated,
 	}
 	if data.ID != input.ID {
 		return nil, errors.New("expense not found")
@@ -81,11 +100,12 @@ func (r *queryResolver) Expenses(ctx context.Context) ([]*model.Expense, error) 
 	data := dbHelpers.GetAllExpenses()
 	for _, r := range data {
 		expenses = append(expenses, &model.Expense{
-			ID:      r.ID,
-			OwnerID: r.OwnerID,
-			Name:    r.Name,
-			Spent:   r.Spent,
-//			DateCreated:    r.DateCreated,
+			ID:          r.ID,
+			OwnerID:     r.OwnerID,
+			Name:        r.Name,
+			Spent:       r.Spent,
+			DateCreated: r.DateCreated,
+			DateUpdated: r.DateUpdated,
 		})
 	}
 	return expenses, nil
@@ -95,11 +115,12 @@ func (r *queryResolver) Expenses(ctx context.Context) ([]*model.Expense, error) 
 func (r *queryResolver) Expense(ctx context.Context, id string) (*model.Expense, error) {
 	data := dbHelpers.GetExpenseById(id)
 	expense := &model.Expense{
-		ID:      data.ID,
-		OwnerID: data.OwnerID,
-		Name:    data.Name,
-		Spent:   data.Spent,
-		Date:    data.Date,
+		ID:          data.ID,
+		OwnerID:     data.OwnerID,
+		Name:        data.Name,
+		Spent:       data.Spent,
+		DateCreated: data.DateCreated,
+		DateUpdated: data.DateUpdated,
 	}
 	if expense.ID != id {
 		return nil, errors.New("expense not found")
@@ -113,11 +134,12 @@ func (r *queryResolver) ExpensesHigherThan(ctx context.Context, spent int, owner
 	data := dbHelpers.ExpensesHigherThan(spent, ownerID)
 	for _, r := range data {
 		expenses = append(expenses, &model.Expense{
-			ID:      r.ID,
-			OwnerID: r.OwnerID,
-			Name:    r.Name,
-			Spent:   r.Spent,
-			Date:    r.Date,
+			ID:          r.ID,
+			OwnerID:     r.OwnerID,
+			Name:        r.Name,
+			Spent:       r.Spent,
+			DateCreated: r.DateCreated,
+			DateUpdated: r.DateUpdated,
 		})
 	}
 	if len(expenses) <= 0 {
@@ -132,11 +154,12 @@ func (r *queryResolver) ExpensesLowerThan(ctx context.Context, spent int, ownerI
 	data := dbHelpers.ExpensesLowerThan(spent, ownerID)
 	for _, r := range data {
 		expenses = append(expenses, &model.Expense{
-			ID:      r.ID,
-			OwnerID: r.OwnerID,
-			Name:    r.Name,
-			Spent:   r.Spent,
-			Date:    r.Date,
+			ID:          r.ID,
+			OwnerID:     r.OwnerID,
+			Name:        r.Name,
+			Spent:       r.Spent,
+			DateCreated: r.DateCreated,
+			DateUpdated: r.DateUpdated,
 		})
 	}
 	if len(expenses) <= 0 {
@@ -149,11 +172,12 @@ func (r *queryResolver) ExpensesLowerThan(ctx context.Context, spent int, ownerI
 func (r *queryResolver) MostExpensiveExpense(ctx context.Context, ownerID string) (*model.Expense, error) {
 	data := dbHelpers.MostExpensiveExpense(ownerID)
 	expense := &model.Expense{
-		ID:      data.ID,
-		OwnerID: data.OwnerID,
-		Name:    data.Name,
-		Spent:   data.Spent,
-		Date:    data.Date,
+		ID:          data.ID,
+		OwnerID:     data.OwnerID,
+		Name:        data.Name,
+		Spent:       data.Spent,
+		DateCreated: data.DateCreated,
+		DateUpdated: data.DateUpdated,
 	}
 	if expense.ID == "" {
 		return nil, errors.New("There are no expenses")
@@ -165,11 +189,12 @@ func (r *queryResolver) MostExpensiveExpense(ctx context.Context, ownerID string
 func (r *queryResolver) LeastExpensiveExpense(ctx context.Context, ownerID string) (*model.Expense, error) {
 	data := dbHelpers.LeastExpensiveExpense(ownerID)
 	expense := &model.Expense{
-		ID:      data.ID,
-		OwnerID: data.OwnerID,
-		Name:    data.Name,
-		Spent:   data.Spent,
-		Date:    data.Date,
+		ID:          data.ID,
+		OwnerID:     data.OwnerID,
+		Name:        data.Name,
+		Spent:       data.Spent,
+		DateCreated: data.DateCreated,
+		DateUpdated: data.DateUpdated,
 	}
 	if expense.ID == "" {
 		return nil, errors.New("There are no expenses")
@@ -186,14 +211,33 @@ func (r *queryResolver) ExpensesFromOwner(ctx context.Context, id string) ([]*mo
 			return nil, errors.New("There are no expenses")
 		}
 		expenses = append(expenses, &model.Expense{
-			ID:      r.ID,
-			OwnerID: r.OwnerID,
-			Name:    r.Name,
-			Spent:   r.Spent,
-			Date:    r.Date,
+			ID:          r.ID,
+			OwnerID:     r.OwnerID,
+			Name:        r.Name,
+			Spent:       r.Spent,
+			DateCreated: r.DateCreated,
+			DateUpdated: r.DateUpdated,
 		})
 	}
 	return expenses, nil
+}
+
+// User is the resolver for the user field.
+func (r *queryResolver) User(ctx context.Context, email string, password string) (*model.User, error) {
+	user, err := dbHelpers.SignIn(email, password)
+	if err != nil {
+		return nil, err
+	}
+	data := &model.User{
+		ID:          user.ID,
+		Name:        user.Name,
+		Email:       user.Email,
+		DateCreated: user.DateCreated,
+		DateUpdated: user.DateUpdated,
+		Username:    user.Username,
+		Password:    user.Password,
+	}
+	return data, nil
 }
 
 // Mutation returns MutationResolver implementation.
@@ -204,28 +248,3 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) MostExpensive(ctx context.Context, ownerID int) (*model.Expense, error) {
-	panic(fmt.Errorf("not implemented: MostExpensive - mostExpensive"))
-}
-func (r *queryResolver) LeastExpensive(ctx context.Context, ownerID int) (*model.Expense, error) {
-	panic(fmt.Errorf("not implemented: LeastExpensive - leastExpensive"))
-}
-func (r *queryResolver) ExpenseHigherThan(ctx context.Context, spent int, ownerID int) ([]*model.Expense, error) {
-	panic(fmt.Errorf("not implemented: ExpenseHigherThan - expenseHigherThan"))
-}
-func (r *queryResolver) ExpenseLowerThan(ctx context.Context, spent int, ownerID int) ([]*model.Expense, error) {
-	panic(fmt.Errorf("not implemented: ExpenseLowerThan - expenseLowerThan"))
-}
-func (r *queryResolver) LastExpense(ctx context.Context, ownerID string) (*model.Expense, error) {
-	panic(fmt.Errorf("not implemented: LastExpense - lastExpense"))
-}
-func (r *queryResolver) ExpenseFromOwner(ctx context.Context, id string) (*model.Expense, error) {
-	panic(fmt.Errorf("not implemented: ExpenseFromOwner - expenseFromOwner"))
-}

@@ -5,5 +5,7 @@ build:
 	@./scripts/build.sh
 runbuild:
 	@./scripts/runbuild.sh
-gql:
+rungql:
 	@./scripts/rungql.sh
+buildgql:
+	@./scripts/buildgql.sh

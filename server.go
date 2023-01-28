@@ -8,16 +8,16 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/vibovenkat123/pennyearned-server/graph"
-    database "github.com/vibovenkat123/pennyearned-server/internal/db/services"
+	database "github.com/vibovenkat123/pennyearned-server/internal/db/services"
 )
 
 const defaultPort = "3000"
 
 func main() {
-    _, err := database.Connect()
-    if err != nil {
-        panic(err)
-    }
+	_, err := database.Connect()
+	if err != nil {
+		panic(err)
+	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort

@@ -1,1 +1,3 @@
-go run ./server.go
+#!/bin/sh
+echo "running graphql server..."
+./bin/gql

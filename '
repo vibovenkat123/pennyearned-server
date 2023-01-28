@@ -25,7 +25,7 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 		DateCreated: user.DateCreated,
 		DateUpdated: user.DateUpdated,
 		Username:    user.Username,
-		Password:    user.Password,
+		Password:    input.Password,
 	}
 	return response, nil
 }
@@ -182,84 +182,81 @@ func (r *queryResolver) ExpensesLowerThan(ctx context.Context, spent int, ownerI
 	}
 	for _, expense := range expenses{
 		expensesLowerThan= append(expensesLowerThan, &model.Expense{
-			ID:          expense.ID,
-			OwnerID:     expense.OwnerID,
-			Name:        expense.Name,
-			Spent:       expense.Spent,
-			DateCreated: expense.DateCreated,
-			DateUpdated: expense.DateUpdated,
+			ID:          r.ID,
+			OwnerID:     r.OwnerID,
+			Name:        r.Name,
+			Spent:       r.Spent,
+			DateCreated: r.DateCreated,
+			DateUpdated: r.DateUpdated,
 		})
 	}
 	if len(expenses) <= 0 {
 		return nil, errors.New("expenses not found")
 	}
-	return expensesLowerThan, nil
+	return expenses, nil
 }
 
 // MostExpensiveExpense is the resolver for the mostExpensiveExpense field.
 func (r *queryResolver) MostExpensiveExpense(ctx context.Context, ownerID string) (*model.Expense, error) {
-	expense, err := dbHelpers.MostExpensiveExpense(ownerID)
+	data, err := dbHelpers.MostExpensiveExpense(ownerID)
 	if err != nil {
 		return nil, err
 	}
-	response := &model.Expense{
-		ID:          expense.ID,
-		OwnerID:     expense.OwnerID,
-		Name:        expense.Name,
-		Spent:       expense.Spent,
-		DateCreated: expense.DateCreated,
-		DateUpdated: expense.DateUpdated,
+	expense := &model.Expense{
+		ID:          data.ID,
+		OwnerID:     data.OwnerID,
+		Name:        data.Name,
+		Spent:       data.Spent,
+		DateCreated: data.DateCreated,
+		DateUpdated: data.DateUpdated,
 	}
-    // if the response id is empty
-	if response.ID == "" {
+	if expense.ID == "" {
 		return nil, errors.New("There are no expenses")
 	}
-	return response, nil
+	return expense, nil
 }
 
 // LeastExpensiveExpense is the resolver for the leastExpensiveExpense field.
 func (r *queryResolver) LeastExpensiveExpense(ctx context.Context, ownerID string) (*model.Expense, error) {
-	expense, err := dbHelpers.LeastExpensiveExpense(ownerID)
+	data, err := dbHelpers.LeastExpensiveExpense(ownerID)
 	if err != nil {
 		return nil, err
 	}
-	response := &model.Expense{
-		ID:          expense.ID,
-		OwnerID:     expense.OwnerID,
-		Name:        expense.Name,
-		Spent:       expense.Spent,
-		DateCreated: expense.DateCreated,
-		DateUpdated: expense.DateUpdated,
+	expense := &model.Expense{
+		ID:          data.ID,
+		OwnerID:     data.OwnerID,
+		Name:        data.Name,
+		Spent:       data.Spent,
+		DateCreated: data.DateCreated,
+		DateUpdated: data.DateUpdated,
 	}
-    // if the response id is empty
-	if response.ID == "" {
+	if expense.ID == "" {
 		return nil, errors.New("There are no expenses")
 	}
-	return response, nil
+	return expense, nil
 }
 
 // ExpensesFromOwner is the resolver for the expensesFromOwner field.
 func (r *queryResolver) ExpensesFromOwner(ctx context.Context, id string) ([]*model.Expense, error) {
-	expenses, err := dbHelpers.GetExpensesByOwnerId(id)
+	data, err := dbHelpers.GetExpensesByOwnerId(id)
 	if err != nil {
 		return nil, err
 	}
-	var response []*model.Expense
-	for _, expense := range expenses{
-        // if the expense id is empty
-		if expense.ID == "" {
+	var expenses []*model.Expense
+	for _, r := range data {
+		if r.ID == "" {
 			return nil, errors.New("There are no expenses")
 		}
-		response = append(response, &model.Expense{
-			ID:          expense.ID,
-			OwnerID:     expense.OwnerID,
-			Name:        expense.Name,
-			Spent:       expense.Spent,
-			DateCreated: expense.DateCreated,
-			DateUpdated: expense.DateUpdated,
+		expenses = append(expenses, &model.Expense{
+			ID:          r.ID,
+			OwnerID:     r.OwnerID,
+			Name:        r.Name,
+			Spent:       r.Spent,
+			DateCreated: r.DateCreated,
+			DateUpdated: r.DateUpdated,
 		})
 	}
-	return response, nil
+	return expenses, nil
 }
 
 // User is the resolver for the user field.
@@ -268,7 +265,7 @@ func (r *queryResolver) User(ctx context.Context, email string, password string)
 	if err != nil {
 		return nil, err
 	}
-	response := &model.User{
+	data := &model.User{
 		ID:          user.ID,
 		Name:        user.Name,
 		Email:       user.Email,
@@ -277,7 +274,7 @@ func (r *queryResolver) User(ctx context.Context, email string, password string)
 		Username:    user.Username,
 		Password:    user.Password,
 	}
-	return response, nil
+	return data, nil
 }
 
 // Mutation returns MutationResolver implementation.

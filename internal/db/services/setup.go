@@ -15,14 +15,14 @@ func Connect() (helpers.DatabaseType, error) {
 		"password=%s dbname=%s sslmode=disable",
 		helpers.DbInfo.Host, helpers.DbInfo.Port, helpers.DbInfo.User, helpers.DbInfo.Password, helpers.DbInfo.Dbname)
 	fmt.Println("Attempting to connect...")
-	helpers.Db, err = sqlx.Open("postgres", postgresqlDbInfo)
+	helpers.DB, err = sqlx.Open("postgres", postgresqlDbInfo)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	err = helpers.Db.Ping()
+	err = helpers.DB.Ping()
 	if err != nil {
 		log.Fatalln(err)
 	}
 	fmt.Println("Connected!!")
-	return helpers.Db, err
+	return helpers.DB, err
 }

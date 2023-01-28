@@ -8,7 +8,8 @@ import (
 	"fmt"
 	"log"
 	"strings"
-
+    "net/mail"
+    pq "github.com/lib/pq"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/argon2"
 )
@@ -65,33 +66,44 @@ func SignIn(email string, password string) (User, error) {
 	}
 	return user, nil
 }
-func validate(name string, username string, email string, password string) error {
-    var err error
+func validEmailAddress(email string) (string, bool) {
+    addr, err := mail.ParseAddress(email)
+    if err != nil {
+        return "", false
+    }
+    return addr.Address, true
+}
+func validate(name string, username string, email string, password string) (string, error) {
+    email, valid := validEmailAddress(email)
+    if !valid{
+        return "", ErrEmailInvalid
+    }
     if len(name) <= 0 {
-        err = ErrNameTooShort
+        return email, ErrNameTooShort
     } 
     if len(name) >= 30 {
-        err = ErrNameTooLong
+        return email, ErrNameTooLong
     }
     if len(username) <= 2 {
-        err = ErrUsernameTooShort 
+        return email, ErrUsernameTooShort 
     } 
     if len(username) >= 12 {
-        err = ErrUsernameTooLong
+        return email, ErrUsernameTooLong
     }
-    if len(password) <= 8 {
-         err = ErrPasswordTooShort
+    if len(password) < 8 {
+         return email, ErrPasswordTooShort
     } 
     if len(password) >= 20 {
-        err=   ErrPasswordTooLong
+        return email, ErrPasswordTooLong
     }
-    err = nil
-    return err
+    return email,nil
 }
 func SignUp(name string, username string, email string, password string) (User, error) {
 	user := User{}
-    err := validate(name, username, email, password)
-    fmt.Println(err)
+    email, err := validate(name, username, email, password)
+    if err != nil {
+        return user, err
+    }
 	id := uuid.New().String()
 	encodedHash, err := GenerateFromPassword(password, P)
 	if err != nil {
@@ -99,6 +111,9 @@ func SignUp(name string, username string, email string, password string) (User, 
 	}
     _, err = Db.Exec("INSERT INTO users (name, username, email, password, id) VALUES ($1, $2, $3, $4, $5)", name, username, email, encodedHash, id)
     if err != nil {
+        if err, _ := err.(*pq.Error); err.Code == "23505"{
+            return user, ErrEmailAlreadyFound
+        }
         return user, err
     }
     err = Db.Get(&user, "SELECT * FROM users where email=$1", email)

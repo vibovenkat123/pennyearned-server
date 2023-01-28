@@ -234,19 +234,6 @@ func GetUserById(id string) (User, error) {
     err := Db.Get(&user, "SELECT * FROM users where id=$1", id)
 	return user, err
 }
-func UpdateUser(user User) (User, error) {
-    userMap := map[string]interface{}{
-        "name": user.Name,
-        "username": user.Username,
-        "password": user.Password,
-        "email": user.Email,
-    }
-    _, err := Db.NamedExec(`UPDATE users SET name=:name, username=:username, email=:email, password=:password, date_updated=now() WHERE email=:email`, userMap)
-    if err != nil {
-        return user, err
-    }
-    return GetUserById(user.ID)
-}
 func Migrate() {
 	fmt.Println("Migrating...")
 	Db.MustExec(defaultSchema.create)

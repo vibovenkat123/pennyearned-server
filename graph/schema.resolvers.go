@@ -7,7 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
-    "fmt"
+
 	"github.com/vibovenkat123/pennyearned-server/graph/model"
 	dbHelpers "github.com/vibovenkat123/pennyearned-server/internal/db/helpers"
 )
@@ -102,58 +102,6 @@ func (r *mutationResolver) DeleteExpense(ctx context.Context, input model.Delete
 	}
 	if data.ID != input.ID {
 		return nil, errors.New("expense not found")
-	}
-	return data, nil
-}
-
-// UpdateUser is the resolver for the updateUser field.
-func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUser) (*model.User, error) {
-	original, err := dbHelpers.SignIn(input.Email, input.Password)
-	if err != nil {
-        fmt.Println(original)
-		return nil, err
-	}
-    var pass string
-	name := input.Name
-    email := input.NewEmail
-    username := input.Username
-    inputPass := input.NewPass
-	if name == nil {
-		name = &original.Name
-	}
-	if email == nil {
-		email = &original.Email
-	}
-	if inputPass == nil {
-        pass = original.Password
-	} else {
-        pass, err = dbHelpers.GenerateFromPassword(*inputPass, dbHelpers.P)
-        if err != nil {
-            return nil, err
-        }
-    }
-    if username == nil {
-        username = &original.Username
-    }
-	userInput := dbHelpers.User{
-        Name: *name,
-        Password: pass,
-        Email: *email,
-        Username: *username,
-        ID: original.ID,
-	}
-	userInput, err = dbHelpers.UpdateUser(userInput)
-	if err != nil {
-		return nil, err
-	}
-	data := &model.User{
-		ID:          userInput.ID,
-		Name:        userInput.Name,
-		DateCreated: userInput.DateCreated,
-		DateUpdated: userInput.DateUpdated,
-        Username: userInput.Username,
-        Password: userInput.Password,
-        Email: userInput.Email,
 	}
 	return data, nil
 }

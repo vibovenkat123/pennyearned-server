@@ -53,19 +53,10 @@ input UpdateExpenseInput {
     name: String
     spent: Int
 }
-input UpdateUser {
-    name: String
-    username: String
-    password: String!
-    newPass: String
-    email: String!
-    newEmail: String
-}
 type Mutation {
   createUser(input: NewUser!): User
   createExpense(input: NewExpense!): Expense
   updateExpense(input: UpdateExpenseInput!): Expense
   deleteExpense(input: DeleteExpense!): Expense
-  updateUser(input: UpdateUser!): User
 }
 

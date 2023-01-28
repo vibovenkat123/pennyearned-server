@@ -4,6 +4,7 @@ package dbHelpers
 import (
 	"errors"
 	"github.com/jmoiron/sqlx"
+    "fmt"
 )
 
 var (
@@ -20,12 +21,12 @@ var (
 	ErrPassNotMatch        = errors.New("Password is invalid")
 	ErrEmailNotFound       = errors.New("Email not found")
 	ErrAlreadyFound        = errors.New("Email or Username already found")
-	ErrUsernameTooShort    = errors.New("Username is too short")
-	ErrUsernameTooLong     = errors.New("Username is too long")
-	ErrPasswordTooShort    = errors.New("Password is too short")
-	ErrPasswordTooLong     = errors.New("Password is too long")
-	ErrNameTooShort        = errors.New("Name is too short")
-	ErrNameTooLong         = errors.New("Name is too long")
+	ErrUsernameTooShort    = errors.New(fmt.Sprintf("Username must be bigger than %v character(s)", minUsernameLength))
+	ErrUsernameTooLong     = errors.New(fmt.Sprintf("Username must be smaller than %v character(s)", maxUsernameLength))
+	ErrPasswordTooShort    = errors.New(fmt.Sprintf("Password must be bigger than %v character(s)", minPasswordLength))
+	ErrPasswordTooLong     = errors.New(fmt.Sprintf("Password must be smaller than %v character(s)", maxPasswordLength))
+	ErrNameTooShort        = errors.New(fmt.Sprintf("Name must be bigger than %v character(s)", minNameLength))
+	ErrNameTooLong         = errors.New(fmt.Sprintf("Name must be smaller than %v character(s)", maxNameLength))
 	ErrEmailInvalid        = errors.New("Email is invalid")
 )
 

@@ -111,10 +111,10 @@ func validate(name string, username string, email string, password string) (stri
 	if len(username) >= maxUsernameLength {
 		return email, ErrUsernameTooLong
 	}
-	if len(password) <= minUsernameLength {
+	if len(password) <= minPasswordLength{
 		return email, ErrPasswordTooShort
 	}
-	if len(password) >= maxUsernameLength {
+	if len(password) >= maxPasswordLength {
 		return email, ErrPasswordTooLong
 	}
 	return email, nil

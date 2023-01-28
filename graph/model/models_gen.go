@@ -35,6 +35,15 @@ type UpdateExpenseInput struct {
 	Spent   *int    `json:"spent"`
 }
 
+type UpdateUser struct {
+	Name     *string `json:"name"`
+	Username *string `json:"username"`
+	Password string  `json:"password"`
+	NewPass  *string `json:"newPass"`
+	Email    string  `json:"email"`
+	NewEmail *string `json:"newEmail"`
+}
+
 type User struct {
 	ID          string `json:"id"`
 	Name        string `json:"name"`

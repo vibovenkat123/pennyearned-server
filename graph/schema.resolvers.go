@@ -7,7 +7,7 @@ package graph
 import (
 	"context"
 	"errors"
-
+    "fmt"
 	"github.com/vibovenkat123/pennyearned-server/graph/model"
 	dbHelpers "github.com/vibovenkat123/pennyearned-server/internal/db/helpers"
 )
@@ -32,7 +32,10 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 
 // CreateExpense is the resolver for the createExpense field.
 func (r *mutationResolver) CreateExpense(ctx context.Context, input model.NewExpense) (*model.Expense, error) {
-	expense := dbHelpers.NewExpense(input.OwnerID, input.Name, input.Spent)
+	expense, err := dbHelpers.NewExpense(input.OwnerID, input.Name, input.Spent)
+	if err != nil {
+		return nil, err
+	}
 	data := &model.Expense{
 		ID:      expense.ID,
 		OwnerID: expense.OwnerID,
@@ -44,7 +47,10 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.NewExp
 
 // UpdateExpense is the resolver for the updateExpense field.
 func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.UpdateExpenseInput) (*model.Expense, error) {
-	original := dbHelpers.GetExpenseById(input.ID)
+	original, err := dbHelpers.GetExpenseById(input.ID)
+	if err != nil {
+		return nil, err
+	}
 	id := input.ID
 	ownerId := input.OwnerID
 	name := input.Name
@@ -64,7 +70,10 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.Update
 		Spent:   *spent,
 		OwnerID: *ownerId,
 	}
-	expense = dbHelpers.UpdateExpense(expense)
+	expense, err = dbHelpers.UpdateExpense(expense)
+	if err != nil {
+		return nil, err
+	}
 	data := &model.Expense{
 		ID:          expense.ID,
 		OwnerID:     expense.OwnerID,
@@ -81,7 +90,10 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.Update
 
 // DeleteExpense is the resolver for the deleteExpense field.
 func (r *mutationResolver) DeleteExpense(ctx context.Context, input model.DeleteExpense) (*model.Expense, error) {
-	expense := dbHelpers.DeleteExpense(input.ID)
+	expense, err := dbHelpers.DeleteExpense(input.ID)
+	if err != nil {
+		return nil, err
+	}
 	data := &model.Expense{
 		ID:      expense.ID,
 		OwnerID: expense.OwnerID,
@@ -94,10 +106,65 @@ func (r *mutationResolver) DeleteExpense(ctx context.Context, input model.Delete
 	return data, nil
 }
 
+// UpdateUser is the resolver for the updateUser field.
+func (r *mutationResolver) UpdateUser(ctx context.Context, input model.UpdateUser) (*model.User, error) {
+	original, err := dbHelpers.SignIn(input.Email, input.Password)
+	if err != nil {
+        fmt.Println(original)
+		return nil, err
+	}
+    var pass string
+	name := input.Name
+    email := input.NewEmail
+    username := input.Username
+    inputPass := input.NewPass
+	if name == nil {
+		name = &original.Name
+	}
+	if email == nil {
+		email = &original.Email
+	}
+	if inputPass == nil {
+        pass = original.Password
+	} else {
+        pass, err = dbHelpers.GenerateFromPassword(*inputPass, dbHelpers.P)
+        if err != nil {
+            return nil, err
+        }
+    }
+    if username == nil {
+        username = &original.Username
+    }
+	userInput := dbHelpers.User{
+        Name: *name,
+        Password: pass,
+        Email: *email,
+        Username: *username,
+        ID: original.ID,
+	}
+	userInput, err = dbHelpers.UpdateUser(userInput)
+	if err != nil {
+		return nil, err
+	}
+	data := &model.User{
+		ID:          userInput.ID,
+		Name:        userInput.Name,
+		DateCreated: userInput.DateCreated,
+		DateUpdated: userInput.DateUpdated,
+        Username: userInput.Username,
+        Password: userInput.Password,
+        Email: userInput.Email,
+	}
+	return data, nil
+}
+
 // Expenses is the resolver for the expenses field.
 func (r *queryResolver) Expenses(ctx context.Context) ([]*model.Expense, error) {
 	var expenses []*model.Expense
-	data := dbHelpers.GetAllExpenses()
+	data, err := dbHelpers.GetAllExpenses()
+	if err != nil {
+		return nil, err
+	}
 	for _, r := range data {
 		expenses = append(expenses, &model.Expense{
 			ID:          r.ID,
@@ -113,7 +180,10 @@ func (r *queryResolver) Expenses(ctx context.Context) ([]*model.Expense, error) 
 
 // Expense is the resolver for the expense field.
 func (r *queryResolver) Expense(ctx context.Context, id string) (*model.Expense, error) {
-	data := dbHelpers.GetExpenseById(id)
+	data, err := dbHelpers.GetExpenseById(id)
+	if err != nil {
+		return nil, err
+	}
 	expense := &model.Expense{
 		ID:          data.ID,
 		OwnerID:     data.OwnerID,
@@ -131,7 +201,10 @@ func (r *queryResolver) Expense(ctx context.Context, id string) (*model.Expense,
 // ExpensesHigherThan is the resolver for the expensesHigherThan field.
 func (r *queryResolver) ExpensesHigherThan(ctx context.Context, spent int, ownerID string) ([]*model.Expense, error) {
 	var expenses []*model.Expense
-	data := dbHelpers.ExpensesHigherThan(spent, ownerID)
+	data, err := dbHelpers.ExpensesHigherThan(spent, ownerID)
+	if err != nil {
+		return nil, err
+	}
 	for _, r := range data {
 		expenses = append(expenses, &model.Expense{
 			ID:          r.ID,
@@ -151,7 +224,10 @@ func (r *queryResolver) ExpensesHigherThan(ctx context.Context, spent int, owner
 // ExpensesLowerThan is the resolver for the expensesLowerThan field.
 func (r *queryResolver) ExpensesLowerThan(ctx context.Context, spent int, ownerID string) ([]*model.Expense, error) {
 	var expenses []*model.Expense
-	data := dbHelpers.ExpensesLowerThan(spent, ownerID)
+	data, err := dbHelpers.ExpensesLowerThan(spent, ownerID)
+	if err != nil {
+		return nil, err
+	}
 	for _, r := range data {
 		expenses = append(expenses, &model.Expense{
 			ID:          r.ID,
@@ -170,7 +246,10 @@ func (r *queryResolver) ExpensesLowerThan(ctx context.Context, spent int, ownerI
 
 // MostExpensiveExpense is the resolver for the mostExpensiveExpense field.
 func (r *queryResolver) MostExpensiveExpense(ctx context.Context, ownerID string) (*model.Expense, error) {
-	data := dbHelpers.MostExpensiveExpense(ownerID)
+	data, err := dbHelpers.MostExpensiveExpense(ownerID)
+	if err != nil {
+		return nil, err
+	}
 	expense := &model.Expense{
 		ID:          data.ID,
 		OwnerID:     data.OwnerID,
@@ -187,7 +266,10 @@ func (r *queryResolver) MostExpensiveExpense(ctx context.Context, ownerID string
 
 // LeastExpensiveExpense is the resolver for the leastExpensiveExpense field.
 func (r *queryResolver) LeastExpensiveExpense(ctx context.Context, ownerID string) (*model.Expense, error) {
-	data := dbHelpers.LeastExpensiveExpense(ownerID)
+	data, err := dbHelpers.LeastExpensiveExpense(ownerID)
+	if err != nil {
+		return nil, err
+	}
 	expense := &model.Expense{
 		ID:          data.ID,
 		OwnerID:     data.OwnerID,
@@ -204,7 +286,10 @@ func (r *queryResolver) LeastExpensiveExpense(ctx context.Context, ownerID strin
 
 // ExpensesFromOwner is the resolver for the expensesFromOwner field.
 func (r *queryResolver) ExpensesFromOwner(ctx context.Context, id string) ([]*model.Expense, error) {
-	data := dbHelpers.GetExpensesByOwnerId(id)
+	data, err := dbHelpers.GetExpensesByOwnerId(id)
+	if err != nil {
+		return nil, err
+	}
 	var expenses []*model.Expense
 	for _, r := range data {
 		if r.ID == "" {

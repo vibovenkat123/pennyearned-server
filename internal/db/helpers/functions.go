@@ -3,15 +3,17 @@ package dbHelpers
 import (
 	"crypto/rand"
 	"crypto/subtle"
+	"database/sql"
 	"encoding/base64"
 	"fmt"
-	"github.com/google/uuid"
-	"golang.org/x/crypto/argon2"
 	"log"
 	"strings"
+
+	"github.com/google/uuid"
+	"golang.org/x/crypto/argon2"
 )
 
-func generateFromPassword(pwd string, p *params) (encodedHash string, err error) {
+func GenerateFromPassword(pwd string, p *params) (encodedHash string, err error) {
 	salt, err := generateRandomBytes(p.saltLength)
 	if err != nil {
 		return "", err
@@ -37,7 +39,10 @@ func generateRandomBytes(n uint32) ([]byte, error) {
 func SignIn(email string, password string) (User, error) {
 	user := User{}
 	emptyUser := User{}
-	Db.Get(&user, "SELECT * FROM users WHERE email=$1", email)
+    err := Db.Get(&user, "SELECT * FROM users WHERE email=$1", email)
+    if err != nil && err != sql.ErrNoRows {
+        return user, err
+    }
 	if user == emptyUser {
 		return emptyUser, ErrEmailNotFound
 	}
@@ -53,25 +58,51 @@ func SignIn(email string, password string) (User, error) {
 		ID:          user.ID,
 		Name:        user.Name,
 		Username:    user.Username,
-		Password:    password,
+		Password:    user.Password,
 		Email:       user.Email,
 		DateCreated: user.DateCreated,
 		DateUpdated: user.DateUpdated,
 	}
 	return user, nil
 }
+func validate(name string, username string, email string, password string) error {
+    var err error
+    if len(name) <= 0 {
+        err = ErrNameTooShort
+    } 
+    if len(name) >= 30 {
+        err = ErrNameTooLong
+    }
+    if len(username) <= 2 {
+        err = ErrUsernameTooShort 
+    } 
+    if len(username) >= 12 {
+        err = ErrUsernameTooLong
+    }
+    if len(password) <= 8 {
+         err = ErrPasswordTooShort
+    } 
+    if len(password) >= 20 {
+        err=   ErrPasswordTooLong
+    }
+    err = nil
+    return err
+}
 func SignUp(name string, username string, email string, password string) (User, error) {
 	user := User{}
+    err := validate(name, username, email, password)
+    fmt.Println(err)
 	id := uuid.New().String()
-	encodedHash, err := generateFromPassword(password, p)
+	encodedHash, err := GenerateFromPassword(password, P)
 	if err != nil {
 		return user, err
 	}
-	tx := Db.MustBegin()
-	tx.MustExec("INSERT INTO users (name, username, email, password, id) VALUES ($1, $2, $3, $4, $5)", name, username, email, encodedHash, id)
-	tx.Commit()
-	Db.Get(&user, "SELECT * FROM users where email=$1", email)
-	return user, nil
+    _, err = Db.Exec("INSERT INTO users (name, username, email, password, id) VALUES ($1, $2, $3, $4, $5)", name, username, email, encodedHash, id)
+    if err != nil {
+        return user, err
+    }
+    err = Db.Get(&user, "SELECT * FROM users where email=$1", email)
+	return user, err
 }
 func decodeHash(encodedHash string) (p *params, salt, hash []byte, err error) {
 	vals := strings.Split(encodedHash, "$")
@@ -113,20 +144,23 @@ func comparePasswordAndHash(password string, encodedHash string) (matches bool, 
 	if err != nil {
 		return false, err
 	}
-	inputHash := argon2.IDKey([]byte(password), salt, p.iterations, p.memory, p.parallelism, p.keyLength)
+	inputHash := argon2.IDKey([]byte(password), salt, P.iterations, P.memory, P.parallelism, P.keyLength)
 
 	if subtle.ConstantTimeCompare(hash, inputHash) == 1 {
 		return true, nil
 	}
 	return false, nil
 }
-func GetAllExpenses() []Expense {
+func GetAllExpenses() ([]Expense, error) {
 	var expenses []Expense
-	Db.Select(&expenses, "SELECT * FROM expenses ORDER BY date_created ASC")
-	return expenses
+    err := Db.Select(&expenses, "SELECT * FROM expenses ORDER BY date_created ASC")
+	return expenses, err
 }
-func MostExpensiveExpense(ownerid string) Expense {
-	expensesData := GetExpensesByOwnerId(ownerid)
+func MostExpensiveExpense(ownerid string) (Expense, error) {
+	expensesData, err := GetExpensesByOwnerId(ownerid)
+    if err != nil {
+        return Expense{}, err
+    }
 	mostExpensive := expensesData[0].Spent
 	id := expensesData[0].ID
 	for _, i := range expensesData[1:] {
@@ -137,8 +171,11 @@ func MostExpensiveExpense(ownerid string) Expense {
 	}
 	return GetExpenseById(id)
 }
-func LeastExpensiveExpense(ownerid string) Expense {
-	expensesData := GetExpensesByOwnerId(ownerid)
+func LeastExpensiveExpense(ownerid string) (Expense, error) {
+	expensesData, err := GetExpensesByOwnerId(ownerid)
+    if err != nil {
+        return Expense{}, err
+    }
 	leastExpensive := expensesData[0].Spent
 	id := expensesData[0].ID
 	for _, i := range expensesData[1:] {
@@ -149,41 +186,66 @@ func LeastExpensiveExpense(ownerid string) Expense {
 	}
 	return GetExpenseById(id)
 }
-func ExpensesLowerThan(spent int, ownerid string) []Expense {
+func ExpensesLowerThan(spent int, ownerid string) ([]Expense, error) {
 	var expenses []Expense
-	expensesData := GetExpensesByOwnerId(ownerid)
+	expensesData, err := GetExpensesByOwnerId(ownerid)
+    if err != nil {
+        return nil, err
+    }
 	for _, i := range expensesData {
 		if i.Spent < spent {
 			expenses = append(expenses, i)
 		}
 	}
-	return expenses
+	return expenses, nil
 }
-func ExpensesHigherThan(spent int, ownerid string) []Expense {
+func ExpensesHigherThan(spent int, ownerid string) ([]Expense, error) {
 	var expenses []Expense
-	expensesData := GetExpensesByOwnerId(ownerid)
+	expensesData, err := GetExpensesByOwnerId(ownerid)
+    if err != nil {
+        return nil, err
+    }
 	for _, i := range expensesData {
 		if i.Spent > spent {
 			expenses = append(expenses, i)
 		}
 	}
-	return expenses
+	return expenses, nil
 }
-func NewExpense(ownerid string, name string, spent int) Expense {
-	tx := Db.MustBegin()
+func NewExpense(ownerid string, name string, spent int) (Expense, error) {
 	id := uuid.New().String()
-	tx.MustExec("INSERT INTO expenses (owner_id, name, spent, id) VALUES ($1, $2, $3, $4)", ownerid, name, spent, id)
-	tx.Commit()
+    _, err := Db.Exec("INSERT INTO expenses (owner_id, name, spent, id) VALUES ($1, $2, $3, $4)", ownerid, name, spent, id)
+    if err != nil {
+        return Expense{}, err
+    }
 	return GetExpenseById(id)
 }
-func DeleteExpense(id string) Expense {
-	expense := GetExpenseById(id)
+func DeleteExpense(id string) (Expense, error) {
+	expense, err := GetExpenseById(id)
 	Db.MustExec(`DELETE FROM expenses WHERE id=$1`, id)
-	return expense
+	return expense, err
 }
-func UpdateExpense(expense Expense) Expense {
+func UpdateExpense(expense Expense) (Expense, error) {
 	Db.MustExec(`UPDATE expenses SET date_updated=now(), owner_id=$1, name=$2, spent=$3 WHERE id=$4`, expense.OwnerID, expense.Name, expense.Spent, expense.ID)
 	return GetExpenseById(expense.ID)
+}
+func GetUserById(id string) (User, error) {
+	user  := User{}
+    err := Db.Get(&user, "SELECT * FROM users where id=$1", id)
+	return user, err
+}
+func UpdateUser(user User) (User, error) {
+    userMap := map[string]interface{}{
+        "name": user.Name,
+        "username": user.Username,
+        "password": user.Password,
+        "email": user.Email,
+    }
+    _, err := Db.NamedExec(`UPDATE users SET name=:name, username=:username, email=:email, password=:password, date_updated=now() WHERE email=:email`, userMap)
+    if err != nil {
+        return user, err
+    }
+    return GetUserById(user.ID)
 }
 func Migrate() {
 	fmt.Println("Migrating...")
@@ -198,20 +260,20 @@ func ResetToSchema() {
 	ExecMultiple(Db, defaultSchema.alter)
 	fmt.Println("Resetted!!")
 }
-func GetExpenseById(expenseId string) Expense {
+func GetExpenseById(expenseId string) (Expense, error) {
 	expense := Expense{}
-	Db.Get(&expense, "SELECT * FROM expenses where id=$1", expenseId)
-	return expense
+    err := Db.Get(&expense, "SELECT * FROM expenses where id=$1", expenseId)
+	return expense, err
 }
-func GetExpensesByOwnerId(ownerid string) []Expense {
+func GetExpensesByOwnerId(ownerid string) ([]Expense, error) {
 	expenses := []Expense{}
-	Db.Select(&expenses, "SELECT * FROM expenses where owner_id=$1", ownerid)
-	return expenses
+    err := Db.Select(&expenses, "SELECT * FROM expenses where owner_id=$1", ownerid)
+	return expenses, err
 }
-func GetOwnerById(ownerid string) User {
+func GetOwnerById(ownerid string) (User, error) {
 	user := User{}
-	Db.Select(&user, "SELECT * FROM users where _id=$1", ownerid)
-	return user
+    err := Db.Select(&user, "SELECT * FROM users where _id=$1", ownerid)
+	return user, err
 }
 func ExecMultiple(e DatabaseType, query string) {
 	statements := strings.Split(query, "\n")

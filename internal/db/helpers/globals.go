@@ -10,6 +10,12 @@ var (
 	ErrIncompatibleVersion = errors.New("incompatible version of argon2")
 	ErrPassNotMatch        = errors.New("Password is invalid")
 	ErrEmailNotFound       = errors.New("Email is invalid")
+	ErrUsernameTooShort = errors.New("Username is too short")
+	ErrUsernameTooLong = errors.New("Username is too long")
+	ErrPasswordTooShort =  errors.New("Username is too short")
+	ErrPasswordTooLong=  errors.New("Username is too long")
+    ErrNameTooShort = errors.New("Name is too short")
+    ErrNameTooLong = errors.New("Name is too long")
 )
 
 type params struct {
@@ -42,11 +48,10 @@ type User struct {
 	DateCreated string `db:"date_created"`
 	DateUpdated string `db:"date_updated"`
 }
-
 type DatabaseType = *sqlx.DB
 
 var Db DatabaseType
-var p = &params{
+var P = &params{
 	iterations:  3,
 	parallelism: 2,
 	saltLength:  16,

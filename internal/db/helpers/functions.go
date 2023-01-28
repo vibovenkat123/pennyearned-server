@@ -6,12 +6,12 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"fmt"
-	"log"
-	"strings"
-    "net/mail"
-    pq "github.com/lib/pq"
 	"github.com/google/uuid"
+	pq "github.com/lib/pq"
 	"golang.org/x/crypto/argon2"
+	"log"
+	"net/mail"
+	"strings"
 )
 
 func GenerateFromPassword(pwd string, p *params) (encodedHash string, err error) {
@@ -40,10 +40,10 @@ func generateRandomBytes(n uint32) ([]byte, error) {
 func SignIn(email string, password string) (User, error) {
 	user := User{}
 	emptyUser := User{}
-    err := Db.Get(&user, "SELECT * FROM users WHERE email=$1", email)
-    if err != nil && err != sql.ErrNoRows {
-        return user, err
-    }
+	err := Db.Get(&user, "SELECT * FROM users WHERE email=$1", email)
+	if err != nil && err != sql.ErrNoRows {
+		return user, err
+	}
 	if user == emptyUser {
 		return emptyUser, ErrEmailNotFound
 	}
@@ -67,56 +67,56 @@ func SignIn(email string, password string) (User, error) {
 	return user, nil
 }
 func validEmailAddress(email string) (string, bool) {
-    addr, err := mail.ParseAddress(email)
-    if err != nil {
-        return "", false
-    }
-    return addr.Address, true
+	addr, err := mail.ParseAddress(email)
+	if err != nil {
+		return "", false
+	}
+	return addr.Address, true
 }
 func validate(name string, username string, email string, password string) (string, error) {
-    email, valid := validEmailAddress(email)
-    if !valid{
-        return "", ErrEmailInvalid
-    }
-    if len(name) <= 0 {
-        return email, ErrNameTooShort
-    } 
-    if len(name) >= 30 {
-        return email, ErrNameTooLong
-    }
-    if len(username) <= 2 {
-        return email, ErrUsernameTooShort 
-    } 
-    if len(username) >= 12 {
-        return email, ErrUsernameTooLong
-    }
-    if len(password) < 8 {
-         return email, ErrPasswordTooShort
-    } 
-    if len(password) >= 20 {
-        return email, ErrPasswordTooLong
-    }
-    return email,nil
+	email, valid := validEmailAddress(email)
+	if !valid {
+		return "", ErrEmailInvalid
+	}
+	if len(name) <= 0 {
+		return email, ErrNameTooShort
+	}
+	if len(name) >= 30 {
+		return email, ErrNameTooLong
+	}
+	if len(username) <= 2 {
+		return email, ErrUsernameTooShort
+	}
+	if len(username) >= 12 {
+		return email, ErrUsernameTooLong
+	}
+	if len(password) < 8 {
+		return email, ErrPasswordTooShort
+	}
+	if len(password) >= 20 {
+		return email, ErrPasswordTooLong
+	}
+	return email, nil
 }
 func SignUp(name string, username string, email string, password string) (User, error) {
 	user := User{}
-    email, err := validate(name, username, email, password)
-    if err != nil {
-        return user, err
-    }
+	email, err := validate(name, username, email, password)
+	if err != nil {
+		return user, err
+	}
 	id := uuid.New().String()
 	encodedHash, err := GenerateFromPassword(password, P)
 	if err != nil {
 		return user, err
 	}
-    _, err = Db.Exec("INSERT INTO users (name, username, email, password, id) VALUES ($1, $2, $3, $4, $5)", name, username, email, encodedHash, id)
-    if err != nil {
-        if err, _ := err.(*pq.Error); err.Code == "23505"{
-            return user, ErrEmailAlreadyFound
-        }
-        return user, err
-    }
-    err = Db.Get(&user, "SELECT * FROM users where email=$1", email)
+	_, err = Db.Exec("INSERT INTO users (name, username, email, password, id) VALUES ($1, $2, $3, $4, $5)", name, username, email, encodedHash, id)
+	if err != nil {
+		if err, _ := err.(*pq.Error); err.Code == "23505" {
+			return user, ErrEmailAlreadyFound
+		}
+		return user, err
+	}
+	err = Db.Get(&user, "SELECT * FROM users where email=$1", email)
 	return user, err
 }
 func decodeHash(encodedHash string) (p *params, salt, hash []byte, err error) {
@@ -168,14 +168,14 @@ func comparePasswordAndHash(password string, encodedHash string) (matches bool, 
 }
 func GetAllExpenses() ([]Expense, error) {
 	var expenses []Expense
-    err := Db.Select(&expenses, "SELECT * FROM expenses ORDER BY date_created ASC")
+	err := Db.Select(&expenses, "SELECT * FROM expenses ORDER BY date_created ASC")
 	return expenses, err
 }
 func MostExpensiveExpense(ownerid string) (Expense, error) {
 	expensesData, err := GetExpensesByOwnerId(ownerid)
-    if err != nil {
-        return Expense{}, err
-    }
+	if err != nil {
+		return Expense{}, err
+	}
 	mostExpensive := expensesData[0].Spent
 	id := expensesData[0].ID
 	for _, i := range expensesData[1:] {
@@ -188,9 +188,9 @@ func MostExpensiveExpense(ownerid string) (Expense, error) {
 }
 func LeastExpensiveExpense(ownerid string) (Expense, error) {
 	expensesData, err := GetExpensesByOwnerId(ownerid)
-    if err != nil {
-        return Expense{}, err
-    }
+	if err != nil {
+		return Expense{}, err
+	}
 	leastExpensive := expensesData[0].Spent
 	id := expensesData[0].ID
 	for _, i := range expensesData[1:] {
@@ -204,9 +204,9 @@ func LeastExpensiveExpense(ownerid string) (Expense, error) {
 func ExpensesLowerThan(spent int, ownerid string) ([]Expense, error) {
 	var expenses []Expense
 	expensesData, err := GetExpensesByOwnerId(ownerid)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 	for _, i := range expensesData {
 		if i.Spent < spent {
 			expenses = append(expenses, i)
@@ -217,9 +217,9 @@ func ExpensesLowerThan(spent int, ownerid string) ([]Expense, error) {
 func ExpensesHigherThan(spent int, ownerid string) ([]Expense, error) {
 	var expenses []Expense
 	expensesData, err := GetExpensesByOwnerId(ownerid)
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 	for _, i := range expensesData {
 		if i.Spent > spent {
 			expenses = append(expenses, i)
@@ -229,10 +229,10 @@ func ExpensesHigherThan(spent int, ownerid string) ([]Expense, error) {
 }
 func NewExpense(ownerid string, name string, spent int) (Expense, error) {
 	id := uuid.New().String()
-    _, err := Db.Exec("INSERT INTO expenses (owner_id, name, spent, id) VALUES ($1, $2, $3, $4)", ownerid, name, spent, id)
-    if err != nil {
-        return Expense{}, err
-    }
+	_, err := Db.Exec("INSERT INTO expenses (owner_id, name, spent, id) VALUES ($1, $2, $3, $4)", ownerid, name, spent, id)
+	if err != nil {
+		return Expense{}, err
+	}
 	return GetExpenseById(id)
 }
 func DeleteExpense(id string) (Expense, error) {
@@ -245,8 +245,8 @@ func UpdateExpense(expense Expense) (Expense, error) {
 	return GetExpenseById(expense.ID)
 }
 func GetUserById(id string) (User, error) {
-	user  := User{}
-    err := Db.Get(&user, "SELECT * FROM users where id=$1", id)
+	user := User{}
+	err := Db.Get(&user, "SELECT * FROM users where id=$1", id)
 	return user, err
 }
 func Migrate() {
@@ -264,17 +264,17 @@ func ResetToSchema() {
 }
 func GetExpenseById(expenseId string) (Expense, error) {
 	expense := Expense{}
-    err := Db.Get(&expense, "SELECT * FROM expenses where id=$1", expenseId)
+	err := Db.Get(&expense, "SELECT * FROM expenses where id=$1", expenseId)
 	return expense, err
 }
 func GetExpensesByOwnerId(ownerid string) ([]Expense, error) {
 	expenses := []Expense{}
-    err := Db.Select(&expenses, "SELECT * FROM expenses where owner_id=$1", ownerid)
+	err := Db.Select(&expenses, "SELECT * FROM expenses where owner_id=$1", ownerid)
 	return expenses, err
 }
 func GetOwnerById(ownerid string) (User, error) {
 	user := User{}
-    err := Db.Select(&user, "SELECT * FROM users where _id=$1", ownerid)
+	err := Db.Select(&user, "SELECT * FROM users where _id=$1", ownerid)
 	return user, err
 }
 func ExecMultiple(e DatabaseType, query string) {

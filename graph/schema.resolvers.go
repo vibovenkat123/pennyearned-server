@@ -47,7 +47,7 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.NewExp
 
 // UpdateExpense is the resolver for the updateExpense field.
 func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.UpdateExpenseInput) (*model.Expense, error) {
-    // get original expense
+	// get original expense
 	original, err := dbHelpers.GetExpenseById(input.ID)
 	if err != nil {
 		return nil, err
@@ -56,8 +56,8 @@ func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.Update
 	ownerId := input.OwnerID
 	name := input.Name
 	spent := input.Spent
-    // check if the inputs are nil
-    // if they are, set them to the original
+	// check if the inputs are nil
+	// if they are, set them to the original
 	if ownerId == nil {
 		ownerId = &original.OwnerID
 	}
@@ -116,7 +116,7 @@ func (r *queryResolver) Expenses(ctx context.Context) ([]*model.Expense, error) 
 	if err != nil {
 		return nil, err
 	}
-	for _, expense := range expenses{
+	for _, expense := range expenses {
 		response = append(response, &model.Expense{
 			ID:          expense.ID,
 			OwnerID:     expense.OwnerID,
@@ -143,7 +143,7 @@ func (r *queryResolver) Expense(ctx context.Context, id string) (*model.Expense,
 		DateCreated: expense.DateCreated,
 		DateUpdated: expense.DateUpdated,
 	}
-    // if the response id is not the same as the input id
+	// if the response id is not the same as the input id
 	if response.ID != id {
 		return nil, errors.New("expense not found")
 	}
@@ -157,7 +157,7 @@ func (r *queryResolver) ExpensesHigherThan(ctx context.Context, spent int, owner
 	if err != nil {
 		return nil, err
 	}
-	for _, expense := range expenses{
+	for _, expense := range expenses {
 		expensesHigherThan = append(expensesHigherThan, &model.Expense{
 			ID:          expense.ID,
 			OwnerID:     expense.OwnerID,
@@ -180,8 +180,8 @@ func (r *queryResolver) ExpensesLowerThan(ctx context.Context, spent int, ownerI
 	if err != nil {
 		return nil, err
 	}
-	for _, expense := range expenses{
-		expensesLowerThan= append(expensesLowerThan, &model.Expense{
+	for _, expense := range expenses {
+		expensesLowerThan = append(expensesLowerThan, &model.Expense{
 			ID:          expense.ID,
 			OwnerID:     expense.OwnerID,
 			Name:        expense.Name,
@@ -210,7 +210,7 @@ func (r *queryResolver) MostExpensiveExpense(ctx context.Context, ownerID string
 		DateCreated: expense.DateCreated,
 		DateUpdated: expense.DateUpdated,
 	}
-    // if the response id is empty
+	// if the response id is empty
 	if response.ID == "" {
 		return nil, errors.New("There are no expenses")
 	}
@@ -231,7 +231,7 @@ func (r *queryResolver) LeastExpensiveExpense(ctx context.Context, ownerID strin
 		DateCreated: expense.DateCreated,
 		DateUpdated: expense.DateUpdated,
 	}
-    // if the response id is empty
+	// if the response id is empty
 	if response.ID == "" {
 		return nil, errors.New("There are no expenses")
 	}
@@ -245,8 +245,8 @@ func (r *queryResolver) ExpensesFromOwner(ctx context.Context, id string) ([]*mo
 		return nil, err
 	}
 	var response []*model.Expense
-	for _, expense := range expenses{
-        // if the expense id is empty
+	for _, expense := range expenses {
+		// if the expense id is empty
 		if expense.ID == "" {
 			return nil, errors.New("There are no expenses")
 		}

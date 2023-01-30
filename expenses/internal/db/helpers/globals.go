@@ -3,8 +3,10 @@ package dbHelpers
 // globals
 import (
 	"errors"
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
-    "fmt"
+	"github.com/redis/go-redis/v9"
 )
 
 var (
@@ -28,6 +30,8 @@ var (
 	ErrNameTooShort        = errors.New(fmt.Sprintf("Name must be bigger than %v character(s)", minNameLength))
 	ErrNameTooLong         = errors.New(fmt.Sprintf("Name must be smaller than %v character(s)", maxNameLength))
 	ErrEmailInvalid        = errors.New("Email is invalid")
+    ErrExpensesNotFound = errors.New("Expenses not found")
+    ErrExpenseNotFound = errors.New("Expense not found")
 )
 
 type params struct {
@@ -61,7 +65,8 @@ type User struct {
 	DateUpdated string `db:"date_updated"`
 }
 type DatabaseType = *sqlx.DB
-
+type RedisType = *redis.Client
+var RDB RedisType
 var DB DatabaseType
 var P = &params{
 	iterations:  3,

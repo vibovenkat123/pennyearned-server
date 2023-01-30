@@ -5,13 +5,15 @@ import (
 	"net/http"
 	"os"
 
+	database "main/expenses/internal/db/services"
+
+	"main/expenses/graph"
+
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/vibovenkat123/pennyearned-server/graph"
-	database "github.com/vibovenkat123/pennyearned-server/internal/db/services"
 )
 
-const defaultPort = "3000"
+const defaultPort = "4000"
 
 func main() {
 	_, err := database.Connect()

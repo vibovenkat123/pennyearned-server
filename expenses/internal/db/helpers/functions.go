@@ -2,6 +2,8 @@ package dbHelpers
 
 // imports
 import (
+    "time"
+    "context"
 	"crypto/rand"
 	"crypto/subtle"
 	"database/sql"
@@ -121,32 +123,37 @@ func validate(name string, username string, email string, password string) (stri
 }
 
 // sign up
-func SignUp(name string, username string, email string, password string) (User, error) {
+func SignUp(ctx context.Context, name string, username string, email string, password string) (string, error) {
 	user := User{}
-	// validate the email
+	//validate the email
 	email, err := validate(name, username, email, password)
 	if err != nil {
-		return user, err
+		return "", err
 	}
 	// generate random uuid
 	id := uuid.New().String()
 	// has the password
 	encodedHash, err := GenerateFromPassword(password, P)
 	if err != nil {
-		return user, err
+		return "", err
 	}
 	// insert a user
 	_, err = DB.Exec("INSERT INTO users (name, username, email, password, id) VALUES ($1, $2, $3, $4, $5)", name, username, email, encodedHash, id)
 	if err != nil {
 		// if the error is "unique key violation" (email or username already found)
 		if err, _ := err.(*pq.Error); err.Code == "23505" {
-			return user, ErrAlreadyFound
+			return "", ErrAlreadyFound
 		}
-		return user, err
+		return "", err
 	}
 	// get the user
 	err = DB.Get(&user, "SELECT * FROM users where email=$1", email)
-	return user, err
+    sessionID := uuid.New().String()
+    e := RDB.Set(ctx, fmt.Sprintf("session:%v", sessionID), user.ID, 604800*time.Second)
+    if e.Err() != nil {
+        return "", e.Err()
+    }
+	return id, err
 }
 
 // decode the hash
@@ -260,6 +267,9 @@ func ExpensesLowerThan(spent int, ownerid string) ([]Expense, error) {
 			expensesLowerThan = append(expensesLowerThan, curr)
 		}
 	}
+    if len(expenses) <= 0 {
+        return expensesLowerThan, ErrExpensesNotFound
+    }
 	return expensesLowerThan, nil
 }
 
@@ -272,9 +282,12 @@ func ExpensesHigherThan(spent int, ownerid string) ([]Expense, error) {
 	}
 	for _, curr := range expenses {
 		if curr.Spent > spent {
-			expensesHigherThan = append(expenses, curr)
+			expensesHigherThan = append(expensesHigherThan, curr)
 		}
 	}
+    if len(expenses) <= 0 {
+        return expensesHigherThan, ErrExpensesNotFound
+    }
 	return expensesHigherThan, nil
 }
 
@@ -297,13 +310,15 @@ func DeleteExpense(id string) (Expense, error) {
 	_, err = DB.Exec(`DELETE FROM expenses WHERE id=$1`, id)
 	return expense, err
 }
-func UpdateExpense(expense Expense) (Expense, error) {
-	_, err := DB.Exec(`UPDATE expenses SET date_updated=now(), owner_id=$1, name=$2, spent=$3 WHERE id=$4`, expense.OwnerID, expense.Name, expense.Spent, expense.ID)
-	if err != nil {
-		// return empty expense
-		return Expense{}, err
-	}
-	return GetExpenseById(expense.ID)
+func UpdateExpense(input Expense) (string, error) {
+	id := input.ID
+	ownerID := input.OwnerID
+	name := input.Name
+	spent := input.Spent
+	// check if the inputs are nil
+	// if they are, set them to the original
+	_, err := DB.Exec(`UPDATE expenses SET date_updated=now(), owner_id=$1, name=$2, spent=$3 WHERE id=$4`, ownerID, name, spent, id)
+	return id, err
 }
 func GetUserById(id string) (User, error) {
 	user := User{}
@@ -330,11 +345,17 @@ func ResetToSchema() {
 func GetExpenseById(expenseId string) (Expense, error) {
 	expense := Expense{}
 	err := DB.Get(&expense, "SELECT * FROM expenses where id=$1", expenseId)
+    if err == sql.ErrNoRows {
+        return expense, ErrExpenseNotFound
+    }
 	return expense, err
 }
 func GetExpensesByOwnerId(ownerid string) ([]Expense, error) {
 	expenses := []Expense{}
 	err := DB.Select(&expenses, "SELECT * FROM expenses where owner_id=$1", ownerid)
+    if len(expenses) <= 0 || err == sql.ErrNoRows{
+        return expenses, ErrExpensesNotFound
+    }
 	return expenses, err
 }
 func GetOwnerById(ownerid string) (User, error) {

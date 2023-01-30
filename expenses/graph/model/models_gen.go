@@ -44,3 +44,7 @@ type User struct {
 	DateCreated string `json:"dateCreated"`
 	DateUpdated string `json:"dateUpdated"`
 }
+
+type UserResponse struct {
+	Cookie string `json:"cookie"`
+}

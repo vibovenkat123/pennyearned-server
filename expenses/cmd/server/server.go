@@ -1,8 +1,9 @@
 package main
 
 import (
-	dbHelpers "github.com/vibovenkat123/pennyearned-server/internal/db/helpers"
-	database "github.com/vibovenkat123/pennyearned-server/internal/db/services"
+	dbHelpers "main/expenses/internal/db/helpers"
+	database "main/expenses/internal/db/services"
+    api "main/expenses/internal/rest/services"
 )
 
 func main() {
@@ -23,6 +24,7 @@ func main() {
 	dbHelpers.Migrate()
 	// WARNING: THE FOLLOWING LINE WILL
 	// DESTROY: THE DATABASE
-	//    dbHelpers.ResetToSchema()
+//	dbHelpers.ResetToSchema()
 	// expose endpoints
+    api.Expose()
 }

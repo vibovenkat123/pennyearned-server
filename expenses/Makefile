@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := build
 run: 
-	@./scripts/run.sh
+	@./scripts/run.sh $(env)
 build:
 	@./scripts/build.sh
 runbuild:

@@ -8,24 +8,20 @@ import (
 	"context"
 	"errors"
 
-	"github.com/vibovenkat123/pennyearned-server/graph/model"
-	dbHelpers "github.com/vibovenkat123/pennyearned-server/internal/db/helpers"
+	dbHelpers "main/expenses/internal/db/helpers"
+
+	"main/expenses/graph/model"
+
 )
 
 // CreateUser is the resolver for the createUser field.
-func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.User, error) {
-	user, err := dbHelpers.SignUp(input.Name, input.Username, input.Email, input.Password)
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) (*model.UserResponse, error) {
+	user, err := dbHelpers.SignUp(ctx, input.Name, input.Username, input.Email, input.Password)
 	if err != nil {
 		return nil, err
 	}
-	response := &model.User{
-		ID:          user.ID,
-		Name:        user.Name,
-		Email:       user.Email,
-		DateCreated: user.DateCreated,
-		DateUpdated: user.DateUpdated,
-		Username:    user.Username,
-		Password:    user.Password,
+	response := &model.UserResponse{
+		Cookie: user,
 	}
 	return response, nil
 }
@@ -48,47 +44,48 @@ func (r *mutationResolver) CreateExpense(ctx context.Context, input model.NewExp
 // UpdateExpense is the resolver for the updateExpense field.
 func (r *mutationResolver) UpdateExpense(ctx context.Context, input model.UpdateExpenseInput) (*model.Expense, error) {
 	// get original expense
-	original, err := dbHelpers.GetExpenseById(input.ID)
-	if err != nil {
-		return nil, err
-	}
-	id := input.ID
-	ownerId := input.OwnerID
-	name := input.Name
-	spent := input.Spent
-	// check if the inputs are nil
-	// if they are, set them to the original
-	if ownerId == nil {
-		ownerId = &original.OwnerID
-	}
-	if name == nil {
-		name = &original.Name
-	}
-	if spent == nil {
-		spent = &original.Spent
-	}
-	expense := dbHelpers.Expense{
-		ID:      id,
-		Name:    *name,
-		Spent:   *spent,
-		OwnerID: *ownerId,
-	}
-	expense, err = dbHelpers.UpdateExpense(expense)
-	if err != nil {
-		return nil, err
-	}
-	response := &model.Expense{
-		ID:          expense.ID,
-		OwnerID:     expense.OwnerID,
-		Name:        expense.Name,
-		Spent:       expense.Spent,
-		DateCreated: expense.DateCreated,
-		DateUpdated: expense.DateUpdated,
-	}
-	if response.ID != input.ID {
-		return nil, errors.New("expense not found")
-	}
-	return response, nil
+//	original, err := dbHelpers.GetExpenseById(input.ID)
+//	if err != nil {
+//		return nil, err
+//	}
+//	id := input.ID
+//	ownerId := input.OwnerID
+//	name := input.Name
+//	spent := input.Spent
+//	// check if the inputs are nil
+//	// if they are, set them to the original
+//	if ownerId == nil {
+//		ownerId = &original.OwnerID
+//	}
+//	if name == nil {
+//		name = &original.Name
+//	}
+//	if spent == nil {
+//		spent = &original.Spent
+//	}
+//	expense := dbHelpers.Expense{
+//		ID:      id,
+//		Name:    *name,
+//		Spent:   *spent,
+//		OwnerID: *ownerId,
+//	}
+//	expense, err = dbHelpers.UpdateExpense(expense)
+//	if err != nil {
+//		return nil, err
+//	}
+//	response := &model.Expense{
+//		ID:          expense.ID,
+//		OwnerID:     expense.OwnerID,
+//		Name:        expense.Name,
+//		Spent:       expense.Spent,
+//		DateCreated: expense.DateCreated,
+//		DateUpdated: expense.DateUpdated,
+//	}
+//	if response.ID != input.ID {
+//		return nil, errors.New("expense not found")
+//	}
+//	return response, nil
+panic("asdf")
 }
 
 // DeleteExpense is the resolver for the deleteExpense field.
@@ -263,21 +260,17 @@ func (r *queryResolver) ExpensesFromOwner(ctx context.Context, id string) ([]*mo
 }
 
 // User is the resolver for the user field.
-func (r *queryResolver) User(ctx context.Context, email string, password string) (*model.User, error) {
-	user, err := dbHelpers.SignIn(email, password)
-	if err != nil {
-		return nil, err
-	}
-	response := &model.User{
-		ID:          user.ID,
-		Name:        user.Name,
-		Email:       user.Email,
-		DateCreated: user.DateCreated,
-		DateUpdated: user.DateUpdated,
-		Username:    user.Username,
-		Password:    user.Password,
-	}
-	return response, nil
+func (r *queryResolver) User(ctx context.Context, email string, password string) (*model.UserResponse, error) {
+//	response := &model.User{
+//		ID:          user.ID,
+//		Name:        user.Name,
+//		Email:       user.Email,
+//		DateCreated: user.DateCreated,
+//		DateUpdated: user.DateUpdated,
+//		Username:    user.Username,
+//		Password:    user.Password,
+//	}
+	return &model.UserResponse{}, nil
 }
 
 // Mutation returns MutationResolver implementation.

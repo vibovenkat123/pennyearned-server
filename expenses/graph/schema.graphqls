@@ -29,7 +29,7 @@ type Query {
   mostExpensiveExpense(owner_id: String!): Expense
   leastExpensiveExpense(owner_id: String!): Expense
   expensesFromOwner(id: String!): [Expense]
-  user(email: String!, password: String!): User
+  user(email: String!, password: String!): UserResponse
 }
 
 input NewExpense {
@@ -53,8 +53,11 @@ input UpdateExpenseInput {
     name: String
     spent: Int
 }
+type UserResponse {
+    cookie: String!
+}
 type Mutation {
-  createUser(input: NewUser!): User
+  createUser(input: NewUser!): UserResponse
   createExpense(input: NewExpense!): Expense
   updateExpense(input: UpdateExpenseInput!): Expense
   deleteExpense(input: DeleteExpense!): Expense

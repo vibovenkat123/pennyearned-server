@@ -6,4 +6,4 @@ Both the frontend and the backend are in active development
 
 If you have any questions, feel free to contact me at <vibovenkat@gmail.com>
 
-The Frontend Website is at <pennyearned.vercel.app>
+The Frontend Website is at <https://pennyearned.vercel.app>

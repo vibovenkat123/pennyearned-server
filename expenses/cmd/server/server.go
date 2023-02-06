@@ -17,14 +17,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	users := []dbHelpers.User{}
-	ownerid := "8ff0c79d-adeb-482a-9bca-dd7687f5cac3"
-	dbHelpers.DB.Select(&users, "SELECT * FROM users where id=$1", ownerid)
 	// migrate (add columns and tables)
 	dbHelpers.Migrate()
 	// WARNING: THE FOLLOWING LINE WILL
 	// DESTROY: THE DATABASE
-//	dbHelpers.ResetToSchema()
+	// dbHelpers.ResetToSchema()
 	// expose endpoints
     api.Expose()
 }

@@ -1,23 +1,44 @@
 package api
+
 import (
-    "net/http"
-    "main/expenses/internal/rest/services/handlers/expenses"
-    helpers "main/expenses/internal/rest/helpers"
-    "fmt"
-    "log"
+	"fmt"
+	helpers "main/expenses/internal/rest/helpers"
+	"main/expenses/internal/rest/services/handlers/expenses"
+	"net/http"
+	"time"
+
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
     "os"
 )
 func Expose() {
-    logger := log.New(os.Stdout, "", log.Ldate | log.Ltime)
-    mux := http.NewServeMux()
-    mux.HandleFunc(helpers.GetExpenseByIDUrl, expenses.GetByID)
-    mux.HandleFunc(helpers.GetExpensesByOwnerIDUrl, expenses.GetByOwnerID)
-    srv :=  &http.Server{
-        Addr: fmt.Sprintf(":%d", helpers.Port),
-        Handler: mux,
+    if helpers.Err != nil {
+        panic(helpers.Err)
     }
-    logger.Printf("starting %s server on %s", os.Getenv("GO_ENV"), srv.Addr)
-    err := srv.ListenAndServe()
-    logger.Fatal(err)
+    r := chi.NewRouter()
+    r.Use(middleware.RequestID)
+    r.Use(middleware.RealIP)
+    r.Use(middleware.Logger)
+    r.Use(middleware.Recoverer)
+    r.Use(middleware.Timeout(60 * time.Second))
+    r.Route("/expense", expensesRouter)
+    r.Route("/users", userRouter)
+    env := os.Getenv("GO_ENV")
+    fmt.Printf("Starting %v server on port :%v\n", env, helpers.Port)
+    panic(http.ListenAndServe(fmt.Sprintf(":%v", helpers.Port), r))
 }
-
+func userRouter (r chi.Router) {
+    r.Route("/{id}", UserIDRouter)
+}
+func UserIDRouter (r chi.Router) {
+    r.Get("/expenses", expenses.GetByOwnerID)
+}
+func expensesRouter (r chi.Router) {
+    r.Route("/{id}", ExpenseIDRouter)
+    r.Post("/", expenses.NewExpense)
+}
+func ExpenseIDRouter (r chi.Router) {
+    r.Get("/", expenses.GetByID)
+    r.Delete("/", expenses.DeleteExpense)
+    r.Patch("/", expenses.UpdateExpense)
+}

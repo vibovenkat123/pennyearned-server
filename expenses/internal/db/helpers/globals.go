@@ -6,9 +6,10 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/redis/go-redis/v9"
 )
-
+type Response struct {
+    ID string `json:"id"`
+}
 var (
 	minNameLength     = 1
 	maxNameLength     = 20
@@ -65,8 +66,6 @@ type User struct {
 	DateUpdated string `db:"date_updated"`
 }
 type DatabaseType = *sqlx.DB
-type RedisType = *redis.Client
-var RDB RedisType
 var DB DatabaseType
 var P = &params{
 	iterations:  3,

@@ -1,0 +1,15 @@
+version: 'latest'
+
+services:
+  userDatabase:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: G8KYCHYxFdVVfnznNye3EvR3EPWgaBT7E
+      POSTGRES_DB: pennyearned
+    volumes:
+        - userdata:/var/lib/postgresql/data
+    ports:
+      - "54321:5432"
+volumes:
+  userdata:

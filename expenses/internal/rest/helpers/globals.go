@@ -1,10 +1,6 @@
-package apiHelpers;
-var (
-    Port = 3000
-    GetExpenseByIDUrl = "/api/expense/get/"
-    GetExpensesByOwnerIDUrl = "/api/expenses/get/"
+package apiHelpers
+import (
+    "os"
+    "strconv"
 )
-type Error struct {
-    Message string
-    Code int
-}
+var Port, Err = strconv.Atoi(os.Getenv("EXPENSES_PORT"))

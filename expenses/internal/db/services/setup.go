@@ -3,7 +3,6 @@ package db
 import (
 	"fmt"
 	"log"
-    "github.com/redis/go-redis/v9"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	helpers "main/expenses/internal/db/helpers"
@@ -11,16 +10,11 @@ import (
 
 func Connect() (helpers.DatabaseType, error) {
 	var err error
-    helpers.RDB = redis.NewClient(&redis.Options{
-        Addr: "localhost:6379",
-        Password: "Ppo39UTaN5pJnWrDEQtCHf9Mn8ycSnJKG",
-        DB: 0,
-    })
-	postgresqlDbInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+	expensesDBInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
-		helpers.DbInfo.Host, helpers.DbInfo.Port, helpers.DbInfo.User, helpers.DbInfo.Password, helpers.DbInfo.Dbname)
+		helpers.DBInfo.Host, helpers.DBInfo.Port, helpers.DBInfo.User, helpers.DBInfo.Password, helpers.DBInfo.Dbname)
 	fmt.Println("Attempting to connect...")
-	helpers.DB, err = sqlx.Open("postgres", postgresqlDbInfo)
+	helpers.DB, err = sqlx.Open("postgres", expensesDBInfo)
 	if err != nil {
 		log.Fatalln(err)
 	}

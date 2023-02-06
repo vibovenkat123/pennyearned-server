@@ -1,16 +1,16 @@
 version: 'latest'
 
 services:
-  db:
+  expensesDatabase:
     image: postgres
     restart: always
     environment:
       POSTGRES_PASSWORD: YfWLumYuoQfCwZFLyJz8Hc27DxNfsWVfz
       POSTGRES_DB: pennyearned
     volumes:
-        - pgdata:/var/lib/postgresql/data
+        - expensedata:/var/lib/postgresql/data
     ports:
       - "54320:5432"
 volumes:
-  pgdata:
+  expensedata:
 

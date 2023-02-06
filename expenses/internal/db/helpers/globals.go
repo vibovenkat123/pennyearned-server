@@ -7,9 +7,11 @@ import (
 
 	"github.com/jmoiron/sqlx"
 )
+
 type Response struct {
-    ID string `json:"id"`
+	ID string `json:"id"`
 }
+
 var (
 	minNameLength     = 1
 	maxNameLength     = 20
@@ -31,8 +33,8 @@ var (
 	ErrNameTooShort        = errors.New(fmt.Sprintf("Name must be bigger than %v character(s)", minNameLength))
 	ErrNameTooLong         = errors.New(fmt.Sprintf("Name must be smaller than %v character(s)", maxNameLength))
 	ErrEmailInvalid        = errors.New("Email is invalid")
-    ErrExpensesNotFound = errors.New("Expenses not found")
-    ErrExpenseNotFound = errors.New("Expense not found")
+	ErrExpensesNotFound    = errors.New("Expenses not found")
+	ErrExpenseNotFound     = errors.New("Expense not found")
 )
 
 type params struct {
@@ -66,6 +68,7 @@ type User struct {
 	DateUpdated string `db:"date_updated"`
 }
 type DatabaseType = *sqlx.DB
+
 var DB DatabaseType
 var P = &params{
 	iterations:  3,

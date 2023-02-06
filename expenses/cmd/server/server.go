@@ -3,7 +3,7 @@ package main
 import (
 	dbHelpers "main/expenses/internal/db/helpers"
 	database "main/expenses/internal/db/services"
-    api "main/expenses/internal/rest/services"
+	api "main/expenses/internal/rest/services"
 )
 
 func main() {
@@ -23,5 +23,5 @@ func main() {
 	// DESTROY: THE DATABASE
 	// dbHelpers.ResetToSchema()
 	// expose endpoints
-    api.Expose()
+	api.Expose()
 }

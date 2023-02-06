@@ -2,9 +2,9 @@ package db
 
 import (
 	"fmt"
-	"log"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"log"
 	helpers "main/expenses/internal/db/helpers"
 )
 

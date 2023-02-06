@@ -1,8 +1,10 @@
 package dbHelpers
+
 import (
-    "os"
-    "strconv"
+	"os"
+	"strconv"
 )
+
 var port, _ = strconv.Atoi(os.Getenv("EXPENSES_POSTGRES_PORT"))
 var DBInfo = Info{
 	Host:     os.Getenv("EXPENSES_POSTGRES_HOST"),

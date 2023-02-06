@@ -1,4 +1,2 @@
 expenses/bin
 .DS_STORE
-expenses/.env
-auth/.env

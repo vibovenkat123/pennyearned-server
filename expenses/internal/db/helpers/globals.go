@@ -35,6 +35,7 @@ var (
 	ErrEmailInvalid        = errors.New("Email is invalid")
 	ErrExpensesNotFound    = errors.New("Expenses not found")
 	ErrExpenseNotFound     = errors.New("Expense not found")
+    ErrInvalidFormat = errors.New("Invalid format")
 )
 
 type params struct {

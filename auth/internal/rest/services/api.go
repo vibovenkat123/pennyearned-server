@@ -30,6 +30,6 @@ func Expose() {
 func userRouter(r chi.Router) {
 	r.Post("/session", users.SignIn)
 	r.Post("/", users.SignUp)
-    r.Delete("/session/{id}", users.SignOut)
-    r.Get("/{id}", users.GetByCookie)
+	r.Delete("/session/{id}", users.SignOut)
+	r.Get("/{id}", users.GetByCookie)
 }

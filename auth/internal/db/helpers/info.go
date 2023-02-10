@@ -15,7 +15,7 @@ var DBInfo = Info{
 	Dbname:   os.Getenv("USERS_POSTGRES_DATABASE"),
 }
 var RedisInfo = Info{
-    Host: os.Getenv("USERS_REDIS_HOST"),
+	Host:     os.Getenv("USERS_REDIS_HOST"),
 	Port:     redisPort,
 	Password: os.Getenv("USERS_REDIS_PASSWORD"),
 	Dbname:   os.Getenv("USERS_REDIS_DATABASE"),

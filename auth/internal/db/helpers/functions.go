@@ -2,19 +2,20 @@ package dbHelpers
 
 // imports
 import (
-    	"crypto/rand"
+	"context"
+	"crypto/rand"
 	"crypto/subtle"
-    "time"
-    "net/http"
 	"database/sql"
 	"encoding/base64"
 	"fmt"
-	"log"
-	"strings"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/argon2"
-    "context"
+	"log"
+	"net/http"
+	"strings"
+	"time"
 )
+
 func GenerateFromPassword(pwd string, p *params) (encodedHash string, err error) {
 	salt, err := generateRandomBytes(p.saltLength)
 	if err != nil {
@@ -38,28 +39,28 @@ func generateRandomBytes(n uint32) ([]byte, error) {
 
 	return b, nil
 }
-func GetByCookie( cookieID string, ctx context.Context) (string, error){
-    val, err := RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
-    return val, err
+func GetByCookie(cookieID string, ctx context.Context) (string, error) {
+	val, err := RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
+	return val, err
 }
-func SignOut(cookieID string, ctx context.Context) (error) {
-    _, err := RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
-    if err != nil {
-        return err
-    }
-    err = RDB.Del(ctx, fmt.Sprintf("session:%v", cookieID)).Err()
-    if err != nil {
-        return err
-    }
-    return err
+func SignOut(cookieID string, ctx context.Context) error {
+	_, err := RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
+	if err != nil {
+		return err
+	}
+	err = RDB.Del(ctx, fmt.Sprintf("session:%v", cookieID)).Err()
+	if err != nil {
+		return err
+	}
+	return err
 }
 func SignIn(email string, password string, ctx context.Context) (*http.Cookie, error) {
-    user := User{}
-    emptyUser := User{}
-    err := DB.Get(&user, "SELECT * FROM users WHERE email=$1", email)
-    if err != nil && err != sql.ErrNoRows {
-        return nil, err
-    }
+	user := User{}
+	emptyUser := User{}
+	err := DB.Get(&user, "SELECT * FROM users WHERE email=$1", email)
+	if err != nil && err != sql.ErrNoRows {
+		return nil, err
+	}
 	if user == emptyUser {
 		return nil, ErrEmailNotFound
 	}
@@ -71,29 +72,29 @@ func SignIn(email string, password string, ctx context.Context) (*http.Cookie, e
 		err = ErrPassNotMatch
 		return nil, err
 	}
-    expire := 86400 * time.Second
-    expires := time.Now().Add(86400 * time.Second)
-    cookieID := uuid.New().String()
-    cookie := http.Cookie{Name: cookieID, Value: user.ID, Expires: expires}
-    err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), user.ID, expire).Err()
+	expire := 86400 * time.Second
+	expires := time.Now().Add(86400 * time.Second)
+	cookieID := uuid.New().String()
+	cookie := http.Cookie{Name: cookieID, Value: user.ID, Expires: expires}
+	err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), user.ID, expire).Err()
 	return &cookie, err
 }
 func SignUp(name string, username string, email string, password string, ctx context.Context) (*http.Cookie, error) {
-    expire := 86400 * time.Second
-    expires := time.Now().Add(86400 * time.Second)
+	expire := 86400 * time.Second
+	expires := time.Now().Add(86400 * time.Second)
 	id := uuid.New().String()
 	cookieID := uuid.New().String()
-    cookie := http.Cookie{Name: cookieID, Value: id, Expires: expires}
+	cookie := http.Cookie{Name: cookieID, Value: id, Expires: expires}
 	encodedHash, err := GenerateFromPassword(password, P)
 	if err != nil {
-		return nil, err 
+		return nil, err
 	}
-    _, err = DB.Exec("INSERT INTO users (name, username, email, password, id) VALUES ($1, $2, $3, $4, $5)", name, username, email, encodedHash, id)
-    if err != nil {
-        return nil, err
-    }
-    err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), id, expire).Err()
-	return &cookie, err 
+	_, err = DB.Exec("INSERT INTO users (name, username, email, password, id) VALUES ($1, $2, $3, $4, $5)", name, username, email, encodedHash, id)
+	if err != nil {
+		return nil, err
+	}
+	err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), id, expire).Err()
+	return &cookie, err
 }
 func decodeHash(encodedHash string) (p *params, salt, hash []byte, err error) {
 	vals := strings.Split(encodedHash, "$")
@@ -170,4 +171,3 @@ func ExecMultiple(e DatabaseType, query string) {
 		}
 	}
 }
-

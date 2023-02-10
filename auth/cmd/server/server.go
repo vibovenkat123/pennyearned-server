@@ -5,15 +5,16 @@ import (
 	database "main/auth/internal/db/services"
 	api "main/auth/internal/rest/services"
 )
+
 func main() {
 	// connect to database
 	db, dbErr, _, redisErr := database.Connect()
 	if dbErr != nil {
 		panic(dbErr)
 	}
-    if redisErr != nil {
-        panic(redisErr)
-    }
+	if redisErr != nil {
+		panic(redisErr)
+	}
 	// check if we successfully connected
 	dbErr = db.Ping()
 	if dbErr != nil {

@@ -19,16 +19,16 @@ func NewExpense(ownerid string, name string, spent int) (Response, error) {
 	// return expenses
 	return response, err
 }
-func DeleteExpense(id string) (error) {
+func DeleteExpense(id string) error {
 	var err error
 	if _, err := GetExpenseById(id); err != nil {
-		return  err
+		return err
 	}
 	_, err = DB.Exec(`DELETE FROM expenses WHERE id=$1`, id)
 	return err
 }
 func UpdateExpense(id string, name string, spent int) (Response, error) {
-    _, err := DB.Exec(`UPDATE expenses SET date_updated=now(), name=$1, spent=$2 WHERE id=$3`, name, spent, id)
+	_, err := DB.Exec(`UPDATE expenses SET date_updated=now(), name=$1, spent=$2 WHERE id=$3`, name, spent, id)
 	response := Response{
 		ID: id,
 	}

@@ -4,8 +4,8 @@ package dbHelpers
 import (
 	"errors"
 	"fmt"
-    "github.com/jmoiron/sqlx"
-    "github.com/redis/go-redis/v9"
+	"github.com/jmoiron/sqlx"
+	"github.com/redis/go-redis/v9"
 )
 
 type Response struct {
@@ -35,7 +35,7 @@ var (
 	ErrEmailInvalid        = errors.New("Email is invalid")
 	ErrExpensesNotFound    = errors.New("Expenses not found")
 	ErrExpenseNotFound     = errors.New("Expense not found")
-    ErrInvalidFormat = errors.New("Invalid format")
+	ErrInvalidFormat       = errors.New("Invalid format")
 )
 
 type params struct {
@@ -70,6 +70,7 @@ type User struct {
 }
 type DatabaseType = *sqlx.DB
 type RedisType = *redis.Client
+
 var DB DatabaseType
 var RDB RedisType
 var P = &params{

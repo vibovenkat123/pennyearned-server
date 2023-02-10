@@ -8,24 +8,25 @@ import (
 	"net/http"
 	"strconv"
 )
+
 func ErrInvalidFormat(w http.ResponseWriter) {
-    http.Error(w, http.StatusText(400), 400)
-    w.WriteHeader(400)
+	http.Error(w, http.StatusText(400), 400)
+	w.WriteHeader(400)
 }
 func ErrNotFound(w http.ResponseWriter) {
-    http.Error(w, http.StatusText(404), 404)
-    w.WriteHeader(404)
+	http.Error(w, http.StatusText(404), 404)
+	w.WriteHeader(404)
 }
 func GetByID(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	id := chi.URLParam(r, "id")
-    if i, _, _ := expenseFunctions.Validate(&id, nil, nil); !i {
-        ErrInvalidFormat(w)
+	if i, _, _ := expenseFunctions.Validate(&id, nil, nil); !i {
+		ErrInvalidFormat(w)
 		return
 	}
 	expenses, err := dbHelpers.GetExpenseById(id)
 	if err != nil {
-        ErrNotFound(w)
+		ErrNotFound(w)
 		return
 	}
 	encoder.Encode(expenses)
@@ -34,12 +35,13 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	ownerid := chi.URLParam(r, "id")
-	if i, _, _ := expenseFunctions.Validate(&ownerid, nil, nil); !i  { ErrInvalidFormat(w)
+	if i, _, _ := expenseFunctions.Validate(&ownerid, nil, nil); !i {
+		ErrInvalidFormat(w)
 		return
 	}
 	expenses, err := dbHelpers.GetExpensesByOwnerId(ownerid)
 	if err != nil {
-        ErrNotFound(w)
+		ErrNotFound(w)
 		return
 	}
 	encoder.Encode(expenses)
@@ -62,16 +64,16 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 		spent, err = strconv.Atoi(inputSpent)
 		if err != nil {
 			ErrInvalidFormat(w)
-            return
+			return
 		}
 	}
-    if i, n, s := expenseFunctions.Validate(&id, &name, &spent); !i || !n || !s{
-        ErrInvalidFormat(w)
+	if i, n, s := expenseFunctions.Validate(&id, &name, &spent); !i || !n || !s {
+		ErrInvalidFormat(w)
 		return
 	}
 	response, err := dbHelpers.UpdateExpense(id, name, spent)
 	if err != nil {
-        ErrNotFound(w)
+		ErrNotFound(w)
 		return
 	}
 	encoder.Encode(response)
@@ -82,18 +84,18 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	ownerid := r.URL.Query().Get("ownerid")
 	name := r.URL.Query().Get("name")
 	spent, err := strconv.Atoi(r.URL.Query().Get("spent"))
-    if err != nil {
-        ErrInvalidFormat(w)
-        return
-    }
-    i, n, s := expenseFunctions.Validate(&ownerid, &name, &spent)
-    if !i || !n || !s {
-        ErrInvalidFormat(w)
+	if err != nil {
+		ErrInvalidFormat(w)
+		return
+	}
+	i, n, s := expenseFunctions.Validate(&ownerid, &name, &spent)
+	if !i || !n || !s {
+		ErrInvalidFormat(w)
 		return
 	}
 	response, err := dbHelpers.NewExpense(ownerid, name, spent)
 	if err != nil {
-        ErrNotFound(w)
+		ErrNotFound(w)
 		return
 	}
 	encoder.Encode(response)
@@ -101,13 +103,13 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 }
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-    if i, _, _ := expenseFunctions.Validate(&id, nil, nil); !i {
-        ErrInvalidFormat(w)
+	if i, _, _ := expenseFunctions.Validate(&id, nil, nil); !i {
+		ErrInvalidFormat(w)
 		return
 	}
 	err := dbHelpers.DeleteExpense(id)
 	if err != nil {
-        ErrNotFound(w)
+		ErrNotFound(w)
 		return
 	}
 	w.WriteHeader(204)

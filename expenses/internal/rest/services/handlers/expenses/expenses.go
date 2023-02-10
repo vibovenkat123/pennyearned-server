@@ -34,8 +34,7 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	ownerid := chi.URLParam(r, "id")
-	if i, _, _ := expenseFunctions.Validate(&ownerid, nil, nil); !i  {
-        ErrInvalidFormat(w)
+	if i, _, _ := expenseFunctions.Validate(&ownerid, nil, nil); !i  { ErrInvalidFormat(w)
 		return
 	}
 	expenses, err := dbHelpers.GetExpensesByOwnerId(ownerid)
@@ -98,20 +97,18 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	encoder.Encode(response)
-	w.WriteHeader(200)
+	w.WriteHeader(201)
 }
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
-	encoder := json.NewEncoder(w)
 	id := chi.URLParam(r, "id")
     if i, _, _ := expenseFunctions.Validate(&id, nil, nil); !i {
         ErrInvalidFormat(w)
 		return
 	}
-	response, err := dbHelpers.DeleteExpense(id)
+	err := dbHelpers.DeleteExpense(id)
 	if err != nil {
         ErrNotFound(w)
 		return
 	}
-	encoder.Encode(response)
-	w.WriteHeader(200)
+	w.WriteHeader(204)
 }

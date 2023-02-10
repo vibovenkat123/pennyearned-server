@@ -10,6 +10,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"os"
+    "github.com/rs/cors"
 )
 
 func Expose() {
@@ -26,7 +27,8 @@ func Expose() {
 	r.Route("/api/users", userRouter)
 	env := os.Getenv("GO_ENV")
 	fmt.Printf("Starting %v server on port :%v\n", env, helpers.Port)
-	panic(http.ListenAndServe(fmt.Sprintf(":%v", helpers.Port), r))
+    handler := cors.Default().Handler(r)
+	panic(http.ListenAndServe(fmt.Sprintf(":%v", helpers.Port), handler))
 }
 func userRouter(r chi.Router) {
 	r.Route("/{id}", UserIDRouter)

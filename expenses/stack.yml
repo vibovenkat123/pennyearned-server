@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_PASSWORD: ${password}
       POSTGRES_DB: ${name}
-      POSTGRES_URL: ${user}
+      POSTGRES_USER: ${user}
     volumes:
         - expensedata:/var/lib/postgresql/data
     ports:

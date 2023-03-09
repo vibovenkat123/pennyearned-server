@@ -4,8 +4,8 @@ package dbHelpers
 import (
 	"errors"
 	"fmt"
+
 	"github.com/jmoiron/sqlx"
-	"github.com/redis/go-redis/v9"
 )
 
 type Response struct {
@@ -47,9 +47,9 @@ type params struct {
 }
 
 type Schema struct {
-	create string
-	drop   string
-	alter  string
+	Create string
+	Drop   string
+	Alter  string
 }
 type Expense struct {
 	ID          string `db:"id"`
@@ -69,10 +69,8 @@ type User struct {
 	DateUpdated string `db:"date_updated"`
 }
 type DatabaseType = *sqlx.DB
-type RedisType = *redis.Client
 
 var DB DatabaseType
-var RDB RedisType
 var P = &params{
 	iterations:  3,
 	parallelism: 2,

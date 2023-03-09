@@ -2,8 +2,8 @@ package api
 
 import (
 	"fmt"
-	helpers "main/auth/internal/rest/helpers"
-	users "main/auth/internal/rest/services/handlers/users"
+	helpers "main/auth/internal/rest/pkg"
+	users "main/auth/internal/rest/app/handlers/users"
 	"net/http"
 	"time"
 

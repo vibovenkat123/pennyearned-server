@@ -3,7 +3,7 @@ package expenses
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
-	"main/expenses/internal/db/helpers"
+	"main/expenses/internal/db/app"
 	"main/expenses/pkg/expenseFunctions"
 	"net/http"
 	"strconv"
@@ -24,7 +24,7 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w)
 		return
 	}
-	expenses, err := dbHelpers.GetExpenseById(id)
+	expenses, err := db.GetExpenseById(id)
 	if err != nil {
 		ErrNotFound(w)
 		return
@@ -39,7 +39,7 @@ func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w)
 		return
 	}
-	expenses, err := dbHelpers.GetExpensesByOwnerId(ownerid)
+	expenses, err := db.GetExpensesByOwnerId(ownerid)
 	if err != nil {
 		ErrNotFound(w)
 		return
@@ -53,7 +53,7 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	name := r.URL.Query().Get("name")
 	inputSpent := r.URL.Query().Get("spent")
-	original, err := dbHelpers.GetExpenseById(id)
+	original, err := db.GetExpenseById(id)
 	var spent int
 	if len(name) <= 0 {
 		name = original.Name
@@ -71,7 +71,7 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w)
 		return
 	}
-	response, err := dbHelpers.UpdateExpense(id, name, spent)
+	response, err := db.UpdateExpense(id, name, spent)
 	if err != nil {
 		ErrNotFound(w)
 		return
@@ -93,7 +93,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w)
 		return
 	}
-	response, err := dbHelpers.NewExpense(ownerid, name, spent)
+	response, err := db.NewExpense(ownerid, name, spent)
 	if err != nil {
 		ErrNotFound(w)
 		return
@@ -107,7 +107,7 @@ func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w)
 		return
 	}
-	err := dbHelpers.DeleteExpense(id)
+	err := db.DeleteExpense(id)
 	if err != nil {
 		ErrNotFound(w)
 		return

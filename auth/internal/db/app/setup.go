@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	helpers "main/auth/internal/db/helpers"
+    helpers "main/auth/internal/db/pkg"
 	"strconv"
 
 	"github.com/jmoiron/sqlx"

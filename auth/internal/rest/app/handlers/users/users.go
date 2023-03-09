@@ -3,8 +3,8 @@ package users
 import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
-	"main/auth/internal/db/helpers"
-	helpers "main/auth/internal/rest/helpers"
+	"main/auth/internal/db/app"
+	helpers "main/auth/internal/rest/pkg"
 	"main/auth/pkg/userFunctions"
 	"net/http"
 )
@@ -36,7 +36,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
-	cookie, err := dbHelpers.SignIn(email, password, r.Context())
+	cookie, err := db.SignIn(email, password, r.Context())
 	if err != nil {
 		ErrNotFound(w, http.StatusText(404))
 		return
@@ -53,7 +53,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w, http.StatusText(400))
 		return
 	}
-	cookie, err := dbHelpers.SignUp(name, username, email, password, r.Context())
+	cookie, err := db.SignUp(name, username, email, password, r.Context())
 	if err != nil {
 		ErrAlreadyFound(w, http.StatusText(409))
 		return
@@ -64,7 +64,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 func GetByCookie(w http.ResponseWriter, r *http.Request) {
 	cookieID := chi.URLParam(r, "id")
 	encoder := json.NewEncoder(w)
-	val, err := dbHelpers.GetByCookie(cookieID, r.Context())
+	val, err := db.GetByCookie(cookieID, r.Context())
 	if err != nil {
 		ErrNotFound(w, http.StatusText(404))
 		return
@@ -77,7 +77,7 @@ func GetByCookie(w http.ResponseWriter, r *http.Request) {
 }
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	cookieID := chi.URLParam(r, "id")
-	cookie, err := dbHelpers.SignOut(cookieID, r.Context())
+	cookie, err := db.SignOut(cookieID, r.Context())
 	if err != nil {
 		ErrNotFound(w, http.StatusText(404))
 		return

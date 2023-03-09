@@ -1,7 +1,7 @@
 package dbHelpers
 
-var defaultSchema = Schema{
-	create: `
+var DefaultSchema = Schema{
+	Create: `
 CREATE TABLE IF NOT EXISTS expenses (
     id text DEFAULT gen_random_uuid() PRIMARY KEY,
     owner_id text NOT NULL,
@@ -11,10 +11,10 @@ CREATE TABLE IF NOT EXISTS expenses (
     date_updated TIMESTAMP DEFAULT now()
 );`,
 
-	drop: `
+	Drop: `
   DROP TABLE IF EXISTS users CASCADE;
   DROP TABLE IF EXISTS expenses CASCADE;
 `,
-	alter: `
+	Alter: `
 `,
 }

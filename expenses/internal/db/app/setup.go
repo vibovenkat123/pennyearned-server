@@ -5,7 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"log"
-	helpers "main/expenses/internal/db/helpers"
+	helpers "main/expenses/internal/db/pkg"
 )
 
 func Connect() (helpers.DatabaseType, error) {

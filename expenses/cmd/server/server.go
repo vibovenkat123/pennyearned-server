@@ -1,9 +1,8 @@
 package main
 
 import (
-	dbHelpers "main/expenses/internal/db/helpers"
-	database "main/expenses/internal/db/services"
-	api "main/expenses/internal/rest/services"
+	database "main/expenses/internal/db/app"
+	api "main/expenses/internal/rest/app"
 )
 
 func main() {
@@ -18,7 +17,7 @@ func main() {
 		panic(err)
 	}
 	// migrate (add columns and tables)
-	dbHelpers.Migrate()
+	database.Migrate()
 	// WARNING: THE FOLLOWING LINE WILL
 	// DESTROY: THE DATABASE
 	// dbHelpers.ResetToSchema()

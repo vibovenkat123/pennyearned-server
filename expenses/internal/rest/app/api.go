@@ -2,8 +2,8 @@ package api
 
 import (
 	"fmt"
-	helpers "main/expenses/internal/rest/helpers"
-	"main/expenses/internal/rest/services/handlers/expenses"
+	helpers "main/expenses/internal/rest/pkg"
+	"main/expenses/internal/rest/app/handlers/expenses"
 	"net/http"
 	"time"
 

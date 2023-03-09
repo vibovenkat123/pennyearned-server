@@ -4,8 +4,8 @@ package dbHelpers
 import (
 	"errors"
 	"fmt"
-
 	"github.com/jmoiron/sqlx"
+	"github.com/redis/go-redis/v9"
 )
 
 type Response struct {
@@ -38,18 +38,18 @@ var (
 	ErrInvalidFormat       = errors.New("Invalid format")
 )
 
-type params struct {
-	memory      uint32
-	iterations  uint32
-	parallelism uint8
-	saltLength  uint32
-	keyLength   uint32
+type Params struct {
+	Memory      uint32
+	Iterations  uint32
+	Parallelism uint8
+	SaltLength  uint32
+	KeyLength   uint32
 }
 
 type Schema struct {
-	create string
-	drop   string
-	alter  string
+	Create string
+	Drop   string
+	Alter  string
 }
 type Expense struct {
 	ID          string `db:"id"`
@@ -69,14 +69,16 @@ type User struct {
 	DateUpdated string `db:"date_updated"`
 }
 type DatabaseType = *sqlx.DB
+type RedisType = *redis.Client
 
 var DB DatabaseType
-var P = &params{
-	iterations:  3,
-	parallelism: 2,
-	saltLength:  16,
-	memory:      64 * 1024,
-	keyLength:   32,
+var RDB RedisType
+var P = &Params{
+	Iterations:  3,
+	Parallelism: 2,
+	SaltLength:  16,
+	Memory:      64 * 1024,
+	KeyLength:   32,
 }
 
 type Info struct {

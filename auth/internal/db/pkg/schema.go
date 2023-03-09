@@ -1,7 +1,7 @@
 package dbHelpers
 
-var defaultSchema = Schema{
-	create: `
+var DefaultSchema = Schema{
+	Create: `
     CREATE TABLE IF NOT EXISTS users (
         id text DEFAULT gen_random_uuid() PRIMARY KEY,
         name varchar(255) NOT NULL,
@@ -13,10 +13,10 @@ var defaultSchema = Schema{
     );
 `,
 
-	drop: `
+	Drop: `
   DROP TABLE IF EXISTS users CASCADE;
   DROP TABLE IF EXISTS expenses CASCADE;
 `,
-	alter: `
+	Alter: `
 `,
 }

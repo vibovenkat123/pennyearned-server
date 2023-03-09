@@ -44,17 +44,20 @@ func GetByCookie(cookieID string, ctx context.Context) (string, error) {
 	return val, err
 }
 func SignOut(cookieID string, ctx context.Context) (cookie *http.Cookie, err error) {
-    cookie = &http.Cookie{
-        Name:   "user",
-        Value:  "",
-        Path: "/",
-        MaxAge: -1,
-        Expires: time.Now().Add(-100 * time.Hour),
-    }
+	// remove the cookie
+	cookie = &http.Cookie{
+		Name:    "user",
+		Value:   "",
+		Path:    "/",
+		MaxAge:  -1,
+		Expires: time.Now().Add(-100 * time.Hour),
+	}
+	// check if the cookie exists in database
 	_, err = RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
 	if err != nil {
 		return cookie, err
 	}
+	// delete the entry
 	err = RDB.Del(ctx, fmt.Sprintf("session:%v", cookieID)).Err()
 	if err != nil {
 		return cookie, err
@@ -63,38 +66,37 @@ func SignOut(cookieID string, ctx context.Context) (cookie *http.Cookie, err err
 }
 func SignIn(email string, password string, ctx context.Context) (*http.Cookie, error) {
 	user := User{}
-	emptyUser := User{}
 	err := DB.Get(&user, "SELECT * FROM users WHERE email=$1", email)
+	// if the database returns no rows
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
-	if user == emptyUser {
-		return nil, ErrEmailNotFound
-	}
+	// if the password and hash match
 	matches, err := comparePasswordAndHash(password, user.Password)
-	if err != nil {
+	if err != nil || !matches {
+		if !matches {
+			err = ErrPassNotMatch
+		}
 		return nil, err
 	}
-	if !matches {
-		err = ErrPassNotMatch
-		return nil, err
-	}
-    cookie, cookieID, expireTime  := CreateUserCookie()
+	// create the cookie
+	cookie, cookieID, expireTime := CreateUserCookie()
 	err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), user.ID, expireTime).Err()
 	return cookie, err
 }
 func CreateUserCookie() (*http.Cookie, string, time.Duration) {
-    expireTime := 86400 * time.Second
+	expireTime := 86400 * time.Second
 	expires := time.Now().Add(expireTime)
 	cookieID := uuid.New().String()
 	cookie := &http.Cookie{
-        Name: "user", 
-        Value: cookieID, 
-        Expires: expires,
-        Path: "/",
-    }
-    return cookie, cookieID, expireTime
+		Name:    "user",
+		Value:   cookieID,
+		Expires: expires,
+		Path:    "/",
+	}
+	return cookie, cookieID, expireTime
 }
+
 func SignUp(name string, username string, email string, password string, ctx context.Context) (*http.Cookie, error) {
 	id := uuid.New().String()
 	encodedHash, err := GenerateFromPassword(password, P)
@@ -105,7 +107,7 @@ func SignUp(name string, username string, email string, password string, ctx con
 	if err != nil {
 		return nil, err
 	}
-    cookie, cookieID, expireTime  := CreateUserCookie()
+	cookie, cookieID, expireTime := CreateUserCookie()
 	err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), id, expireTime).Err()
 	return cookie, err
 }

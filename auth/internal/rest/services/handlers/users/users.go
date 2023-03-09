@@ -82,6 +82,6 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
-    http.SetCookie(w, cookie)
+	http.SetCookie(w, cookie)
 	SuccessfullyDeleted(w, http.StatusText(204))
 }

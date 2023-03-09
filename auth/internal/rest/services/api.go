@@ -22,7 +22,7 @@ func Expose() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
-	r.Route("/api/users", userRouter)
+	r.Route("/api/user", userRouter)
 	env := os.Getenv("GO_ENV")
 	fmt.Printf("Starting %v server on port :%v\n", env, helpers.Port)
 	panic(http.ListenAndServe(fmt.Sprintf(":%v", helpers.Port), r))

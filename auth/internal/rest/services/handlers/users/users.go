@@ -77,10 +77,11 @@ func GetByCookie(w http.ResponseWriter, r *http.Request) {
 }
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	cookieID := chi.URLParam(r, "id")
-	err := dbHelpers.SignOut(cookieID, r.Context())
+	cookie, err := dbHelpers.SignOut(cookieID, r.Context())
 	if err != nil {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
+    http.SetCookie(w, cookie)
 	SuccessfullyDeleted(w, http.StatusText(204))
 }

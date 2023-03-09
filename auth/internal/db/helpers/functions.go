@@ -43,16 +43,23 @@ func GetByCookie(cookieID string, ctx context.Context) (string, error) {
 	val, err := RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
 	return val, err
 }
-func SignOut(cookieID string, ctx context.Context) error {
-	_, err := RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
+func SignOut(cookieID string, ctx context.Context) (cookie *http.Cookie, err error) {
+    cookie = &http.Cookie{
+        Name:   "user",
+        Value:  "",
+        Path: "/",
+        MaxAge: -1,
+        Expires: time.Now().Add(-100 * time.Hour),
+    }
+	_, err = RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
 	if err != nil {
-		return err
+		return cookie, err
 	}
 	err = RDB.Del(ctx, fmt.Sprintf("session:%v", cookieID)).Err()
 	if err != nil {
-		return err
+		return cookie, err
 	}
-	return err
+	return cookie, err
 }
 func SignIn(email string, password string, ctx context.Context) (*http.Cookie, error) {
 	user := User{}
@@ -72,19 +79,24 @@ func SignIn(email string, password string, ctx context.Context) (*http.Cookie, e
 		err = ErrPassNotMatch
 		return nil, err
 	}
-	expire := 86400 * time.Second
-	expires := time.Now().Add(86400 * time.Second)
+    cookie, cookieID, expireTime  := CreateUserCookie()
+	err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), user.ID, expireTime).Err()
+	return cookie, err
+}
+func CreateUserCookie() (*http.Cookie, string, time.Duration) {
+    expireTime := 86400 * time.Second
+	expires := time.Now().Add(expireTime)
 	cookieID := uuid.New().String()
-	cookie := http.Cookie{Name: cookieID, Value: user.ID, Expires: expires}
-	err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), user.ID, expire).Err()
-	return &cookie, err
+	cookie := &http.Cookie{
+        Name: "user", 
+        Value: cookieID, 
+        Expires: expires,
+        Path: "/",
+    }
+    return cookie, cookieID, expireTime
 }
 func SignUp(name string, username string, email string, password string, ctx context.Context) (*http.Cookie, error) {
-	expire := 86400 * time.Second
-	expires := time.Now().Add(86400 * time.Second)
 	id := uuid.New().String()
-	cookieID := uuid.New().String()
-	cookie := http.Cookie{Name: cookieID, Value: id, Expires: expires}
 	encodedHash, err := GenerateFromPassword(password, P)
 	if err != nil {
 		return nil, err
@@ -93,8 +105,9 @@ func SignUp(name string, username string, email string, password string, ctx con
 	if err != nil {
 		return nil, err
 	}
-	err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), id, expire).Err()
-	return &cookie, err
+    cookie, cookieID, expireTime  := CreateUserCookie()
+	err = RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), id, expireTime).Err()
+	return cookie, err
 }
 func decodeHash(encodedHash string) (p *params, salt, hash []byte, err error) {
 	vals := strings.Split(encodedHash, "$")

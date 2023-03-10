@@ -4,12 +4,19 @@ package db
 import (
 	"database/sql"
 	"fmt"
+	helpers "main/expenses/internal/db/pkg"
+	"strings"
+
 	"github.com/google/uuid"
 	_ "github.com/lib/pq"
-	"log"
-	"strings"
-    helpers "main/expenses/internal/db/pkg"
+	"go.uber.org/zap"
 )
+var Logger *zap.Logger
+
+func InitializeLogger(logger *zap.Logger) {
+	Logger = logger
+}
+
 
 func NewExpense(ownerid string, name string, spent int) (helpers.Response, error) {
 	id := uuid.New().String()
@@ -76,7 +83,9 @@ func ExecMultiple(e helpers.DatabaseType, query string) {
 	for _, s := range statements {
 		_, err := e.Exec(s)
 		if err != nil {
-			log.Fatalln(err)
+			Logger.Error("Error executing statements",
+                zap.Error(err),
+            )
 		}
 	}
 }

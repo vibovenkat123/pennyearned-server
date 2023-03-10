@@ -2,17 +2,25 @@ package api
 
 import (
 	"fmt"
-	helpers "main/expenses/internal/rest/pkg"
 	"main/expenses/internal/rest/app/handlers/expenses"
+	helpers "main/expenses/internal/rest/pkg"
 	"net/http"
 	"time"
-    "log"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
+	"go.uber.org/zap"
 )
+
 var env string
-func Expose() {
+
+func Expose(log *zap.Logger) {
+    if helpers.ConvertErr != nil {
+        log.Error("The port variable is not a valid int",
+            zap.Error(helpers.ConvertErr),
+        )
+    }
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -23,7 +31,7 @@ func Expose() {
 	r.Route("/api/users", userRouter)
 	fmt.Printf("Starting %v server on port :%v\n", env, helpers.Port)
 	handler := cors.Default().Handler(r)
-	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%v", helpers.Port), handler))
+	http.ListenAndServe(fmt.Sprintf(":%v", helpers.Port), handler)
 }
 func userRouter(r chi.Router) {
 	r.Route("/{id}", UserIDRouter)

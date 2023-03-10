@@ -1,7 +1,9 @@
 package dbHelpers
+
 import (
-    "strconv"
+	"strconv"
 )
+
 var envPort string
 var port int
 var envRedisPort string
@@ -15,20 +17,22 @@ var redisPass string
 var redisName string
 var DBInfo Info
 var RedisInfo Info
+var ConvertErr error
+var RedisConvertErr error
 func init() {
-    port, _ = strconv.Atoi(envPort)
-    redisPort, _ = strconv.Atoi(envRedisPort)
-    DBInfo = Info{
-        Host:     dbHost,
-        Port:     port,
-        User:     dbUser, 
-        Password: dbPass,
-        Dbname:   dbName,
-    }
-    RedisInfo = Info{
-        Host:     redisHost,
-        Port:     redisPort,
-        Password: redisPass,
-        Dbname:   redisName,
-    }
+	port, ConvertErr = strconv.Atoi(envPort)
+	redisPort, RedisConvertErr  = strconv.Atoi(envRedisPort)
+	DBInfo = Info{
+		Host:     dbHost,
+		Port:     port,
+		User:     dbUser,
+		Password: dbPass,
+		Dbname:   dbName,
+	}
+	RedisInfo = Info{
+		Host:     redisHost,
+		Port:     redisPort,
+		Password: redisPass,
+		Dbname:   redisName,
+	}
 }

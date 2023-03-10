@@ -1,8 +1,7 @@
 package apiHelpers
 
 import (
-    "strconv"
-    "log"
+	"strconv"
 )
 
 type UserIDRes struct {
@@ -10,11 +9,9 @@ type UserIDRes struct {
 }
 
 var Port int
-var err error
+var ConvertErr error
 var envPort string
+
 func init() {
-    Port, err = strconv.Atoi(envPort)
-    if err != nil {
-        log.Fatalln(err)
-    }
+	Port, ConvertErr = strconv.Atoi(envPort)
 }

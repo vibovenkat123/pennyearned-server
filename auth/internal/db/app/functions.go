@@ -9,14 +9,19 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/argon2"
-	"log"
+	helpers "main/auth/internal/db/pkg"
 	"net/http"
 	"strings"
 	"time"
-    helpers "main/auth/internal/db/pkg"
 )
 
+var log *zap.Logger
+
+func InitializeLogger(logger *zap.Logger) {
+	log = logger
+}
 func GenerateFromPassword(pwd string, p *helpers.Params) (encodedHash string, err error) {
 	salt, err := generateRandomBytes(p.SaltLength)
 	if err != nil {
@@ -183,7 +188,9 @@ func ExecMultiple(e helpers.DatabaseType, query string) {
 	for _, s := range statements {
 		_, err := e.Exec(s)
 		if err != nil {
-			log.Fatalln(err)
+			log.Error("Error executing statements",
+                zap.Error(err),
+            )
 		}
 	}
 }

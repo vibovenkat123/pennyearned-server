@@ -26,7 +26,7 @@ func Initialize() {
 	// migrate (add columns and tables)
 	database.Migrate()
 	// WARNING: THE FOLLOWING LINE WILL DESTROY THE DATABASE
-	// dbHelpers.ResetToSchema()
+	database.ResetToSchema()
 	// expose endpoints
 	api.Expose(Logger)
 }

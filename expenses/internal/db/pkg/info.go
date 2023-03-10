@@ -13,6 +13,7 @@ var dbUser string
 var dbName string
 var dbPass string
 var ConvertErr error
+
 func init() {
 	port, ConvertErr = strconv.Atoi(envPort)
 	DBInfo = Info{

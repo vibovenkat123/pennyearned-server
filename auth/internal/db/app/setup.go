@@ -15,16 +15,16 @@ import (
 var ctx = context.Background()
 
 func Connect(log *zap.Logger) (helpers.DatabaseType, helpers.RedisType) {
-    if helpers.ConvertErr != nil {
-        log.Error("Failed to convert port env to integer for postgres",
-            zap.Error(helpers.ConvertErr),
-        )
-    }
-    if helpers.RedisConvertErr != nil {
-        log.Error("Failed to convert port env to integer for redis",
-            zap.Error(helpers.RedisConvertErr),
-        )
-    }
+	if helpers.ConvertErr != nil {
+		log.Error("Failed to convert port env to integer for postgres",
+			zap.Error(helpers.ConvertErr),
+		)
+	}
+	if helpers.RedisConvertErr != nil {
+		log.Error("Failed to convert port env to integer for redis",
+			zap.Error(helpers.RedisConvertErr),
+		)
+	}
 	rdb, redisErr := ConnectRedis()
 	if redisErr != nil {
 		log.Error("Failed to connect to redis",

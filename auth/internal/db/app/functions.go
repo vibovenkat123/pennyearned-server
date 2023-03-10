@@ -189,8 +189,8 @@ func ExecMultiple(e helpers.DatabaseType, query string) {
 		_, err := e.Exec(s)
 		if err != nil {
 			log.Error("Error executing statements",
-                zap.Error(err),
-            )
+				zap.Error(err),
+			)
 		}
 	}
 }

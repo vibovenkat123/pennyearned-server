@@ -19,9 +19,10 @@ var DBInfo Info
 var RedisInfo Info
 var ConvertErr error
 var RedisConvertErr error
+
 func init() {
 	port, ConvertErr = strconv.Atoi(envPort)
-	redisPort, RedisConvertErr  = strconv.Atoi(envRedisPort)
+	redisPort, RedisConvertErr = strconv.Atoi(envRedisPort)
 	DBInfo = Info{
 		Host:     dbHost,
 		Port:     port,

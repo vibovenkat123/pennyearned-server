@@ -15,11 +15,11 @@ import (
 var env string
 
 func Expose(log *zap.Logger) {
-    if helpers.ConvertErr != nil {
-        log.Error("The port variable is not a valid int",
-            zap.Error(helpers.ConvertErr),
-        )
-    }
+	if helpers.ConvertErr != nil {
+		log.Error("The port variable is not a valid int",
+			zap.Error(helpers.ConvertErr),
+		)
+	}
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)

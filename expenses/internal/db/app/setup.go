@@ -10,11 +10,11 @@ import (
 )
 
 func Connect(log *zap.Logger) (helpers.DatabaseType, error) {
-    if helpers.ConvertErr != nil {
-        log.Error("The port variable is not a valid int",
-            zap.Error(helpers.ConvertErr),
-        )
-    }
+	if helpers.ConvertErr != nil {
+		log.Error("The port variable is not a valid int",
+			zap.Error(helpers.ConvertErr),
+		)
+	}
 	var err error
 	expensesDBInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -22,7 +22,7 @@ func Connect(log *zap.Logger) (helpers.DatabaseType, error) {
 	fmt.Println("Attempting to connect...")
 	helpers.DB, err = sqlx.Open("postgres", expensesDBInfo)
 	if err != nil {
-        return nil, err
+		return nil, err
 	}
 	err = helpers.DB.Ping()
 	if err != nil {

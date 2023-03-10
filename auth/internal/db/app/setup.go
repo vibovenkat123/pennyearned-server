@@ -14,19 +14,34 @@ import (
 
 var ctx = context.Background()
 
-func Connect() (helpers.DatabaseType, error, helpers.RedisType, error) {
-	db, err := ConnectPostgres()
-	rdb, redisErr := ConnectRedis()
-	return db, err, rdb, redisErr
+func Connect() (helpers.DatabaseType, helpers.RedisType) {
+    rdb, redisErr := ConnectRedis()
+    if redisErr != nil {
+        log.Fatalln(redisErr)
+    }
+	db, dbErr := ConnectPostgres()
+    if dbErr != nil {
+        log.Fatalln(dbErr)
+    }
+	return db, rdb 
 }
 func ConnectRedis() (helpers.RedisType, error) {
-	dbNumber, _ := strconv.Atoi(helpers.RedisInfo.Dbname)
+    var dbNumber int
+    var err error
+    if len(helpers.RedisInfo.Dbname) == 0{ 
+        dbNumber = 0
+    } else {
+        dbNumber, err  = strconv.Atoi(helpers.RedisInfo.Dbname)
+        if err != nil {
+            log.Fatalln(err)
+        }
+    }
 	helpers.RDB = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%v:%v", helpers.RedisInfo.Host, helpers.RedisInfo.Port),
 		Password: helpers.RedisInfo.Password,
 		DB:       dbNumber,
 	})
-	err := helpers.RDB.Ping(ctx).Err()
+	err = helpers.RDB.Ping(ctx).Err()
 	return helpers.RDB, err
 }
 func ConnectPostgres() (helpers.DatabaseType, error) {

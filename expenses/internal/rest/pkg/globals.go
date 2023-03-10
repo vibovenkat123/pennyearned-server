@@ -1,8 +1,15 @@
 package apiHelpers
 
 import (
-	"os"
 	"strconv"
+    "log"
 )
-
-var Port, Err = strconv.Atoi(os.Getenv("EXPENSES_PORT"))
+var Port int
+var err error
+var envPort string
+func init() {
+   Port, err = strconv.Atoi(envPort)
+   if err != nil {
+        log.Fatalln(err)
+   }
+}

@@ -3,18 +3,19 @@ package main
 import (
 	database "main/expenses/internal/db/app"
 	api "main/expenses/internal/rest/app"
+    "log"
 )
 
 func main() {
 	// connect to database
 	db, err := database.Connect()
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 	// check if we successfully connected
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 	// migrate (add columns and tables)
 	database.Migrate()

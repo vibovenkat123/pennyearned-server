@@ -3,21 +3,16 @@ package main
 import (
     database "main/auth/internal/db/app"
 	api "main/auth/internal/rest/app"
+    "log"
 )
 
 func main() {
 	// connect to database
-	db, dbErr, _, redisErr := database.Connect()
-	if dbErr != nil {
-		panic(dbErr)
-	}
-	if redisErr != nil {
-		panic(redisErr)
-	}
-	// check if we successfully connected
-	dbErr = db.Ping()
-	if dbErr != nil {
-		panic(dbErr)
+	db, _:= database.Connect()
+    // check if we successfully connected
+    err := db.Ping()
+	if err != nil {
+		log.Fatalln(err)
 	}
 	// migrate (add columns and tables)
 	database.Migrate()

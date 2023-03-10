@@ -6,17 +6,13 @@ import (
 	"main/expenses/internal/rest/app/handlers/expenses"
 	"net/http"
 	"time"
-
+    "log"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
-	"os"
 )
-
+var env string
 func Expose() {
-	if helpers.Err != nil {
-		panic(helpers.Err)
-	}
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -25,10 +21,9 @@ func Expose() {
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Route("/api/expense", expensesRouter)
 	r.Route("/api/users", userRouter)
-	env := os.Getenv("GO_ENV")
 	fmt.Printf("Starting %v server on port :%v\n", env, helpers.Port)
 	handler := cors.Default().Handler(r)
-	panic(http.ListenAndServe(fmt.Sprintf(":%v", helpers.Port), handler))
+	log.Fatalln(http.ListenAndServe(fmt.Sprintf(":%v", helpers.Port), handler))
 }
 func userRouter(r chi.Router) {
 	r.Route("/{id}", UserIDRouter)

@@ -1,15 +1,27 @@
 package dbHelpers
 
 import (
-	"os"
 	"strconv"
+    "log"
 )
-
-var port, _ = strconv.Atoi(os.Getenv("EXPENSES_POSTGRES_PORT"))
-var DBInfo = Info{
-	Host:     os.Getenv("EXPENSES_POSTGRES_HOST"),
-	Port:     port,
-	User:     os.Getenv("EXPENSES_POSTGRES_USER"),
-	Password: os.Getenv("EXPENSES_POSTGRES_PASSWORD"),
-	Dbname:   os.Getenv("EXPENSES_POSTGRES_DATABASE"),
+var dbHost string
+var envPort string
+var port int
+var err error
+var DBInfo Info
+var dbUser string
+var dbName string
+var dbPass string
+func init() {
+    port, err = strconv.Atoi(envPort) 
+    if err != nil {
+        log.Fatalln(err)
+    }
+    DBInfo = Info{
+        Host:     dbHost,
+        Port:     port,
+        User:     dbUser,
+        Password: dbPass,
+        Dbname:   dbName,
+    }
 }

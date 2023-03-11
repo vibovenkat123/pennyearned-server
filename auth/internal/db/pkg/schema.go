@@ -15,7 +15,6 @@ var DefaultSchema = Schema{
 
 	Drop: `
   DROP TABLE IF EXISTS users CASCADE;
-  DROP TABLE IF EXISTS expenses CASCADE;
 `,
 	Alter: `
 `,

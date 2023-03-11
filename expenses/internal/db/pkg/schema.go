@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS expenses (
 );`,
 
 	Drop: `
-  DROP TABLE IF EXISTS users CASCADE;
   DROP TABLE IF EXISTS expenses CASCADE;
 `,
 	Alter: `

@@ -20,7 +20,7 @@ func ErrNotFound(w http.ResponseWriter) {
 func GetByID(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	id := chi.URLParam(r, "id")
-	if i, _, _ := expenseFunctions.Validate(&id, nil, nil); !i {
+	if good := expenseFunctions.ValidateID(id); !good {
 		ErrInvalidFormat(w)
 		return
 	}
@@ -35,7 +35,7 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
 	ownerid := chi.URLParam(r, "id")
-	if i, _, _ := expenseFunctions.Validate(&ownerid, nil, nil); !i {
+	if good := expenseFunctions.ValidateID(ownerid); !good {
 		ErrInvalidFormat(w)
 		return
 	}
@@ -67,7 +67,7 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if i, n, s := expenseFunctions.Validate(&id, &name, &spent); !i || !n || !s {
+	if good := expenseFunctions.Validate(id, name, spent); !good {
 		ErrInvalidFormat(w)
 		return
 	}
@@ -88,8 +88,8 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w)
 		return
 	}
-	i, n, s := expenseFunctions.Validate(&ownerid, &name, &spent)
-	if !i || !n || !s {
+	good := expenseFunctions.Validate(ownerid, name, spent)
+	if !good {
 		ErrInvalidFormat(w)
 		return
 	}
@@ -103,7 +103,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 }
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
-	if i, _, _ := expenseFunctions.Validate(&id, nil, nil); !i {
+	if good := expenseFunctions.ValidateID(id); !good {
 		ErrInvalidFormat(w)
 		return
 	}

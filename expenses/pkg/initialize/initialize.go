@@ -33,5 +33,5 @@ func Initialize() {
 	// DESTROY: THE DATABASE
 	// database.ResetToSchema()
 	// expose endpoints
-	api.Expose(Logger)
+	api.StartAPI(Logger)
 }

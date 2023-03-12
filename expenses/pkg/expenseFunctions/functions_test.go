@@ -7,36 +7,51 @@ import (
 func TestValidate(t *testing.T) {
 	t.Run("Invalid", TestInvalidCases)
 	t.Run("Valid", TestValidCases)
+	t.Run("Invalid Spent", TestInvalidSpentCase)
+	t.Run("Invalid ID", TestInvalidIDCase)
+	t.Run("Invalid Name", TestInvalidNameCase)
 }
 
 func TestValidCases(t *testing.T) {
 	id := "025823d5-0f92-47f9-a182-ff1e79e987d6"
 	name := "bob"
 	spent := 123
-	idIsGood, nameIsGood, spentIsGood := Validate(&id, &name, &spent)
-	if !idIsGood {
-		t.Fatalf(`Validate(nil, *%v, nil) = %t, want  result to be %v"`, name, nameIsGood, true)
-	}
-	if !nameIsGood {
-		t.Fatalf(`Validate(nil, *%v, nil) = %t, want  result to be %v"`, id, idIsGood, true)
-	}
-	if !spentIsGood {
-		t.Fatalf(`Validate(nil, *%v, nil) = %t, want  result to be %v"`, spent, spentIsGood, true)
+	good := Validate(id, name, spent)
+	if !good {
+		t.Fatalf(`Validate() = %t, want  result to be %v"`, good, true)
 	}
 }
 
 func TestInvalidCases(t *testing.T) {
 	wrongName := ""
-	wrongSpent := 1
+	wrongSpent := -1
 	wrongId := "123"
-	idIsGood, nameIsGood, spentIsGood := Validate(&wrongId, &wrongName, &wrongSpent)
-	if idIsGood {
-		t.Fatalf(`Validate(nil, *%v, nil) = %t, want  result to be %v"`, wrongId, idIsGood, false)
+	good := Validate(wrongId, wrongName, wrongSpent)
+	if good {
+		t.Fatalf(`Validate() with wrong cases  = %t, want  result to be %v"`, good, false)
 	}
-	if nameIsGood {
-		t.Fatalf(`Validate(nil, *%v, nil) = %t, want  result to be %v"`, wrongName, nameIsGood, false)
+}
+
+func TestInvalidSpentCase(t *testing.T) {
+	wrongSpent := -1
+	good := ValidateSpent(wrongSpent)
+	if good {
+		t.Fatalf(`ValidateSpent() with wrong spent case returned %t, want  result to be %v"`, good, false)
 	}
-	if spentIsGood {
-		t.Fatalf(`Validate(nil, *%v, nil) = %t, want  result to be %v"`, wrongSpent, spentIsGood, false)
+}
+
+func TestInvalidIDCase(t *testing.T) {
+	wrongID := "123"
+	good := ValidateID(wrongID)
+	if good {
+		t.Fatalf(`ValidateID() with wrong id case returned %t, want  result to be %v"`, good, false)
+	}
+}
+
+func TestInvalidNameCase(t *testing.T) {
+	wrongName := ""
+	good := ValidateName(wrongName)
+	if good {
+		t.Fatalf(`ValidateName() with wrong name case returned %t, want  result to be %v"`, good, false)
 	}
 }

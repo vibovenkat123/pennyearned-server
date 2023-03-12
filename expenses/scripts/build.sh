@@ -7,6 +7,7 @@ postgresPassCommand="main/expenses/internal/db/pkg.dbPass=$EXPENSES_POSTGRES_PAS
 postgresUserCommand="main/expenses/internal/db/pkg.dbUser=$EXPENSES_POSTGRES_USER"
 apiEnvCommand="main/expenses/internal/rest/app.env=$GO_ENV"
 apiPortCommand="main/expenses/internal/rest/pkg.envPort=$EXPENSES_PORT"
-go build -ldflags \
+env GOARCH=amd64 GOOS=linux\
+    go build -ldflags \
     "-X '$postgresPortCommand' -X '$postgresDatabaseCommand' -X '$postgresHostCommand' -X '$postgresPassCommand' -X '$postgresUserCommand' -X '$apiEnvCommand' -X '$apiPortCommand'"\
     -o bin/server cmd/server/server.go

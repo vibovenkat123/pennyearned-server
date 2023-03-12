@@ -1,9 +1,9 @@
-.DEFAULT_GOAL := build
-run: 
-	@./scripts/run.sh $(env)
+all: clean test build
+clean: 
+	@./scripts/clean.sh
+test: 
+	@./scripts/test.sh
 build:
 	@./scripts/build.sh
-runbuild:
-	@./scripts/runbuild.sh
 stack:
 	@./scripts/stack.sh

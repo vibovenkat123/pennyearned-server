@@ -28,5 +28,5 @@ func Initialize() {
 	// WARNING: THE FOLLOWING LINE WILL DESTROY THE DATABASE
 	// database.ResetToSchema()
 	// expose endpoints
-	api.Expose(Logger)
+	api.StartAPI(Logger)
 }

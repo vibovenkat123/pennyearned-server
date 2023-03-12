@@ -1,2 +1,4 @@
 expenses/bin
-.DS_STORE
+**/.DS_Store
+.serverless
+terraform/.terraform

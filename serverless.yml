@@ -1,0 +1,67 @@
+app: pennyearned-dev
+service: pennyearned
+org: vibovenkat
+provider:
+  name: aws
+  runtime: go1.x
+ 
+package:
+  patterns:
+  - '!./**'
+  - './auth/bin/**'
+  - './expenses/bin/**'
+functions:
+  signout:
+    handler: auth/bin/server
+    events:
+      - http: 
+          path: api/user/session/{id}
+          method: delete
+  signup:
+    handler: auth/bin/server
+    events:
+      - http:
+          path: api/user
+          method: post
+  signin:
+    handler: auth/bin/server
+    events:
+      - http:
+          path: api/user/session
+          method: post
+  getuserbycookie:
+    handler: auth/bin/server
+    events:
+      - http:
+          path: api/user/{id}
+          method: get
+  getexpense:
+    handler: expenses/bin/server
+    events:
+      - http:
+          path: api/expense/{id}
+          method: get
+  deleteexpense:
+    handler: expenses/bin/server
+    events:
+      - http:
+          path: api/expense/{id}
+          method: delete
+  updateexpense:
+    handler: expenses/bin/server
+    events:
+      - http:
+          path: api/expense/{id}
+          method: patch 
+  newexpense:
+    handler: expenses/bin/server
+    events:
+      - http:
+          path: api/expense
+          method: post
+  getexpensebyuser:
+    handler: expenses/bin/server
+    events:
+      - http:
+          path: api/user/{id}/expenses
+          method: get

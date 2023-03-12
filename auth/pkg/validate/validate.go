@@ -1,4 +1,4 @@
-package userFunctions
+package validate
 
 import (
 	"net/mail"

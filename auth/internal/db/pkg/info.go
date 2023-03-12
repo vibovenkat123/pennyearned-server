@@ -1,6 +1,7 @@
 package dbHelpers
 
 import (
+	"os"
 	"strconv"
 )
 
@@ -21,6 +22,16 @@ var ConvertErr error
 var RedisConvertErr error
 
 func init() {
+	if os.Getenv("GO_ENV") == "local" {
+		envPort = os.Getenv("USERS_POSTGRES_PORT")
+		dbUser = os.Getenv("USERS_POSTGRES_USER")
+		dbHost = os.Getenv("USERS_POSTGRES_HOST")
+		envRedisPort = os.Getenv("USERS_REDIS_PORT")
+		dbPass = os.Getenv("USERS_POSTGRES_PASSWORD")
+		dbName = os.Getenv("USERS_POSTGRES_DATABASE")
+		redisHost = os.Getenv("USERS_REDIS_HOST")
+		redisPass = os.Getenv("USERS_REDIS_PASSWORD")
+	}
 	port, ConvertErr = strconv.Atoi(envPort)
 	redisPort, RedisConvertErr = strconv.Atoi(envRedisPort)
 	DBInfo = Info{

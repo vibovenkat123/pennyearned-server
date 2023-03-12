@@ -5,7 +5,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"main/auth/internal/db/app"
 	helpers "main/auth/internal/rest/pkg"
-	"main/auth/pkg/userFunctions"
+	"main/auth/pkg/validate"
 	"net/http"
 )
 
@@ -32,7 +32,7 @@ func SuccessfullyDeleted(w http.ResponseWriter, text string) {
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	email := r.URL.Query().Get("email")
 	password := r.URL.Query().Get("password")
-	if !(userFunctions.PasswordCheck(password) && userFunctions.EmailCheck(email)) {
+	if !(validate.PasswordCheck(password) && validate.EmailCheck(email)) {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
@@ -49,7 +49,7 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 	password := r.URL.Query().Get("password")
 	name := r.URL.Query().Get("name")
 	username := r.URL.Query().Get("username")
-	if !userFunctions.Validate(name, username, email, password) {
+	if !validate.Validate(name, username, email, password) {
 		ErrInvalidFormat(w, http.StatusText(400))
 		return
 	}

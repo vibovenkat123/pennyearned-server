@@ -12,6 +12,7 @@ require (
 	github.com/awslabs/aws-lambda-go-api-proxy v0.14.0
 	github.com/go-chi/chi/v5 v5.0.8
 	github.com/google/uuid v1.3.0
+	github.com/rs/cors v1.8.3
 	go.uber.org/zap v1.24.0
 )
 

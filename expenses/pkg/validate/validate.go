@@ -1,4 +1,4 @@
-package expenseFunctions
+package validate
 
 func Validate(id string, name string, spent int) bool {
 	return (ValidateID(id)) && (ValidateName(name)) && (ValidateSpent(spent))
@@ -8,7 +8,7 @@ func ValidateID(id string) bool {
 }
 
 func ValidateName(name string) bool {
-	return len(name) > 0
+	return len(name) > 1 && len(name) < 30
 }
 
 func ValidateSpent(spent int) bool {

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/go-chi/chi/v5"
 	"main/auth/internal/db/app"
-	helpers "main/auth/internal/rest/pkg"
+	globals "main/auth/internal/rest/pkg"
 	"main/auth/pkg/validate"
 	"net/http"
 )
@@ -22,29 +22,34 @@ func ErrAlreadyFound(w http.ResponseWriter, text string) {
 	w.WriteHeader(409)
 }
 func Success(w http.ResponseWriter, text string) {
-	http.Error(w, text, 200)
 	w.WriteHeader(200)
+	w.Write([]byte(text))
 }
 func SuccessfullyDeleted(w http.ResponseWriter, text string) {
-	http.Error(w, text, 204)
 	w.WriteHeader(204)
+	w.Write([]byte(text))
 }
 func SignIn(w http.ResponseWriter, r *http.Request) {
+	encoder := json.NewEncoder(w)
 	email := r.URL.Query().Get("email")
 	password := r.URL.Query().Get("password")
 	if !(validate.PasswordCheck(password) && validate.EmailCheck(email)) {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
-	cookie, err := db.SignIn(email, password, r.Context())
+	accessToken, err := db.SignIn(email, password, r.Context())
 	if err != nil {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
-	http.SetCookie(w, cookie)
+	response := globals.UserAccessRes{
+		AccessToken: *accessToken,
+	}
+	encoder.Encode(response)
 	w.WriteHeader(200)
 }
 func SignUp(w http.ResponseWriter, r *http.Request) {
+	encoder := json.NewEncoder(w)
 	email := r.URL.Query().Get("email")
 	password := r.URL.Query().Get("password")
 	name := r.URL.Query().Get("name")
@@ -53,35 +58,37 @@ func SignUp(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w, http.StatusText(400))
 		return
 	}
-	cookie, err := db.SignUp(name, username, email, password, r.Context())
+	accessToken, err := db.SignUp(name, username, email, password, r.Context())
 	if err != nil {
 		ErrAlreadyFound(w, http.StatusText(409))
 		return
 	}
-	http.SetCookie(w, cookie)
+	response := globals.UserAccessRes{
+		AccessToken: *accessToken,
+	}
+	encoder.Encode(response)
 	w.WriteHeader(201)
 }
 func GetByCookie(w http.ResponseWriter, r *http.Request) {
 	cookieID := chi.URLParam(r, "id")
 	encoder := json.NewEncoder(w)
-	val, err := db.GetByCookie(cookieID, r.Context())
+	val, err := db.GetByAccess(cookieID, r.Context())
 	if err != nil {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
-	res := helpers.UserIDRes{
+	res := globals.UserIDRes{
 		ID: val,
 	}
 	encoder.Encode(res)
 	w.WriteHeader(200)
 }
 func SignOut(w http.ResponseWriter, r *http.Request) {
-	cookieID := chi.URLParam(r, "id")
-	cookie, err := db.SignOut(cookieID, r.Context())
+	accessToken := chi.URLParam(r, "id")
+	err := db.SignOut(accessToken, r.Context())
 	if err != nil {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
-	http.SetCookie(w, cookie)
 	SuccessfullyDeleted(w, http.StatusText(204))
 }

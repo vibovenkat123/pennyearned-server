@@ -12,7 +12,6 @@ import (
 	"go.uber.org/zap"
 	"golang.org/x/crypto/argon2"
 	helpers "main/auth/internal/db/pkg"
-	"net/http"
 	"strings"
 	"time"
 )
@@ -45,34 +44,27 @@ func generateRandomBytes(n uint32) ([]byte, error) {
 
 	return b, nil
 }
-func GetByCookie(cookieID string, ctx context.Context) (string, error) {
-	val, err := helpers.RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
+func GetByAccess(accessToken string, ctx context.Context) (string, error) {
+	val, err := helpers.RDB.Get(ctx, fmt.Sprintf("session:%v", accessToken)).Result()
 	return val, err
 }
-func SignOut(cookieID string, ctx context.Context) (cookie *http.Cookie, err error) {
-	// remove the cookie
-	cookie = &http.Cookie{
-		Name:    "user",
-		Value:   "",
-		Path:    "/",
-		MaxAge:  -1,
-		Expires: time.Now().Add(-100 * time.Hour),
-	}
-	// check if the cookie exists in database
-	_, err = helpers.RDB.Get(ctx, fmt.Sprintf("session:%v", cookieID)).Result()
+func SignOut(accessToken string, ctx context.Context) (err error) {
+	// remove the accessToken
+	// check if the accessToken exists in database
+	_, err = helpers.RDB.Get(ctx, fmt.Sprintf("session:%v", accessToken)).Result()
 	if err != nil {
-		return cookie, err
+		return err
 	}
 	// delete the entry
-	err = helpers.RDB.Del(ctx, fmt.Sprintf("session:%v", cookieID)).Err()
+	err = helpers.RDB.Del(ctx, fmt.Sprintf("session:%v", accessToken)).Err()
 	if err != nil {
-		return cookie, err
+		return err
 	}
-	return cookie, err
+	return err
 }
-func SignIn(email string, password string, ctx context.Context) (*http.Cookie, error) {
+func SignIn(email string, password string, ctx context.Context) (accessToken *string, err error) {
 	user := helpers.User{}
-	err := helpers.DB.Get(&user, "SELECT * FROM users WHERE email=$1", email)
+	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE email=$1", email)
 	// if the database returns no rows
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
@@ -85,25 +77,17 @@ func SignIn(email string, password string, ctx context.Context) (*http.Cookie, e
 		}
 		return nil, err
 	}
-	// create the cookie
-	cookie, cookieID, expireTime := CreateUserCookie()
-	err = helpers.RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), user.ID, expireTime).Err()
-	return cookie, err
+	// create the accessToken
+	accessToken, expireTime := CreateAccessToken()
+	err = helpers.RDB.Set(ctx, fmt.Sprintf("session:%v", *accessToken), user.ID, expireTime).Err()
+	return
 }
-func CreateUserCookie() (*http.Cookie, string, time.Duration) {
-	expireTime := 86400 * time.Second
-	expires := time.Now().Add(expireTime)
-	cookieID := uuid.New().String()
-	cookie := &http.Cookie{
-		Name:    "user",
-		Value:   cookieID,
-		Expires: expires,
-		Path:    "/",
-	}
-	return cookie, cookieID, expireTime
+func CreateAccessToken() (*string, time.Duration) {
+	token := uuid.New().String()
+	accessToken := &token
+	return accessToken, time.Second * 86400
 }
-
-func SignUp(name string, username string, email string, password string, ctx context.Context) (*http.Cookie, error) {
+func SignUp(name string, username string, email string, password string, ctx context.Context) (accessToken *string, err error) {
 	id := uuid.New().String()
 	encodedHash, err := GenerateFromPassword(password, helpers.P)
 	if err != nil {
@@ -113,9 +97,9 @@ func SignUp(name string, username string, email string, password string, ctx con
 	if err != nil {
 		return nil, err
 	}
-	cookie, cookieID, expireTime := CreateUserCookie()
-	err = helpers.RDB.Set(ctx, fmt.Sprintf("session:%v", cookieID), id, expireTime).Err()
-	return cookie, err
+	accessToken, expireTime := CreateAccessToken()
+	err = helpers.RDB.Set(ctx, fmt.Sprintf("session:%v", *accessToken), id, expireTime).Err()
+	return accessToken, err
 }
 func decodeHash(encodedHash string) (p *helpers.Params, salt, hash []byte, err error) {
 	vals := strings.Split(encodedHash, "$")

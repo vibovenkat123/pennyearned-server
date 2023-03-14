@@ -1,16 +1,16 @@
 package validate
 
-func Validate(id string, name string, spent int) bool {
-	return (ValidateID(id)) && (ValidateName(name)) && (ValidateSpent(spent))
+func All(id string, name string, spent int) bool {
+	return (ID(id)) && (Name(name)) && (Spent(spent))
 }
-func ValidateID(id string) bool {
+func ID(id string) bool {
 	return len(id) == 36
 }
 
-func ValidateName(name string) bool {
+func Name(name string) bool {
 	return len(name) > 1 && len(name) < 30
 }
 
-func ValidateSpent(spent int) bool {
+func Spent(spent int) bool {
 	return spent > 0
 }

@@ -1,0 +1,177 @@
+!_TAG_FILE_FORMAT	2
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted/
+!_TAG_PROGRAM_AUTHOR	Joel Stemmer	/stemmertech@gmail.com/
+!_TAG_PROGRAM_NAME	gotags
+!_TAG_PROGRAM_URL	https://github.com/jstemmer/gotags
+!_TAG_PROGRAM_VERSION	1.4.1	/go1.20.1/
+All	pkg/validate/validate.go	3;"	f	access:public	line:3	signature:(id string, name string, spent int)	type:bool
+Alter	internal/db/pkg/globals.go	52;"	w	access:public	ctype:Schema	line:52	type:string
+Connect	internal/db/app/setup.go	12;"	f	access:public	line:12	signature:(log *zap.Logger)	type:helpers.DatabaseType, error
+ConvertErr	internal/db/pkg/info.go	16;"	v	access:public	line:16	type:error
+ConvertErr	internal/rest/pkg/globals.go	9;"	v	access:public	line:9	type:error
+Create	internal/db/pkg/globals.go	50;"	w	access:public	ctype:Schema	line:50	type:string
+DB	internal/db/pkg/globals.go	73;"	v	access:public	line:73	type:DatabaseType
+DBInfo	internal/db/pkg/info.go	12;"	v	access:public	line:12	type:Info
+DatabaseType	internal/db/pkg/globals.go	71;"	t	access:public	line:71	type:*sqlx.DB
+DateCreated	internal/db/pkg/globals.go	59;"	w	access:public	ctype:Expense	line:59	type:string
+DateCreated	internal/db/pkg/globals.go	68;"	w	access:public	ctype:User	line:68	type:string
+DateUpdated	internal/db/pkg/globals.go	60;"	w	access:public	ctype:Expense	line:60	type:string
+DateUpdated	internal/db/pkg/globals.go	69;"	w	access:public	ctype:User	line:69	type:string
+Dbname	internal/db/pkg/globals.go	87;"	w	access:public	ctype:Info	line:87	type:string
+DefaultSchema	internal/db/pkg/schema.go	3;"	v	access:public	line:3
+DeleteExpense	internal/db/app/functions.go	30;"	f	access:public	line:30	signature:(id string)	type:error
+DeleteExpense	internal/rest/app/handlers/expenses/expenses.go	104;"	f	access:public	line:104	signature:(w http.ResponseWriter, r *http.Request)
+Drop	internal/db/pkg/globals.go	51;"	w	access:public	ctype:Schema	line:51	type:string
+Email	internal/db/pkg/globals.go	65;"	w	access:public	ctype:User	line:65	type:string
+ErrAlreadyFound	internal/db/pkg/globals.go	28;"	v	access:public	line:28
+ErrEmailInvalid	internal/db/pkg/globals.go	35;"	v	access:public	line:35
+ErrEmailNotFound	internal/db/pkg/globals.go	27;"	v	access:public	line:27
+ErrExpenseNotFound	internal/db/pkg/globals.go	37;"	v	access:public	line:37
+ErrExpensesNotFound	internal/db/pkg/globals.go	36;"	v	access:public	line:36
+ErrIncompatibleVersion	internal/db/pkg/globals.go	25;"	v	access:public	line:25
+ErrInvalidFormat	internal/db/pkg/globals.go	38;"	v	access:public	line:38
+ErrInvalidFormat	internal/rest/app/handlers/expenses/expenses.go	12;"	f	access:public	line:12	signature:(w http.ResponseWriter)
+ErrInvalidHash	internal/db/pkg/globals.go	24;"	v	access:public	line:24
+ErrNameTooLong	internal/db/pkg/globals.go	34;"	v	access:public	line:34
+ErrNameTooShort	internal/db/pkg/globals.go	33;"	v	access:public	line:33
+ErrNotFound	internal/rest/app/handlers/expenses/expenses.go	16;"	f	access:public	line:16	signature:(w http.ResponseWriter)
+ErrPassNotMatch	internal/db/pkg/globals.go	26;"	v	access:public	line:26
+ErrPasswordTooLong	internal/db/pkg/globals.go	32;"	v	access:public	line:32
+ErrPasswordTooShort	internal/db/pkg/globals.go	31;"	v	access:public	line:31
+ErrUsernameTooLong	internal/db/pkg/globals.go	30;"	v	access:public	line:30
+ErrUsernameTooShort	internal/db/pkg/globals.go	29;"	v	access:public	line:29
+ExecMultiple	internal/db/app/functions.go	78;"	f	access:public	line:78	signature:(e helpers.DatabaseType, query string)
+Expense	internal/db/pkg/globals.go	54;"	t	access:public	line:54	type:struct
+ExpenseIDRouter	internal/rest/app/api.go	69;"	f	access:public	line:69	signature:(r chi.Router)
+Expose	internal/rest/app/api.go	22;"	f	access:public	line:22	signature:(log *zap.Logger, local bool)
+GetByID	internal/rest/app/handlers/expenses/expenses.go	20;"	f	access:public	line:20	signature:(w http.ResponseWriter, r *http.Request)
+GetByOwnerID	internal/rest/app/handlers/expenses/expenses.go	35;"	f	access:public	line:35	signature:(w http.ResponseWriter, r *http.Request)
+GetExpenseById	internal/db/app/functions.go	62;"	f	access:public	line:62	signature:(expenseId string)	type:helpers.Expense, error
+GetExpensesByOwnerId	internal/db/app/functions.go	70;"	f	access:public	line:70	signature:(ownerid string)	type:[]helpers.Expense, error
+Handler	internal/rest/app/api.go	54;"	f	access:public	line:54	signature:(ctx context.Context, req events.APIGatewayProxyRequest)	type:events.APIGatewayProxyResponse, error
+Host	internal/db/pkg/globals.go	83;"	w	access:public	ctype:Info	line:83	type:string
+ID	internal/db/pkg/globals.go	12;"	w	access:public	ctype:Response	line:12	type:string
+ID	internal/db/pkg/globals.go	55;"	w	access:public	ctype:Expense	line:55	type:string
+ID	internal/db/pkg/globals.go	63;"	w	access:public	ctype:User	line:63	type:string
+ID	pkg/validate/validate.go	6;"	f	access:public	line:6	signature:(id string)	type:bool
+Info	internal/db/pkg/globals.go	82;"	t	access:public	line:82	type:struct
+Initialize	pkg/initialize/initialize.go	15;"	f	access:public	line:15	signature:()
+InitializeLogger	internal/db/app/functions.go	17;"	f	access:public	line:17	signature:(logger *zap.Logger)
+Local	internal/rest/pkg/globals.go	11;"	v	access:public	line:11	type:bool
+Logger	internal/db/app/functions.go	15;"	v	access:public	line:15	type:*zap.Logger
+Logger	pkg/initialize/initialize.go	9;"	v	access:public	line:9	type:*zap.Logger
+Migrate	internal/db/app/functions.go	47;"	f	access:public	line:47	signature:()
+Name	internal/db/pkg/globals.go	57;"	w	access:public	ctype:Expense	line:57	type:string
+Name	internal/db/pkg/globals.go	64;"	w	access:public	ctype:User	line:64	type:string
+Name	pkg/validate/validate.go	10;"	f	access:public	line:10	signature:(name string)	type:bool
+NewExpense	internal/db/app/functions.go	21;"	f	access:public	line:21	signature:(ownerid string, name string, spent int)	type:helpers.Response, error
+NewExpense	internal/rest/app/handlers/expenses/expenses.go	82;"	f	access:public	line:82	signature:(w http.ResponseWriter, r *http.Request)
+OwnerID	internal/db/pkg/globals.go	56;"	w	access:public	ctype:Expense	line:56	type:string
+P	internal/db/pkg/globals.go	74;"	v	access:public	line:74
+Password	internal/db/pkg/globals.go	67;"	w	access:public	ctype:User	line:67	type:string
+Password	internal/db/pkg/globals.go	86;"	w	access:public	ctype:Info	line:86	type:string
+Port	internal/db/pkg/globals.go	84;"	w	access:public	ctype:Info	line:84	type:int
+Port	internal/rest/pkg/globals.go	8;"	v	access:public	line:8	type:int
+ResetToSchema	internal/db/app/functions.go	55;"	f	access:public	line:55	signature:()
+Response	internal/db/pkg/globals.go	11;"	t	access:public	line:11	type:struct
+Schema	internal/db/pkg/globals.go	49;"	t	access:public	line:49	type:struct
+Spent	internal/db/pkg/globals.go	58;"	w	access:public	ctype:Expense	line:58	type:int
+Spent	pkg/validate/validate.go	14;"	f	access:public	line:14	signature:(spent int)	type:bool
+StartAPI	internal/rest/app/api.go	47;"	f	access:public	line:47	signature:(log *zap.Logger)
+TestInvalidCases	pkg/validate/validate_test.go	22;"	f	access:public	line:22	signature:(t *testing.T)
+TestInvalidID	pkg/validate/validate_test.go	36;"	f	access:public	line:36	signature:(t *testing.T)
+TestInvalidName	pkg/validate/validate_test.go	44;"	f	access:public	line:44	signature:(t *testing.T)
+TestInvalidSpent	pkg/validate/validate_test.go	28;"	f	access:public	line:28	signature:(t *testing.T)
+TestNameTooLong	pkg/validate/validate_test.go	48;"	f	access:public	line:48	signature:(t *testing.T)
+TestNameTooShort	pkg/validate/validate_test.go	55;"	f	access:public	line:55	signature:(t *testing.T)
+TestValidCases	pkg/validate/validate_test.go	12;"	f	access:public	line:12	signature:(t *testing.T)
+TestValidate	pkg/validate/validate_test.go	7;"	f	access:public	line:7	signature:(t *testing.T)
+UpdateExpense	internal/db/app/functions.go	38;"	f	access:public	line:38	signature:(id string, name string, spent int)	type:helpers.Response, error
+UpdateExpense	internal/rest/app/handlers/expenses/expenses.go	51;"	f	access:public	line:51	signature:(w http.ResponseWriter, r *http.Request)
+User	internal/db/pkg/globals.go	62;"	t	access:public	line:62	type:struct
+User	internal/db/pkg/globals.go	85;"	w	access:public	ctype:Info	line:85	type:string
+UserIDRouter	internal/rest/app/api.go	62;"	f	access:public	line:62	signature:(r chi.Router)
+Username	internal/db/pkg/globals.go	66;"	w	access:public	ctype:User	line:66	type:string
+adapter	internal/rest/app/api.go	20;"	v	access:private	line:20	type:*chiadapter.ChiLambda
+api	internal/rest/app/api.go	1;"	p	line:1
+apiHelpers	internal/rest/pkg/globals.go	1;"	p	line:1
+context	internal/rest/app/api.go	4;"	i	line:4
+database/sql	internal/db/app/functions.go	5;"	i	line:5
+db	internal/db/app/functions.go	1;"	p	line:1
+db	internal/db/app/setup.go	1;"	p	line:1
+dbHelpers	internal/db/pkg/globals.go	1;"	p	line:1
+dbHelpers	internal/db/pkg/info.go	1;"	p	line:1
+dbHelpers	internal/db/pkg/schema.go	1;"	p	line:1
+dbHost	internal/db/pkg/info.go	8;"	v	access:private	line:8	type:string
+dbName	internal/db/pkg/info.go	14;"	v	access:private	line:14	type:string
+dbPass	internal/db/pkg/info.go	15;"	v	access:private	line:15	type:string
+dbUser	internal/db/pkg/info.go	13;"	v	access:private	line:13	type:string
+encoding/json	internal/rest/app/handlers/expenses/expenses.go	4;"	i	line:4
+env	internal/rest/app/api.go	19;"	v	access:private	line:19	type:string
+envPort	internal/db/pkg/info.go	9;"	v	access:private	line:9	type:string
+envPort	internal/rest/pkg/globals.go	10;"	v	access:private	line:10	type:string
+err	internal/db/pkg/info.go	11;"	v	access:private	line:11	type:error
+errors	internal/db/pkg/globals.go	5;"	i	line:5
+expenses	internal/rest/app/handlers/expenses/expenses.go	1;"	p	line:1
+expensesRouter	internal/rest/app/api.go	65;"	f	access:private	line:65	signature:(r chi.Router)
+fmt	internal/db/app/functions.go	6;"	i	line:6
+fmt	internal/db/app/setup.go	4;"	i	line:4
+fmt	internal/db/pkg/globals.go	6;"	i	line:6
+fmt	internal/rest/app/api.go	5;"	i	line:5
+github.com/aws/aws-lambda-go/events	internal/rest/app/api.go	6;"	i	line:6
+github.com/aws/aws-lambda-go/lambda	internal/rest/app/api.go	7;"	i	line:7
+github.com/awslabs/aws-lambda-go-api-proxy/chi	internal/rest/app/api.go	8;"	i	line:8
+github.com/go-chi/chi/v5	internal/rest/app/api.go	9;"	i	line:9
+github.com/go-chi/chi/v5	internal/rest/app/handlers/expenses/expenses.go	5;"	i	line:5
+github.com/go-chi/chi/v5/middleware	internal/rest/app/api.go	10;"	i	line:10
+github.com/google/uuid	internal/db/app/functions.go	10;"	i	line:10
+github.com/jmoiron/sqlx	internal/db/app/setup.go	7;"	i	line:7
+github.com/jmoiron/sqlx	internal/db/pkg/globals.go	8;"	i	line:8
+github.com/lib/pq	internal/db/app/functions.go	11;"	i	line:11
+github.com/lib/pq	internal/db/app/setup.go	8;"	i	line:8
+github.com/rs/cors	internal/rest/app/api.go	11;"	i	line:11
+go.uber.org/zap	internal/db/app/functions.go	12;"	i	line:12
+go.uber.org/zap	internal/db/app/setup.go	9;"	i	line:9
+go.uber.org/zap	internal/rest/app/api.go	12;"	i	line:12
+go.uber.org/zap	pkg/initialize/initialize.go	4;"	i	line:4
+init	internal/db/pkg/info.go	18;"	f	access:private	line:18	signature:()
+init	internal/rest/pkg/globals.go	13;"	f	access:private	line:13	signature:()
+init	pkg/initialize/initialize.go	11;"	f	access:private	line:11	signature:()
+initialize	pkg/initialize/initialize.go	1;"	p	line:1
+iterations	internal/db/pkg/globals.go	43;"	w	access:private	ctype:params	line:43	type:uint32
+keyLength	internal/db/pkg/globals.go	46;"	w	access:private	ctype:params	line:46	type:uint32
+main	cmd/server/server.go	1;"	p	line:1
+main	cmd/server/server.go	7;"	f	access:private	line:7	signature:()
+main/expenses/internal/db/app	internal/rest/app/handlers/expenses/expenses.go	6;"	i	line:6
+main/expenses/internal/db/app	pkg/initialize/initialize.go	5;"	i	line:5
+main/expenses/internal/db/pkg	internal/db/app/functions.go	7;"	i	line:7
+main/expenses/internal/db/pkg	internal/db/app/setup.go	5;"	i	line:5
+main/expenses/internal/rest/app	pkg/initialize/initialize.go	6;"	i	line:6
+main/expenses/internal/rest/app/handlers/expenses	internal/rest/app/api.go	13;"	i	line:13
+main/expenses/internal/rest/pkg	internal/rest/app/api.go	14;"	i	line:14
+main/expenses/pkg/initialize	cmd/server/server.go	4;"	i	line:4
+main/expenses/pkg/validate	internal/rest/app/handlers/expenses/expenses.go	7;"	i	line:7
+maxNameLength	internal/db/pkg/globals.go	17;"	v	access:private	line:17
+maxPasswordLength	internal/db/pkg/globals.go	21;"	v	access:private	line:21
+maxUsernameLength	internal/db/pkg/globals.go	19;"	v	access:private	line:19
+memory	internal/db/pkg/globals.go	42;"	w	access:private	ctype:params	line:42	type:uint32
+minNameLength	internal/db/pkg/globals.go	16;"	v	access:private	line:16
+minPasswordLength	internal/db/pkg/globals.go	20;"	v	access:private	line:20
+minUsernameLength	internal/db/pkg/globals.go	18;"	v	access:private	line:18
+net/http	internal/rest/app/api.go	15;"	i	line:15
+net/http	internal/rest/app/handlers/expenses/expenses.go	8;"	i	line:8
+os	internal/db/pkg/info.go	4;"	i	line:4
+os	internal/rest/pkg/globals.go	4;"	i	line:4
+parallelism	internal/db/pkg/globals.go	44;"	w	access:private	ctype:params	line:44	type:uint8
+params	internal/db/pkg/globals.go	41;"	t	access:private	line:41	type:struct
+port	internal/db/pkg/info.go	10;"	v	access:private	line:10	type:int
+saltLength	internal/db/pkg/globals.go	45;"	w	access:private	ctype:params	line:45	type:uint32
+strconv	internal/db/pkg/info.go	5;"	i	line:5
+strconv	internal/rest/app/handlers/expenses/expenses.go	9;"	i	line:9
+strconv	internal/rest/pkg/globals.go	5;"	i	line:5
+strings	internal/db/app/functions.go	8;"	i	line:8
+testing	pkg/validate/validate_test.go	4;"	i	line:4
+time	internal/rest/app/api.go	16;"	i	line:16
+userRouter	internal/rest/app/api.go	59;"	f	access:private	line:59	signature:(r chi.Router)
+validate	pkg/validate/validate.go	1;"	p	line:1
+validate	pkg/validate/validate_test.go	1;"	p	line:1

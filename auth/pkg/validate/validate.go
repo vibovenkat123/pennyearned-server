@@ -1,25 +1,25 @@
 package validate
 
-import (
-	"net/mail"
-)
+import "strconv"
 
-func Validate(name string, username string, email string, password string) (good bool) {
-	return NameCheck(name) && UsernameCheck(username) && EmailCheck(email) && PasswordCheck(password)
+func All(name string, username string, code string, password string) (good bool) {
+	return Name(name) && Username(username) && Password(password) && Code(code)
 }
-func NameCheck(name string) bool {
+
+func Code(code string) bool {
+	_, err := strconv.Atoi(code)
+	return err == nil && len(code) == 6
+}
+
+func Name(name string) bool {
 	length := len(name)
 	return length > 0 && length < 30
 }
-func UsernameCheck(username string) bool {
+func Username(username string) bool {
 	length := len(username)
 	return length > 2 && length < 12
 }
-func EmailCheck(email string) bool {
-	_, err := mail.ParseAddress(email)
-	return err == nil
-}
-func PasswordCheck(password string) bool {
+func Password(password string) bool {
 	length := len(password)
 	return length >= 8 && length <= 20
 }

@@ -13,9 +13,9 @@ func TestValidCases(t *testing.T) {
 	id := "025823d5-0f92-47f9-a182-ff1e79e987d6"
 	name := "bob"
 	spent := 123
-	good := Validate(id, name, spent)
+	good := All(id, name, spent)
 	if !good {
-		t.Fatalf(`Validate(%v, %v, %v) returned %t with good cases, wanted it to return %v"`, id, name, spent, !good, good)
+		t.Fatalf(`All(%v, %v, %v) returned %t with good cases, wanted it to return %v"`, id, name, spent, !good, good)
 	}
 }
 
@@ -27,17 +27,17 @@ func TestInvalidCases(t *testing.T) {
 
 func TestInvalidSpent(t *testing.T) {
 	spent := -1
-	good := ValidateSpent(spent)
+	good := Spent(spent)
 	if good {
-		t.Fatalf(`ValidateSpent(%v) with a wrong spent case returned %t, wanted it to return %v"`, spent, good, !good)
+		t.Fatalf(`Spent(%v) with a wrong spent case returned %t, wanted it to return %v"`, spent, good, !good)
 	}
 }
 
 func TestInvalidID(t *testing.T) {
 	id := "123"
-	good := ValidateID(id)
+	good := ID(id)
 	if good {
-		t.Fatalf(`ValidateID(%v) with a wrong id case returned %t, wanted it to return %v"`, id, good, !good)
+		t.Fatalf(`ID(%v) with a wrong id case returned %t, wanted it to return %v"`, id, good, !good)
 	}
 }
 
@@ -47,15 +47,15 @@ func TestInvalidName(t *testing.T) {
 }
 func TestNameTooLong(t *testing.T) {
 	name := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-	good := ValidateName(name)
+	good := Name(name)
 	if good {
-		t.Fatalf(`ValidateName(%v) with a wrong name case returned %t, wanted it to return %v"`, name, good, !good)
+		t.Fatalf(`Name(%v) with a wrong name case returned %t, wanted it to return %v"`, name, good, !good)
 	}
 }
 func TestNameTooShort(t *testing.T) {
 	name := ""
-	good := ValidateName(name)
+	good := Name(name)
 	if good {
-		t.Fatalf(`ValidateName(%v) with a wrong name case returned %t, wanted it to return %v"`, name, good, !good)
+		t.Fatalf(`Name(%v) with a wrong name case returned %t, wanted it to return %v"`, name, good, !good)
 	}
 }

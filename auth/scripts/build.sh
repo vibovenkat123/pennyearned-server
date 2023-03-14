@@ -10,13 +10,16 @@ redisHostCommand="main/auth/internal/db/pkg.redisHost=$USERS_REDIS_HOST"
 redisPassCommand="main/auth/internal/db/pkg.redisPass=$USERS_REDIS_PASSWORD"
 apiEnvCommand="main/auth/internal/rest/app.env=$GO_ENV"
 apiPortCommand="main/auth/internal/rest/pkg.envPort=$USERS_PORT"
-goEnvCommand="main/auth/internal/rest/pkg.envPort=$GO_ENV"
+fromEmailCommand="main/auth/internal/db/app.fromEmail=$FROM_EMAIL"
+fromPasswordCommand="main/auth/internal/db/app.emailPassword=$FROM_PASSWORD"
+smtpHostCommand="main/auth/internal/db/app.smtpHost=$SMTP_HOST"
+smtpPortCommand="main/auth/internal/db/app.smtpPort=$SMTP_PORT"
 if [ $GO_ENV  == "local" ]
 then
     go run cmd/server/server.go
 else
     env GOARCH=amd64 GOOS=linux\
         go build -ldflags \
-        "-X '$postgresPortCommand' -X '$postgresDatabaseCommand' -X '$postgresHostCommand' -X '$postgresPassCommand' -X '$postgresUserCommand' -X '$redisHostCommand' -X '$redisPassCommand' -X '$redisPortCommand' -X '$apiEnvCommand' -X '$apiPortCommand' -X '$goEnvCommand'"\
+        "-X '$postgresPortCommand' -X '$postgresDatabaseCommand' -X '$postgresHostCommand' -X '$postgresPassCommand' -X '$postgresUserCommand' -X '$redisHostCommand' -X '$redisPassCommand' -X '$redisPortCommand' -X '$apiEnvCommand' -X '$apiPortCommand'"\
         -o bin/server cmd/server/server.go
 fi

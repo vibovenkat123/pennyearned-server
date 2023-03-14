@@ -2,25 +2,89 @@ package db
 
 // imports
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/subtle"
 	"database/sql"
 	"encoding/base64"
 	"fmt"
+	"html/template"
+	helpers "main/auth/internal/db/pkg"
+	mathrand "math/rand"
+	"net/smtp"
+	"strconv"
+	"strings"
+	"time"
+
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/argon2"
-	helpers "main/auth/internal/db/pkg"
-	"strings"
-	"time"
+	"os"
 )
 
 var log *zap.Logger
+var tmpt *template.Template
+var fromEmail string
+var emailPassword string
+var smtpHost string
+var smtpPort string
+var auth smtp.Auth
+var body bytes.Buffer
 
+type EmailData struct {
+	Code string
+}
+
+func init() {
+	if os.Getenv("GO_ENV") == "local" {
+		fromEmail = os.Getenv("FROM_EMAIL")
+		emailPassword = os.Getenv("FROM_PASSWORD")
+		smtpHost = os.Getenv("SMTP_HOST")
+		smtpPort = os.Getenv("SMTP_PORT")
+	}
+	tmpt = template.Must(template.ParseFiles("email.html"))
+	auth = smtp.PlainAuth("", fromEmail, emailPassword, smtpHost)
+}
 func InitializeLogger(logger *zap.Logger) {
 	log = logger
 }
+func randomString(digits int, upperbound int) string {
+	result := ""
+	for i := 0; i < digits; i++ {
+		n := mathrand.Intn(upperbound)
+		result += strconv.Itoa(n)
+	}
+	return result
+}
+func SendEmail(to []string, ctx context.Context) error {
+	code := randomString(6, 9)
+	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+	body.Write([]byte(fmt.Sprintf("Subject: %v is your verification code\n%s\n\n", code, mimeHeaders)))
+	data := EmailData{
+		Code: code,
+	}
+	for _, email := range to {
+		err := helpers.RDB.Set(ctx, fmt.Sprintf("code:%v", code), email, time.Second*1800).Err()
+		if err != nil {
+			log.Error("Error setting code in the redis",
+				zap.Error(err),
+			)
+			return err
+		}
+	}
+	tmpt.Execute(&body, data)
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, fromEmail, to, body.Bytes())
+	if err != nil {
+		log.Error("Error sending email",
+			zap.Error(err),
+			zap.Strings("emails", to),
+		)
+		return err
+	}
+	return nil
+}
+
 func GenerateFromPassword(pwd string, p *helpers.Params) (encodedHash string, err error) {
 	salt, err := generateRandomBytes(p.SaltLength)
 	if err != nil {
@@ -82,14 +146,23 @@ func SignIn(email string, password string, ctx context.Context) (accessToken *st
 	err = helpers.RDB.Set(ctx, fmt.Sprintf("session:%v", *accessToken), user.ID, expireTime).Err()
 	return
 }
+
 func CreateAccessToken() (*string, time.Duration) {
 	token := uuid.New().String()
 	accessToken := &token
 	return accessToken, time.Second * 86400
 }
-func SignUp(name string, username string, email string, password string, ctx context.Context) (accessToken *string, err error) {
+
+func SignUp(name string, username string, password string, code string, ctx context.Context) (accessToken *string, err error) {
 	id := uuid.New().String()
 	encodedHash, err := GenerateFromPassword(password, helpers.P)
+	if err != nil {
+		return nil, err
+	}
+	email, err := helpers.RDB.Get(ctx, fmt.Sprintf("code:%v", code)).Result()
+	if email == "" {
+		return nil, helpers.ErrInvalidCode
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -101,6 +174,7 @@ func SignUp(name string, username string, email string, password string, ctx con
 	err = helpers.RDB.Set(ctx, fmt.Sprintf("session:%v", *accessToken), id, expireTime).Err()
 	return accessToken, err
 }
+
 func decodeHash(encodedHash string) (p *helpers.Params, salt, hash []byte, err error) {
 	vals := strings.Split(encodedHash, "$")
 	if len(vals) != 6 {

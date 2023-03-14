@@ -1,0 +1,38 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-spacer height="100px"></mj-spacer>
+        <mj-text font-size="30px" font-family="helvetica" align="center" color="#1085DA">Pennyearned</mj-text>
+
+        <mj-divider border-color="#1085DA"></mj-divider>
+        <mj-spacer height="100px"></mj-spacer>
+
+        <mj-text font-size="16px" font-family="helvetica" align="center">
+          Hi there!
+        </mj-text>
+        <mj-spacer></mj-spacer>
+        <mj-text font-size="16px" font-family="helvetica" align="center">
+          Thank you for joining pennyearned!
+        </mj-text>
+        <mj-text font-size="16px" font-family="helvetica" align="center">
+          Use this code below for verifying:
+        </mj-text>
+        <mj-spacer></mj-spacer>
+        <mj-text font-size="40px" font-family="Arial" font-weight="bold" align="center">
+          1 2 3 4 5 6
+        </mj-text>
+        <mj-spacer></mj-spacer>
+        <mj-text font-size="16px" font-family="helvetica" align="center">
+          This code will only be valid for 30 minutes
+        </mj-text>
+        <mj-spacer height="100px"></mj-spacer>
+        <mj-text font-size="15px" font-family="helvetica" align="center">
+						For any Questions, contact:
+        </mj-text>
+        <mj-spacer></mj-spacer>
+        <mj-text  font-size="15px" font-family="helvetica" align="center"><a href="mailto:pennyearnedapp@gmail.com">pennyearnedapp@gmail.com</a></mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

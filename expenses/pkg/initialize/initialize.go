@@ -29,8 +29,7 @@ func Initialize() {
 	}
 	// migrate (add columns and tables)
 	database.Migrate()
-	// WARNING: THE FOLLOWING LINE WILL
-	// DESTROY: THE DATABASE
+	// WARNING: THE FOLLOWING LINE WILL DESTROY: THE DATABASE
 	// database.ResetToSchema()
 	// expose endpoints
 	api.StartAPI(Logger)

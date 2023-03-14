@@ -22,6 +22,7 @@ var (
 )
 var (
 	ErrInvalidHash         = errors.New("the encoded hash is not in the correct format")
+	ErrInvalidCode         = errors.New("The code you entered is not found")
 	ErrIncompatibleVersion = errors.New("incompatible version of argon2")
 	ErrPassNotMatch        = errors.New("Password is invalid")
 	ErrEmailNotFound       = errors.New("Email not found")

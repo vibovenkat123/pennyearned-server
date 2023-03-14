@@ -10,6 +10,7 @@ package:
   - '!./**'
   - './auth/bin/**'
   - './expenses/bin/**'
+  - './auth/email.html'
 functions:
   signout:
     handler: auth/bin/server
@@ -17,11 +18,17 @@ functions:
       - http: 
           path: api/user/session/{id}
           method: delete
-  signup:
+  verifyemail:
     handler: auth/bin/server
     events:
       - http:
           path: api/user
+          method: post
+  signupverify:
+    handler: auth/bin/server
+    events:
+      - http:
+          path: api/user/verify/{code}
           method: post
   signin:
     handler: auth/bin/server

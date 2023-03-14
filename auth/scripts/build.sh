@@ -14,12 +14,13 @@ fromEmailCommand="main/auth/internal/db/app.fromEmail=$FROM_EMAIL"
 fromPasswordCommand="main/auth/internal/db/app.emailPassword=$FROM_PASSWORD"
 smtpHostCommand="main/auth/internal/db/app.smtpHost=$SMTP_HOST"
 smtpPortCommand="main/auth/internal/db/app.smtpPort=$SMTP_PORT"
+templatePathCommand="main/auth/internal/db/app.templateFile=$TEMPLATE_PATH"
 if [ $GO_ENV  == "local" ]
 then
     go run cmd/server/server.go
 else
     env GOARCH=amd64 GOOS=linux\
         go build -ldflags \
-        "-X '$postgresPortCommand' -X '$postgresDatabaseCommand' -X '$postgresHostCommand' -X '$postgresPassCommand' -X '$postgresUserCommand' -X '$redisHostCommand' -X '$redisPassCommand' -X '$redisPortCommand' -X '$apiEnvCommand' -X '$apiPortCommand'"\
+        "-X '$postgresPortCommand' -X '$postgresDatabaseCommand' -X '$postgresHostCommand' -X '$postgresPassCommand' -X '$postgresUserCommand' -X '$redisHostCommand' -X '$redisPassCommand' -X '$redisPortCommand' -X '$apiEnvCommand' -X '$apiPortCommand' -X '$templatePathCommand' -X '$fromEmailCommand' -X '$fromPasswordCommand' -X '$smtpHostCommand' -X '$smtpPortCommand'"\
         -o bin/server cmd/server/server.go
 fi

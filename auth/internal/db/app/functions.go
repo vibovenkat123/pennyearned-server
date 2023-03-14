@@ -31,6 +31,7 @@ var smtpHost string
 var smtpPort string
 var auth smtp.Auth
 var body bytes.Buffer
+var templateFile string
 
 type EmailData struct {
 	Code string
@@ -42,8 +43,9 @@ func init() {
 		emailPassword = os.Getenv("FROM_PASSWORD")
 		smtpHost = os.Getenv("SMTP_HOST")
 		smtpPort = os.Getenv("SMTP_PORT")
+		templateFile = os.Getenv("TEMPLATE_PATH")
 	}
-	tmpt = template.Must(template.ParseFiles("email.html"))
+	tmpt = template.Must(template.ParseFiles(templateFile))
 	auth = smtp.PlainAuth("", fromEmail, emailPassword, smtpHost)
 }
 func InitializeLogger(logger *zap.Logger) {

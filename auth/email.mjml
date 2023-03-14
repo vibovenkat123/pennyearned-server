@@ -20,7 +20,7 @@
         </mj-text>
         <mj-spacer></mj-spacer>
         <mj-text font-size="40px" font-family="Arial" font-weight="bold" align="center">
-          1 2 3 4 5 6
+          {{.Code}} 
         </mj-text>
         <mj-spacer></mj-spacer>
         <mj-text font-size="16px" font-family="helvetica" align="center">

@@ -2,8 +2,10 @@ package expenses
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"main/expenses/internal/db/app"
+	globals "main/expenses/internal/rest/pkg"
 	"main/expenses/pkg/validate"
 	"net/http"
 	"strconv"
@@ -50,6 +52,18 @@ func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 }
 func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
+	var updateExpenseData globals.UpdateExpenseData
+	err := globals.DecodeJSONBody(w, r, &updateExpenseData)
+	if err != nil {
+		var malformedreq *globals.MalformedReq
+		if errors.As(err, &malformedreq) {
+			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+
 	id := chi.URLParam(r, "id")
 	name := r.URL.Query().Get("name")
 	inputSpent := r.URL.Query().Get("spent")
@@ -81,11 +95,28 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 }
 func NewExpense(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
+	var newExpenseData globals.NewExpenseData
+	err := globals.DecodeJSONBody(w, r, &newExpenseData)
+	if err != nil {
+		var malformedreq *globals.MalformedReq
+		if errors.As(err, &malformedreq) {
+			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+
 	ownerid := r.URL.Query().Get("ownerid")
 	name := r.URL.Query().Get("name")
 	spent, err := strconv.Atoi(r.URL.Query().Get("spent"))
 	if err != nil {
-		ErrInvalidFormat(w)
+		var malformedreq *globals.MalformedReq
+		if errors.As(err, &malformedreq) {
+			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
 		return
 	}
 	good := validate.All(ownerid, name, spent)

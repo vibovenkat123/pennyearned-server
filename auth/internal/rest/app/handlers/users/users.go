@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/go-chi/chi/v5"
 	"main/auth/internal/db/app"
 	dbGlobals "main/auth/internal/db/pkg"
@@ -40,8 +41,19 @@ func SuccessfullyDeleted(w http.ResponseWriter, text string) {
 }
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
-	email := r.URL.Query().Get("email")
-	password := r.URL.Query().Get("password")
+	var signInData globals.SignInData
+	err := globals.DecodeJSONBody(w, r, &signInData)
+	if err != nil {
+		var malformedreq *globals.MalformedReq
+		if errors.As(err, &malformedreq) {
+			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+	email := signInData.Email
+	password := signInData.Password
 	if !validate.Password(password) {
 		ErrNotFound(w, http.StatusText(404))
 		return
@@ -57,22 +69,45 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	encoder.Encode(response)
 	w.WriteHeader(200)
 }
+
 func SendVerification(w http.ResponseWriter, r *http.Request) {
-	email := r.URL.Query().Get("email")
+	var verifyData globals.VerifyData
+	err := globals.DecodeJSONBody(w, r, &verifyData)
+	if err != nil {
+		var malformedreq *globals.MalformedReq
+		if errors.As(err, &malformedreq) {
+			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
+	email := verifyData.Email
 	to := []string{email}
-	err := db.SendEmail(to, r.Context())
+	err = db.SendEmail(to, r.Context())
 	if err != nil {
 		ErrServer(w, err.Error())
 		return
 	}
 	PartialSuccess(w, http.StatusText(202))
 }
-func SignUp(w http.ResponseWriter, r *http.Request) {
+func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	encoder := json.NewEncoder(w)
+	var signUpVerifyData globals.SignUpVerifyData
+	err := globals.DecodeJSONBody(w, r, &signUpVerifyData)
+	if err != nil {
+		var malformedreq *globals.MalformedReq
+		if errors.As(err, &malformedreq) {
+			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
+		} else {
+			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		}
+		return
+	}
 	code := chi.URLParam(r, "code")
-	password := r.URL.Query().Get("password")
-	name := r.URL.Query().Get("name")
-	username := r.URL.Query().Get("username")
+	password := signUpVerifyData.Password
+	name := signUpVerifyData.Name
+	username := signUpVerifyData.Username
 	if !validate.All(name, username, code, password) {
 		ErrInvalidFormat(w, http.StatusText(400))
 		return

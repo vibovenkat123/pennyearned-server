@@ -1,16 +1,21 @@
 package users
 
 import (
-	"encoding/json"
 	"errors"
-	"github.com/go-chi/chi/v5"
 	"main/auth/internal/db/app"
 	dbGlobals "main/auth/internal/db/pkg"
-	globals "main/auth/internal/rest/pkg"
+	helpers "main/auth/internal/rest/pkg"
 	"main/auth/pkg/validate"
 	"net/http"
-)
 
+	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
+)
+var log *zap.Logger
+
+func SetLogger(logger *zap.Logger) {
+	log = logger
+}
 func ErrServer(w http.ResponseWriter, text string) {
 	http.Error(w, text, 500)
 	w.WriteHeader(500)
@@ -40,11 +45,10 @@ func SuccessfullyDeleted(w http.ResponseWriter, text string) {
 	w.Write([]byte(text))
 }
 func SignIn(w http.ResponseWriter, r *http.Request) {
-	encoder := json.NewEncoder(w)
-	var signInData globals.SignInData
-	err := globals.DecodeJSONBody(w, r, &signInData)
+	var signInData helpers.SignInData
+	err := helpers.DecodeJSONBody(w, r, &signInData)
 	if err != nil {
-		var malformedreq *globals.MalformedReq
+		var malformedreq *helpers.MalformedReq
 		if errors.As(err, &malformedreq) {
 			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
 		} else {
@@ -63,18 +67,23 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
-	response := globals.UserAccessRes{
+	accessTokenResponse := helpers.UserAccessRes{
 		AccessToken: *accessToken,
 	}
-	encoder.Encode(response)
-	w.WriteHeader(200)
+	err = helpers.WriteJSON(w, http.StatusOK, accessTokenResponse, nil)
+	if err != nil {
+		log.Error("Error writing JSON",
+			zap.Error(err),
+		)
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
 
 func SendVerification(w http.ResponseWriter, r *http.Request) {
-	var verifyData globals.VerifyData
-	err := globals.DecodeJSONBody(w, r, &verifyData)
+	var verifyData helpers.VerifyData
+	err := helpers.DecodeJSONBody(w, r, &verifyData)
 	if err != nil {
-		var malformedreq *globals.MalformedReq
+		var malformedreq *helpers.MalformedReq
 		if errors.As(err, &malformedreq) {
 			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
 		} else {
@@ -92,11 +101,10 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 	PartialSuccess(w, http.StatusText(202))
 }
 func SignUpVerify(w http.ResponseWriter, r *http.Request) {
-	encoder := json.NewEncoder(w)
-	var signUpVerifyData globals.SignUpVerifyData
-	err := globals.DecodeJSONBody(w, r, &signUpVerifyData)
+	var signUpVerifyData helpers.SignUpVerifyData
+	err := helpers.DecodeJSONBody(w, r, &signUpVerifyData)
 	if err != nil {
-		var malformedreq *globals.MalformedReq
+		var malformedreq *helpers.MalformedReq
 		if errors.As(err, &malformedreq) {
 			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
 		} else {
@@ -121,25 +129,34 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 		ErrAlreadyFound(w, http.StatusText(409))
 		return
 	}
-	response := globals.UserAccessRes{
+	accessTokenResponse := helpers.UserAccessRes{
 		AccessToken: *accessToken,
 	}
-	encoder.Encode(response)
-	w.WriteHeader(201)
+	err = helpers.WriteJSON(w, http.StatusCreated, accessTokenResponse, nil)
+	if err != nil {
+		log.Error("Error writing JSON",
+			zap.Error(err),
+		)
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
 func GetByCookie(w http.ResponseWriter, r *http.Request) {
 	cookieID := chi.URLParam(r, "id")
-	encoder := json.NewEncoder(w)
 	val, err := db.GetByAccess(cookieID, r.Context())
 	if err != nil {
 		ErrNotFound(w, http.StatusText(404))
 		return
 	}
-	res := globals.UserIDRes{
+	userIDResponse := helpers.UserIDRes{
 		ID: val,
 	}
-	encoder.Encode(res)
-	w.WriteHeader(200)
+	err = helpers.WriteJSON(w, http.StatusOK, userIDResponse, nil)
+	if err != nil {
+		log.Error("Error writing JSON",
+			zap.Error(err),
+		)
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
 func SignOut(w http.ResponseWriter, r *http.Request) {
 	accessToken := chi.URLParam(r, "id")

@@ -18,10 +18,10 @@ func InitializeLogger(logger *zap.Logger) {
 	Logger = logger
 }
 
-func NewExpense(ownerid string, name string, spent int) (helpers.Response, error) {
+func NewExpense(ownerid string, name string, spent int) (helpers.IDResponse, error) {
 	id := uuid.New().String()
 	_, err := helpers.DB.Exec("INSERT INTO expenses (owner_id, name, spent, id) VALUES ($1, $2, $3, $4)", ownerid, name, spent, id)
-	response := helpers.Response{
+	response := helpers.IDResponse{
 		ID: id,
 	}
 	// return expenses
@@ -35,9 +35,9 @@ func DeleteExpense(id string) error {
 	_, err = helpers.DB.Exec(`DELETE FROM expenses WHERE id=$1`, id)
 	return err
 }
-func UpdateExpense(id string, name string, spent int) (helpers.Response, error) {
+func UpdateExpense(id string, name string, spent int) (helpers.IDResponse, error) {
 	_, err := helpers.DB.Exec(`UPDATE expenses SET date_updated=now(), name=$1, spent=$2 WHERE id=$3`, name, spent, id)
-	response := helpers.Response{
+	response := helpers.IDResponse{
 		ID: id,
 	}
 	return response, err

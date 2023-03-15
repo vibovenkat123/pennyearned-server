@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
 	"go.uber.org/zap"
-	users "main/auth/internal/rest/app/handlers/users"
+	handlers "main/auth/internal/rest/app/handlers/users"
 	helpers "main/auth/internal/rest/pkg"
 	"net/http"
 	"time"
@@ -34,6 +34,7 @@ func Expose(log *zap.Logger, local bool) {
 	r.Route("/v1/api/user", userRouter)
 	handler := cors.Default().Handler(r)
 	if local {
+		handlers.SetLogger(log)
 		log.Info("Starting server",
 			zap.String("Port", fmt.Sprintf("%v", helpers.Port)),
 		)
@@ -54,9 +55,9 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 	return adapter.ProxyWithContext(ctx, req)
 }
 func userRouter(r chi.Router) {
-	r.Post("/session", users.SignIn)
-	r.Post("/", users.SendVerification)
-	r.Post("/verify/{code}", users.SignUpVerify)
-	r.Delete("/session/{id}", users.SignOut)
-	r.Get("/{id}", users.GetByCookie)
+	r.Post("/session", handlers.SignIn)
+	r.Post("/", handlers.SendVerification)
+	r.Post("/verify/{code}", handlers.SignUpVerify)
+	r.Delete("/session/{id}", handlers.SignOut)
+	r.Get("/{id}", handlers.GetByCookie)
 }

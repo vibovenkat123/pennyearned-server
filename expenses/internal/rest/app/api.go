@@ -10,7 +10,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
 	"go.uber.org/zap"
-	"main/expenses/internal/rest/app/handlers/expenses"
+	handlers "main/expenses/internal/rest/app/handlers/expenses"
 	helpers "main/expenses/internal/rest/pkg"
 	"net/http"
 	"time"
@@ -34,6 +34,7 @@ func Expose(log *zap.Logger, local bool) {
 	r.Route("/v1/api/expense", expensesRouter)
 	r.Route("/v1/api/user", userRouter)
 	if local {
+		handlers.SetLogger(log)
 		handler := cors.Default().Handler(r)
 		log.Info("Starting server",
 			zap.String("Port", fmt.Sprintf("%v", helpers.Port)),
@@ -60,14 +61,14 @@ func userRouter(r chi.Router) {
 	r.Route("/{id}", UserIDRouter)
 }
 func UserIDRouter(r chi.Router) {
-	r.Get("/expenses", expenses.GetByOwnerID)
+	r.Get("/expenses", handlers.GetByOwnerID)
 }
 func expensesRouter(r chi.Router) {
 	r.Route("/{id}", ExpenseIDRouter)
-	r.Post("/", expenses.NewExpense)
+	r.Post("/", handlers.NewExpense)
 }
 func ExpenseIDRouter(r chi.Router) {
-	r.Get("/", expenses.GetByID)
-	r.Delete("/", expenses.DeleteExpense)
-	r.Patch("/", expenses.UpdateExpense)
+	r.Get("/", handlers.GetByID)
+	r.Delete("/", handlers.DeleteExpense)
+	r.Patch("/", handlers.UpdateExpense)
 }

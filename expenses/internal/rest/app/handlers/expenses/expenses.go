@@ -1,16 +1,20 @@
 package expenses
 
 import (
-	"encoding/json"
 	"errors"
-	"github.com/go-chi/chi/v5"
 	"main/expenses/internal/db/app"
-	globals "main/expenses/internal/rest/pkg"
+	helpers "main/expenses/internal/rest/pkg"
 	"main/expenses/pkg/validate"
 	"net/http"
 	"strconv"
-)
 
+	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
+)
+var log *zap.Logger
+func SetLogger(logger *zap.Logger) {
+	log = logger
+}
 func ErrInvalidFormat(w http.ResponseWriter) {
 	http.Error(w, http.StatusText(400), 400)
 	w.WriteHeader(400)
@@ -20,42 +24,48 @@ func ErrNotFound(w http.ResponseWriter) {
 	w.WriteHeader(404)
 }
 func GetByID(w http.ResponseWriter, r *http.Request) {
-	encoder := json.NewEncoder(w)
 	id := chi.URLParam(r, "id")
 	if good := validate.ID(id); !good {
 		ErrInvalidFormat(w)
 		return
 	}
-	expenses, err := db.GetExpenseById(id)
+	expense, err := db.GetExpenseById(id)
 	if err != nil {
 		ErrNotFound(w)
 		return
 	}
-	encoder.Encode(expenses)
-	w.WriteHeader(200)
+	err = helpers.WriteJSON(w, http.StatusOK, expense, nil)
+	if err != nil {
+		log.Error("Error writing JSON",
+			zap.Error(err),
+		)
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
 func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
-	encoder := json.NewEncoder(w)
 	ownerid := chi.URLParam(r, "id")
 	if good := validate.ID(ownerid); !good {
 		ErrInvalidFormat(w)
 		return
 	}
-	expenses, err := db.GetExpensesByOwnerId(ownerid)
+	ownerExpenses, err := db.GetExpensesByOwnerId(ownerid)
 	if err != nil {
 		ErrNotFound(w)
 		return
 	}
-	encoder.Encode(expenses)
-	w.WriteHeader(200)
-
+	err = helpers.WriteJSON(w, http.StatusOK, ownerExpenses, nil)
+	if err != nil {
+		log.Error("Error writing JSON",
+			zap.Error(err),
+		)
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
 func UpdateExpense(w http.ResponseWriter, r *http.Request) {
-	encoder := json.NewEncoder(w)
-	var updateExpenseData globals.UpdateExpenseData
-	err := globals.DecodeJSONBody(w, r, &updateExpenseData)
+	var updateExpenseData helpers.UpdateExpenseData
+	err := helpers.DecodeJSONBody(w, r, &updateExpenseData)
 	if err != nil {
-		var malformedreq *globals.MalformedReq
+		var malformedreq *helpers.MalformedReq
 		if errors.As(err, &malformedreq) {
 			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
 		} else {
@@ -85,20 +95,24 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w)
 		return
 	}
-	response, err := db.UpdateExpense(id, name, spent)
+	updatedExpense, err := db.UpdateExpense(id, name, spent)
 	if err != nil {
 		ErrNotFound(w)
 		return
 	}
-	encoder.Encode(response)
-	w.WriteHeader(200)
+	err = helpers.WriteJSON(w, http.StatusOK, updatedExpense, nil)
+	if err != nil {
+		log.Error("Error writing JSON",
+			zap.Error(err),
+		)
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
 func NewExpense(w http.ResponseWriter, r *http.Request) {
-	encoder := json.NewEncoder(w)
-	var newExpenseData globals.NewExpenseData
-	err := globals.DecodeJSONBody(w, r, &newExpenseData)
+	var newExpenseData helpers.NewExpenseData
+	err := helpers.DecodeJSONBody(w, r, &newExpenseData)
 	if err != nil {
-		var malformedreq *globals.MalformedReq
+		var malformedreq *helpers.MalformedReq
 		if errors.As(err, &malformedreq) {
 			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
 		} else {
@@ -111,7 +125,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 	spent, err := strconv.Atoi(r.URL.Query().Get("spent"))
 	if err != nil {
-		var malformedreq *globals.MalformedReq
+		var malformedreq *helpers.MalformedReq
 		if errors.As(err, &malformedreq) {
 			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
 		} else {
@@ -124,13 +138,18 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 		ErrInvalidFormat(w)
 		return
 	}
-	response, err := db.NewExpense(ownerid, name, spent)
+	newExpense, err := db.NewExpense(ownerid, name, spent)
 	if err != nil {
 		ErrNotFound(w)
 		return
 	}
-	encoder.Encode(response)
-	w.WriteHeader(201)
+	err = helpers.WriteJSON(w, http.StatusCreated, newExpense, nil)
+	if err != nil {
+		log.Error("Error writing JSON",
+			zap.Error(err),
+		)
+		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+	}
 }
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")

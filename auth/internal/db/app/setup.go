@@ -60,11 +60,11 @@ func ConnectRedis() (*helpers.RedisType, error) {
 }
 func ConnectPostgres() (*helpers.DatabaseType, error) {
 	var err error
-	expensesDBInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+	usersDBInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		helpers.DBInfo.Host, helpers.DBInfo.Port, helpers.DBInfo.User, helpers.DBInfo.Password, helpers.DBInfo.Dbname)
 	fmt.Println("Attempting to connect...")
-	helpers.DB, err = sqlx.Open("postgres", expensesDBInfo)
+	helpers.DB, err = sqlx.Open("postgres", usersDBInfo)
 	if err != nil {
 		return nil, err
 	}

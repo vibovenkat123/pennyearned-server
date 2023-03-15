@@ -8,7 +8,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type Response struct {
+type IDResponse struct {
 	ID string `json:"id"`
 }
 
@@ -33,10 +33,6 @@ var (
 	ErrPasswordTooLong     = errors.New(fmt.Sprintf("Password must be smaller than %v character(s)", maxPasswordLength))
 	ErrNameTooShort        = errors.New(fmt.Sprintf("Name must be bigger than %v character(s)", minNameLength))
 	ErrNameTooLong         = errors.New(fmt.Sprintf("Name must be smaller than %v character(s)", maxNameLength))
-	ErrEmailInvalid        = errors.New("Email is invalid")
-	ErrExpensesNotFound    = errors.New("Expenses not found")
-	ErrExpenseNotFound     = errors.New("Expense not found")
-	ErrInvalidFormat       = errors.New("Invalid format")
 )
 
 type Params struct {
@@ -51,14 +47,6 @@ type Schema struct {
 	Create string
 	Drop   string
 	Alter  string
-}
-type Expense struct {
-	ID          string `db:"id"`
-	OwnerID     string `db:"owner_id"`
-	Name        string `db:"name"`
-	Spent       int    `db:"spent"`
-	DateCreated string `db:"date_created"`
-	DateUpdated string `db:"date_updated"`
 }
 type User struct {
 	ID          string `db:"id"`

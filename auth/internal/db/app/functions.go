@@ -78,10 +78,6 @@ func SendEmail(to []string, ctx context.Context) error {
 	tmpt.Execute(&body, data)
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, fromEmail, to, body.Bytes())
 	if err != nil {
-		log.Error("Error sending email",
-			zap.Error(err),
-			zap.Strings("emails", to),
-		)
 		return err
 	}
 	return nil

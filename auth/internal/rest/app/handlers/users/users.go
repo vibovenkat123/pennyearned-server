@@ -101,6 +101,10 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		ErrServer(w, err.Error())
+		log.Error("Error sending email",
+			zap.Error(err),
+			zap.Strings("emails", to),
+		)
 		return
 	}
 	PartialSuccess(w, http.StatusText(202))

@@ -28,7 +28,7 @@ var topKey = "expense"
 func init() {
 	Local = os.Getenv("GO_ENV") == "local"
 	if Local {
-		envPort = os.Getenv("USERS_PORT")
+		envPort = os.Getenv("EXPENSES_PORT")
 	}
 	Port, ConvertErr = strconv.Atoi(envPort)
 }

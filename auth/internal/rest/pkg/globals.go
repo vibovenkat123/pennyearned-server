@@ -11,7 +11,7 @@ type SignInData struct {
 }
 
 type SignUpVerifyData struct {
-	Name     string `json:"name"`
+	Name     string `json:"name,omitempty"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }

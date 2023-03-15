@@ -6,8 +6,6 @@ import (
 	helpers "main/expenses/internal/rest/pkg"
 	"main/expenses/pkg/validate"
 	"net/http"
-	"strconv"
-
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )

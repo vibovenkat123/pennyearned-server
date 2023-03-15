@@ -7,6 +7,7 @@ import (
 	helpers "main/auth/internal/rest/pkg"
 	"main/auth/pkg/validate"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
@@ -97,6 +98,7 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if strings.Contains(err.Error(), "is not a valid RFC-5321 address") {
 			ErrInvalidFormat(w, http.StatusText(400))
+			return
 		}
 		ErrServer(w, err.Error())
 		return

@@ -56,7 +56,7 @@ func Handler(ctx context.Context, req events.APIGatewayProxyRequest) (events.API
 func userRouter(r chi.Router) {
 	r.Post("/session", users.SignIn)
 	r.Post("/", users.SendVerification)
-	r.Post("/verify/{code}", users.SignUp)
+	r.Post("/verify/{code}", users.SignUpVerify)
 	r.Delete("/session/{id}", users.SignOut)
 	r.Get("/{id}", users.GetByCookie)
 }

@@ -27,6 +27,7 @@ func Initialize() {
 			zap.Error(err),
 		)
 	}
+	database.InitializeLogger(Logger)
 	// migrate (add columns and tables)
 	database.Migrate()
 	// WARNING: THE FOLLOWING LINE WILL DESTROY: THE DATABASE

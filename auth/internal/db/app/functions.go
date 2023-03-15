@@ -2,13 +2,13 @@ package db
 
 // imports
 import (
+	"fmt"
 	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/subtle"
 	"database/sql"
 	"encoding/base64"
-	"fmt"
 	"html/template"
 	helpers "main/auth/internal/db/pkg"
 	mathrand "math/rand"
@@ -226,19 +226,19 @@ func comparePasswordAndHash(password string, encodedHash string) (matches bool, 
 
 // apply changes to db (no breaking ones)
 func Migrate() {
-	fmt.Println("Migrating...")
+	log.Info("Migrating...")
 	helpers.DB.MustExec(helpers.DefaultSchema.Create)
 	ExecMultiple(helpers.DB, helpers.DefaultSchema.Alter)
-	fmt.Println("Migrated!!")
+	log.Info("Migrated!!")
 }
 
 // WARNING: THIS FUNCTION RESETS THE DATABASE
 func ResetToSchema() {
-	fmt.Println("Resetting...")
+	log.Info("Resetting...")
 	ExecMultiple(helpers.DB, helpers.DefaultSchema.Drop)
 	helpers.DB.MustExec(helpers.DefaultSchema.Create)
 	ExecMultiple(helpers.DB, helpers.DefaultSchema.Alter)
-	fmt.Println("Resetted!!")
+	log.Info("Resetted!!")
 }
 func ExecMultiple(e helpers.DatabaseType, query string) {
 	statements := strings.Split(query, "\n")

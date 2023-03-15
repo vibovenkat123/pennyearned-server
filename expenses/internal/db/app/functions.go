@@ -3,7 +3,6 @@ package db
 // imports
 import (
 	"database/sql"
-	"fmt"
 	helpers "main/expenses/internal/db/pkg"
 	"strings"
 
@@ -45,19 +44,19 @@ func UpdateExpense(id string, name string, spent int) (helpers.IDResponse, error
 
 // apply changes to db (no breaking ones)
 func Migrate() {
-	fmt.Println("Migrating...")
+	Logger.Info("Migrating...")
 	helpers.DB.MustExec(helpers.DefaultSchema.Create)
 	ExecMultiple(helpers.DB, helpers.DefaultSchema.Alter)
-	fmt.Println("Migrated!!")
+	Logger.Info("Migrated!!")
 }
 
 // WARNING: THIS FUNCTION RESETS THE DATABASE
 func ResetToSchema() {
-	fmt.Println("Resetting...")
+	Logger.Info("Resetting...")
 	ExecMultiple(helpers.DB, helpers.DefaultSchema.Drop)
 	helpers.DB.MustExec(helpers.DefaultSchema.Create)
 	ExecMultiple(helpers.DB, helpers.DefaultSchema.Alter)
-	fmt.Println("Resetted!!")
+	Logger.Info("Resetted!!")
 }
 func GetExpenseById(expenseId string) (helpers.Expense, error) {
 	expense := helpers.Expense{}

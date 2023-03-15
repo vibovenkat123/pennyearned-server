@@ -19,7 +19,7 @@ func Connect(log *zap.Logger) (helpers.DatabaseType, error) {
 	expensesDBInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		helpers.DBInfo.Host, helpers.DBInfo.Port, helpers.DBInfo.User, helpers.DBInfo.Password, helpers.DBInfo.Dbname)
-	fmt.Println("Attempting to connect...")
+	log.Info("Attempting to connect...")
 	helpers.DB, err = sqlx.Open("postgres", expensesDBInfo)
 	if err != nil {
 		return nil, err

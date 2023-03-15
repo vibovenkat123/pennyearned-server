@@ -26,7 +26,7 @@ func SuccessfullyDeleted(w http.ResponseWriter, text string) {
 }
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	var signInData SignInData
-	err := App.DecodeJSONBody(w, r, &signInData)
+	err := App.ReadJSON(w, r, &signInData)
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
@@ -58,7 +58,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 
 func SendVerification(w http.ResponseWriter, r *http.Request) {
 	var verifyData VerifyData
-	err := App.DecodeJSONBody(w, r, &verifyData)
+	err := App.ReadJSON(w, r, &verifyData)
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
@@ -83,7 +83,7 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 }
 func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	var signUpVerifyData SignUpVerifyData
-	err := App.DecodeJSONBody(w, r, &signUpVerifyData)
+	err := App.ReadJSON(w, r, &signUpVerifyData)
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
@@ -98,7 +98,7 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	name := signUpVerifyData.Name
 	username := signUpVerifyData.Username
 	if !validate.All(name, username, code, password) {
-		App.BadRequestResponse(w, r, ErrSignUpWrongFormat)
+		App.BadRequestResponse(w, r, ErrSignUPWrongFormat)
 		return
 	}
 	accessToken, err := db.SignUp(name, username, password, code, r.Context())

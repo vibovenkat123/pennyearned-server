@@ -21,6 +21,8 @@ var adapter *chiadapter.ChiLambda
 
 func Expose(local bool) {
 	r := chi.NewRouter()
+	r.NotFound(http.HandlerFunc(App.NotFoundResponse))
+	r.MethodNotAllowed(http.HandlerFunc(App.MethodNotAllowedResponse))
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)

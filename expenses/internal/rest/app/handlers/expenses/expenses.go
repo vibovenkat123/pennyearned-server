@@ -12,7 +12,7 @@ import (
 func GetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if good := validate.ID(id); !good {
-		App.WrongFormatResponse(w, r)
+		App.BadRequestResponse(w, r, ErrInvalidID)
 		return
 	}
 	expense, err := db.GetExpenseById(id)
@@ -28,7 +28,7 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 	ownerid := chi.URLParam(r, "id")
 	if good := validate.ID(ownerid); !good {
-		App.WrongFormatResponse(w, r)
+		App.BadRequestResponse(w, r, ErrInvalidID)
 		return
 	}
 	ownerExpenses, err := db.GetExpensesByOwnerId(ownerid)
@@ -48,7 +48,7 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
-			App.ErrorResponse(w, r, malformedreq.StatusCode, malformedreq.Msg)
+			App.BadRequestResponse(w, r, err)
 		} else {
 			App.ServerErrorResponse(w, r, err)
 		}
@@ -67,13 +67,9 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 		spent = original.Spent
 	} else {
 		spent = inputSpent
-		if err != nil {
-			App.WrongFormatResponse(w, r)
-			return
-		}
 	}
 	if good := validate.All(id, name, spent); !good {
-		App.WrongFormatResponse(w, r)
+		App.BadRequestResponse(w, r, ErrExpenseInvalid)
 		return
 	}
 	updatedExpense, err := db.UpdateExpense(id, name, spent)
@@ -92,7 +88,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
-			App.ErrorResponse(w, r, malformedreq.StatusCode, malformedreq.Msg)
+			App.BadRequestResponse(w, r, err)
 		} else {
 			App.ServerErrorResponse(w, r, err)
 		}
@@ -105,7 +101,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
-			App.ErrorResponse(w, r, malformedreq.StatusCode, malformedreq.Msg)
+			App.BadRequestResponse(w, r, err)
 		} else {
 			App.ServerErrorResponse(w, r, err)
 		}
@@ -113,7 +109,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	}
 	good := validate.All(ownerid, name, spent)
 	if !good {
-		App.WrongFormatResponse(w, r)
+		App.BadRequestResponse(w, r, ErrExpenseInvalid)
 		return
 	}
 	newExpense, err := db.NewExpense(ownerid, name, spent)
@@ -129,7 +125,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if good := validate.ID(id); !good {
-		App.WrongFormatResponse(w, r)
+		App.BadRequestResponse(w, r, ErrInvalidID)
 		return
 	}
 	err := db.DeleteExpense(id)

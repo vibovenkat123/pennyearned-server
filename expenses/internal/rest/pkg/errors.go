@@ -4,6 +4,12 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"net/http"
+	"errors"
+)
+
+var (
+	ErrInvalidID = errors.New("The ID provided is not the valid format for a id")
+	ErrExpenseInvalid = errors.New("The parameters provided for creating/updating a expense are invalid")
 )
 
 // basic error log
@@ -42,9 +48,8 @@ func (app *Application) MethodNotAllowedResponse(w http.ResponseWriter, r *http.
 	App.ErrorResponse(w, r, http.StatusMethodNotAllowed, message)
 }
 
-func (app *Application) WrongFormatResponse(w http.ResponseWriter, r *http.Request) {
-	message := "The server cannot process the request due to a client error"
-	App.ErrorResponse(w, r, http.StatusBadRequest, message)
+func (app *Application) BadRequestResponse(w http.ResponseWriter, r *http.Request, err error) {
+	App.ErrorResponse(w, r, http.StatusBadRequest, err.Error())
 }
 
 func (app *Application) ConflictResponse(w http.ResponseWriter, r *http.Request) {

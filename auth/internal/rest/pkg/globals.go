@@ -5,6 +5,21 @@ import (
 	"strconv"
 )
 
+type SignInData struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type SignUpVerifyData struct {
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type VerifyData struct {
+	Email string `json:"email"`
+}
+
 type UserIDRes struct {
 	ID string `json:"id"`
 }

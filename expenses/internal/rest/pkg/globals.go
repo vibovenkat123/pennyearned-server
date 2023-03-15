@@ -5,6 +5,16 @@ import (
 	"strconv"
 )
 
+type UpdateExpenseData struct {
+	Name  string `json:"name"`
+	Spent int    `json:"spent"`
+}
+type NewExpenseData struct {
+	OwnerID string `json:"ownerid"`
+	Name    string `json:"name"`
+	Spent   int    `json:"spent"`
+}
+
 var Port int
 var ConvertErr error
 var envPort string

@@ -4,6 +4,7 @@ import (
 	"go.uber.org/zap"
 	database "main/auth/internal/db/app"
 	api "main/auth/internal/rest/app"
+	apiGlobals "main/auth/internal/rest/pkg"
 )
 
 var Logger *zap.Logger
@@ -28,5 +29,6 @@ func Initialize() {
 	// WARNING: THE FOLLOWING LINE WILL DESTROY THE DATABASE
 	// database.ResetToSchema()
 	// expose endpoints
-	api.StartAPI(Logger)
+	apiGlobals.SetLogger(Logger)
+	api.StartAPI()
 }

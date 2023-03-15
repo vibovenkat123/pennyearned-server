@@ -2,72 +2,55 @@ package expenses
 
 import (
 	"errors"
+	"github.com/go-chi/chi/v5"
 	"main/expenses/internal/db/app"
-	helpers "main/expenses/internal/rest/pkg"
+	. "main/expenses/internal/rest/pkg"
 	"main/expenses/pkg/validate"
 	"net/http"
-	"github.com/go-chi/chi/v5"
-	"go.uber.org/zap"
 )
-var log *zap.Logger
-func SetLogger(logger *zap.Logger) {
-	log = logger
-}
-func ErrInvalidFormat(w http.ResponseWriter) {
-	http.Error(w, http.StatusText(400), 400)
-	w.WriteHeader(400)
-}
-func ErrNotFound(w http.ResponseWriter) {
-	http.Error(w, http.StatusText(404), 404)
-	w.WriteHeader(404)
-}
+
 func GetByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if good := validate.ID(id); !good {
-		ErrInvalidFormat(w)
+		App.WrongFormatResponse(w, r)
 		return
 	}
 	expense, err := db.GetExpenseById(id)
 	if err != nil {
-		ErrNotFound(w)
+		App.NotFoundResponse(w, r)
 		return
 	}
-	err = helpers.WriteJSON(w, http.StatusOK, helpers.DefaultEnvelope(expense), nil)
+	err = App.WriteJSON(w, http.StatusOK, App.DefaultEnvelope(expense), nil)
 	if err != nil {
-		log.Error("Error writing JSON",
-			zap.Error(err),
-		)
-		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+		App.ServerErrorResponse(w, r, err)
 	}
 }
 func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 	ownerid := chi.URLParam(r, "id")
 	if good := validate.ID(ownerid); !good {
-		ErrInvalidFormat(w)
+		App.WrongFormatResponse(w, r)
 		return
 	}
 	ownerExpenses, err := db.GetExpensesByOwnerId(ownerid)
 	if err != nil {
-		ErrNotFound(w)
+		App.NotFoundResponse(w, r)
 		return
 	}
-	err = helpers.WriteJSON(w, http.StatusOK, helpers.Envelope{"expenses": ownerExpenses}, nil)
+	err = App.WriteJSON(w, http.StatusOK, Envelope{"expenses": ownerExpenses}, nil)
 	if err != nil {
-		log.Error("Error writing JSON",
-			zap.Error(err),
-		)
-		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+		App.ServerErrorResponse(w, r, err)
+		return
 	}
 }
 func UpdateExpense(w http.ResponseWriter, r *http.Request) {
-	var updateExpenseData helpers.UpdateExpenseData
-	err := helpers.DecodeJSONBody(w, r, &updateExpenseData)
+	var updateExpenseData UpdateExpenseData
+	err := App.DecodeJSONBody(w, r, &updateExpenseData)
 	if err != nil {
-		var malformedreq *helpers.MalformedReq
+		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
-			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
+			App.ErrorResponse(w, r, malformedreq.StatusCode, malformedreq.Msg)
 		} else {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			App.ServerErrorResponse(w, r, err)
 		}
 		return
 	}
@@ -85,36 +68,33 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	} else {
 		spent = inputSpent
 		if err != nil {
-			ErrInvalidFormat(w)
+			App.WrongFormatResponse(w, r)
 			return
 		}
 	}
 	if good := validate.All(id, name, spent); !good {
-		ErrInvalidFormat(w)
+		App.WrongFormatResponse(w, r)
 		return
 	}
 	updatedExpense, err := db.UpdateExpense(id, name, spent)
 	if err != nil {
-		ErrNotFound(w)
+		App.NotFoundResponse(w, r)
 		return
 	}
-	err = helpers.WriteJSON(w, http.StatusOK, helpers.DefaultEnvelope(updatedExpense), nil)
+	err = App.WriteJSON(w, http.StatusOK, App.DefaultEnvelope(updatedExpense), nil)
 	if err != nil {
-		log.Error("Error writing JSON",
-			zap.Error(err),
-		)
-		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+		App.ServerErrorResponse(w, r, err)
 	}
 }
 func NewExpense(w http.ResponseWriter, r *http.Request) {
-	var newExpenseData helpers.NewExpenseData
-	err := helpers.DecodeJSONBody(w, r, &newExpenseData)
+	var newExpenseData NewExpenseData
+	err := App.DecodeJSONBody(w, r, &newExpenseData)
 	if err != nil {
-		var malformedreq *helpers.MalformedReq
+		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
-			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
+			App.ErrorResponse(w, r, malformedreq.StatusCode, malformedreq.Msg)
 		} else {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			App.ServerErrorResponse(w, r, err)
 		}
 		return
 	}
@@ -123,41 +103,38 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	name := newExpenseData.Name
 	spent := newExpenseData.Spent
 	if err != nil {
-		var malformedreq *helpers.MalformedReq
+		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
-			http.Error(w, malformedreq.Msg, malformedreq.StatusCode)
+			App.ErrorResponse(w, r, malformedreq.StatusCode, malformedreq.Msg)
 		} else {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			App.ServerErrorResponse(w, r, err)
 		}
 		return
 	}
 	good := validate.All(ownerid, name, spent)
 	if !good {
-		ErrInvalidFormat(w)
+		App.WrongFormatResponse(w, r)
 		return
 	}
 	newExpense, err := db.NewExpense(ownerid, name, spent)
 	if err != nil {
-		ErrNotFound(w)
+		App.NotFoundResponse(w, r)
 		return
 	}
-	err = helpers.WriteJSON(w, http.StatusCreated, helpers.DefaultEnvelope(newExpense), nil)
+	err = App.WriteJSON(w, http.StatusCreated, App.DefaultEnvelope(newExpense), nil)
 	if err != nil {
-		log.Error("Error writing JSON",
-			zap.Error(err),
-		)
-		http.Error(w, "The server encountered a problem and could not process your request", http.StatusInternalServerError)
+		App.ServerErrorResponse(w, r, err)
 	}
 }
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 	if good := validate.ID(id); !good {
-		ErrInvalidFormat(w)
+		App.WrongFormatResponse(w, r)
 		return
 	}
 	err := db.DeleteExpense(id)
 	if err != nil {
-		ErrNotFound(w)
+		App.NotFoundResponse(w, r)
 		return
 	}
 	w.WriteHeader(204)

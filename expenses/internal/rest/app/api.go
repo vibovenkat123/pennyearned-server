@@ -11,7 +11,7 @@ import (
 	"github.com/rs/cors"
 	"go.uber.org/zap"
 	handlers "main/expenses/internal/rest/app/handlers/expenses"
-	helpers "main/expenses/internal/rest/pkg"
+	. "main/expenses/internal/rest/pkg"
 	"net/http"
 	"time"
 )
@@ -19,12 +19,7 @@ import (
 var env string
 var adapter *chiadapter.ChiLambda
 
-func Expose(log *zap.Logger, local bool) {
-	if helpers.ConvertErr != nil {
-		log.Error("The port variable is not a valid int",
-			zap.Error(helpers.ConvertErr),
-		)
-	}
+func Expose(local bool) {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -34,20 +29,19 @@ func Expose(log *zap.Logger, local bool) {
 	r.Route("/v1/api/expense", expensesRouter)
 	r.Route("/v1/api/user", userRouter)
 	if local {
-		handlers.SetLogger(log)
 		handler := cors.Default().Handler(r)
-		log.Info("Starting server",
-			zap.String("Port", fmt.Sprintf("%v", helpers.Port)),
+		App.Log.Info("Starting server",
+			zap.String("Port", fmt.Sprintf("%v", App.Conf.Port)),
 		)
-		http.ListenAndServe(fmt.Sprintf(":%v", helpers.Port), handler)
+		http.ListenAndServe(fmt.Sprintf(":%v", App.Conf.Port), handler)
 	} else {
-		log.Info("Starting server on lambda")
+		App.Log.Info("Starting server on lambda")
 		adapter = chiadapter.New(r)
 	}
 }
-func StartAPI(log *zap.Logger) {
-	Expose(log, helpers.Local)
-	if !helpers.Local {
+func StartAPI() {
+	Expose(Local)
+	if !Local {
 		lambda.Start(Handler)
 	}
 }

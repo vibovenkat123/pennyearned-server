@@ -3,7 +3,23 @@ package apiHelpers
 import (
 	"os"
 	"strconv"
+
+	"go.uber.org/zap"
 )
+
+type Application struct {
+	Log *zap.Logger
+	Conf Config
+}
+
+type Config struct {
+	Port int
+}
+
+var App *Application = &Application{}
+func SetLogger(logger *zap.Logger) {
+	App.Log = logger
+}
 
 type SignInData struct {
 	Email    string `json:"email"`
@@ -33,15 +49,18 @@ type UserAccessRes struct {
 
 // the top key that the envelope uses by default
 var topKey = "user"
-var Port int
-var ConvertErr error
-var envPort string
 var Local bool
-
 func init() {
+	var envPort string
 	Local = os.Getenv("GO_ENV") == "local"
 	if Local {
 		envPort = os.Getenv("USERS_PORT")
 	}
-	Port, ConvertErr = strconv.Atoi(envPort)
+	port, err := strconv.Atoi(envPort)
+	if err != nil {
+		App.Log.Error("Failed to convert port to int",
+			zap.Error(err),
+		)
+	}
+	App.Conf.Port = port
 }

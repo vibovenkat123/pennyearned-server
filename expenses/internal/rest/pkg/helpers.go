@@ -18,7 +18,7 @@ func (malformedreq *MalformedReq) Error() string {
 	return malformedreq.Msg
 }
 
-func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dataToDecode interface{}) error {
+func (app *Application) DecodeJSONBody(w http.ResponseWriter, r *http.Request, dataToDecode interface{}) error {
 	if r.Header.Get("Content-Type") != "" {
 		value := r.Header.Get("Content-Type")
 		if value != "application/json" {
@@ -77,10 +77,10 @@ func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dataToDecode interfa
 	return nil
 }
 
-func DefaultEnvelope(data any) Envelope {
+func (app *Application) DefaultEnvelope(data any) Envelope {
 	return Envelope{topKey: data}
 }
-func WriteJSON(w http.ResponseWriter, status int, data Envelope, headers http.Header) error {
+func (app *Application) WriteJSON(w http.ResponseWriter, status int, data Envelope, headers http.Header) error {
 	// Encode the data to JSON, returning the error if there was one.
 	// Make the json pretty printed/tabbed
 	js, err := json.MarshalIndent(data, "", "\t")

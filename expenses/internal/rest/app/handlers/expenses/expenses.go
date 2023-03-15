@@ -44,7 +44,7 @@ func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 }
 func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	var updateExpenseData UpdateExpenseData
-	err := App.DecodeJSONBody(w, r, &updateExpenseData)
+	err := App.ReadJSON(w, r, &updateExpenseData)
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
@@ -84,7 +84,7 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 }
 func NewExpense(w http.ResponseWriter, r *http.Request) {
 	var newExpenseData NewExpenseData
-	err := App.DecodeJSONBody(w, r, &newExpenseData)
+	err := App.ReadJSON(w, r, &newExpenseData)
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {

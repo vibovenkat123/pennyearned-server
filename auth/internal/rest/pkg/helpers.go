@@ -19,6 +19,8 @@ func (malformedreq *MalformedReq) Error() string {
 }
 
 func (app *Application) ReadJSON(w http.ResponseWriter, r *http.Request, dataToDecode interface{}) error {
+	maxBytes := 1_048_576
+	r.Body = http.MaxBytesReader(w, r.Body, int64(maxBytes))
 	err := json.NewDecoder(r.Body).Decode(dataToDecode)
 	if err != nil {
 		var syntaxError *json.SyntaxError

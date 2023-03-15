@@ -75,17 +75,17 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	}
 
 	id := chi.URLParam(r, "id")
-	name := r.URL.Query().Get("name")
-	inputSpent := r.URL.Query().Get("spent")
+	name := updateExpenseData.Name
+	inputSpent := updateExpenseData.Spent
 	original, err := db.GetExpenseById(id)
 	var spent int
 	if len(name) <= 0 {
 		name = original.Name
 	}
-	if len(inputSpent) <= 0 {
+	if inputSpent <= 0 {
 		spent = original.Spent
 	} else {
-		spent, err = strconv.Atoi(inputSpent)
+		spent = inputSpent
 		if err != nil {
 			ErrInvalidFormat(w)
 			return
@@ -121,9 +121,9 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ownerid := r.URL.Query().Get("ownerid")
-	name := r.URL.Query().Get("name")
-	spent, err := strconv.Atoi(r.URL.Query().Get("spent"))
+	ownerid := newExpenseData.OwnerID
+	name := newExpenseData.Name
+	spent := newExpenseData.Spent
 	if err != nil {
 		var malformedreq *helpers.MalformedReq
 		if errors.As(err, &malformedreq) {

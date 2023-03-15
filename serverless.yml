@@ -4,7 +4,7 @@ org: vibovenkat
 provider:
   name: aws
   runtime: go1.x
- 
+
 package:
   patterns:
   - '!./**'
@@ -15,60 +15,60 @@ functions:
   signout:
     handler: auth/bin/server
     events:
-      - http: 
-          path: api/user/session/{id}
+      - http:
+          path: v1/api/user/session/{id}
           method: delete
   verifyemail:
     handler: auth/bin/server
     events:
       - http:
-          path: api/user
+          path: v1/api/user
           method: post
   signupverify:
     handler: auth/bin/server
     events:
       - http:
-          path: api/user/verify/{code}
+          path: v1/api/user/verify/{code}
           method: post
   signin:
     handler: auth/bin/server
     events:
       - http:
-          path: api/user/session
+          path: v1/api/user/session
           method: post
   getuserbycookie:
     handler: auth/bin/server
     events:
       - http:
-          path: api/user/{id}
+          path: v1/api/user/{id}
           method: get
   getexpense:
     handler: expenses/bin/server
     events:
       - http:
-          path: api/expense/{id}
+          path: v1/api/expense/{id}
           method: get
   deleteexpense:
     handler: expenses/bin/server
     events:
       - http:
-          path: api/expense/{id}
+          path: v1/api/expense/{id}
           method: delete
   updateexpense:
     handler: expenses/bin/server
     events:
       - http:
-          path: api/expense/{id}
-          method: patch 
+          path: v1/api/expense/{id}
+          method: patch
   newexpense:
     handler: expenses/bin/server
     events:
       - http:
-          path: api/expense
+          path: v1/api/expense
           method: post
   getexpensebyuser:
     handler: expenses/bin/server
     events:
       - http:
-          path: api/user/{id}/expenses
+          path: v1/api/user/{id}/expenses
           method: get

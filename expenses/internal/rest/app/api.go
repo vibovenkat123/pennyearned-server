@@ -31,8 +31,8 @@ func Expose(log *zap.Logger, local bool) {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
-	r.Route("/api/expense", expensesRouter)
-	r.Route("/api/user", userRouter)
+	r.Route("/v1/api/expense", expensesRouter)
+	r.Route("/v1/api/user", userRouter)
 	if local {
 		handler := cors.Default().Handler(r)
 		log.Info("Starting server",

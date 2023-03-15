@@ -77,20 +77,23 @@ func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dataToDecode interfa
 	return nil
 }
 
-func WriteJSON(w http.ResponseWriter, status int, data any, headers http.Header) error {
+func DefaultEnvelope(data any) Envelope {
+	return Envelope{topKey: data}
+}
+func WriteJSON(w http.ResponseWriter, status int, data Envelope, headers http.Header) error {
 	// Encode the data to JSON, returning the error if there was one.
 	// Make the json pretty printed/tabbed
 	js, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		return err
 	}
-	// Append a newline to make it easier to view in terminal applications.
+	// Append a newline to make it easier to view in terminal applications (CURL).
 	js = append(js, '\n')
 
 	for key, value := range headers {
 		w.Header()[key] = value
 	}
-	// Add the "Content-Type: application/json" header, then write the status code and // JSON response.
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	w.Write(js)

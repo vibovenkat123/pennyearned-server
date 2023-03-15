@@ -70,7 +70,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	accessTokenResponse := helpers.UserAccessRes{
 		AccessToken: *accessToken,
 	}
-	err = helpers.WriteJSON(w, http.StatusOK, accessTokenResponse, nil)
+	err = helpers.WriteJSON(w, http.StatusOK, helpers.DefaultEnvelope(accessTokenResponse), nil)
 	if err != nil {
 		log.Error("Error writing JSON",
 			zap.Error(err),
@@ -132,7 +132,7 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	accessTokenResponse := helpers.UserAccessRes{
 		AccessToken: *accessToken,
 	}
-	err = helpers.WriteJSON(w, http.StatusCreated, accessTokenResponse, nil)
+	err = helpers.WriteJSON(w, http.StatusCreated, helpers.DefaultEnvelope(accessTokenResponse), nil)
 	if err != nil {
 		log.Error("Error writing JSON",
 			zap.Error(err),
@@ -150,7 +150,7 @@ func GetByCookie(w http.ResponseWriter, r *http.Request) {
 	userIDResponse := helpers.UserIDRes{
 		ID: val,
 	}
-	err = helpers.WriteJSON(w, http.StatusOK, userIDResponse, nil)
+	err = helpers.WriteJSON(w, http.StatusOK, helpers.DefaultEnvelope(userIDResponse), nil)
 	if err != nil {
 		log.Error("Error writing JSON",
 			zap.Error(err),

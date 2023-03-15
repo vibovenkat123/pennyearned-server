@@ -77,7 +77,11 @@ func DecodeJSONBody(w http.ResponseWriter, r *http.Request, dataToDecode interfa
 	return nil
 }
 
-func WriteJSON(w http.ResponseWriter, status int, data any, headers http.Header) error {
+func DefaultEnvelope(data any) Envelope{
+	return Envelope{topKey: data}
+}
+
+func WriteJSON(w http.ResponseWriter, status int, data Envelope, headers http.Header) error {
 	// Encode the data to JSON, returning the error if there was one.
 	// Make the json pretty printed/tabbed
 	js, err := json.MarshalIndent(data, "", "\t")

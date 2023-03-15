@@ -16,6 +16,9 @@ type SignUpVerifyData struct {
 	Password string `json:"password"`
 }
 
+// Make the json pretty printed/tabbed
+type Envelope map[string]any
+
 type VerifyData struct {
 	Email string `json:"email"`
 }
@@ -28,6 +31,8 @@ type UserAccessRes struct {
 	AccessToken string `json:"access_token"`
 }
 
+// the top key that the envelope uses by default
+var topKey = "user"
 var Port int
 var ConvertErr error
 var envPort string

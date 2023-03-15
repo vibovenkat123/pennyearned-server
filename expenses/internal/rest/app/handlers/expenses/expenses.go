@@ -34,7 +34,7 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 		ErrNotFound(w)
 		return
 	}
-	err = helpers.WriteJSON(w, http.StatusOK, expense, nil)
+	err = helpers.WriteJSON(w, http.StatusOK, helpers.DefaultEnvelope(expense), nil)
 	if err != nil {
 		log.Error("Error writing JSON",
 			zap.Error(err),
@@ -53,7 +53,7 @@ func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 		ErrNotFound(w)
 		return
 	}
-	err = helpers.WriteJSON(w, http.StatusOK, ownerExpenses, nil)
+	err = helpers.WriteJSON(w, http.StatusOK, helpers.Envelope{"expenses": ownerExpenses}, nil)
 	if err != nil {
 		log.Error("Error writing JSON",
 			zap.Error(err),
@@ -100,7 +100,7 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 		ErrNotFound(w)
 		return
 	}
-	err = helpers.WriteJSON(w, http.StatusOK, updatedExpense, nil)
+	err = helpers.WriteJSON(w, http.StatusOK, helpers.DefaultEnvelope(updatedExpense), nil)
 	if err != nil {
 		log.Error("Error writing JSON",
 			zap.Error(err),
@@ -143,7 +143,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 		ErrNotFound(w)
 		return
 	}
-	err = helpers.WriteJSON(w, http.StatusCreated, newExpense, nil)
+	err = helpers.WriteJSON(w, http.StatusCreated, helpers.DefaultEnvelope(newExpense), nil)
 	if err != nil {
 		log.Error("Error writing JSON",
 			zap.Error(err),

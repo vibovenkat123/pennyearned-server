@@ -95,6 +95,9 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 	to := []string{email}
 	err = db.SendEmail(to, r.Context())
 	if err != nil {
+		if strings.Contains(err.Error(), "is not a valid RFC-5321 address") {
+			ErrInvalidFormat(w, http.StatusText(400))
+		}
 		ErrServer(w, err.Error())
 		return
 	}

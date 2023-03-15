@@ -30,7 +30,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
-			App.ErrorResponse(w, r, malformedreq.StatusCode, malformedreq.Msg)
+			App.BadRequestResponse(w, r, err)
 		} else {
 			App.ServerErrorResponse(w, r, err)
 		}
@@ -62,7 +62,7 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
-			App.ErrorResponse(w, r, malformedreq.StatusCode, malformedreq.Msg)
+			App.BadRequestResponse(w, r, err)
 		} else {
 			App.ServerErrorResponse(w, r, err)
 		}
@@ -73,7 +73,7 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 	err = db.SendEmail(to, r.Context())
 	if err != nil {
 		if strings.Contains(err.Error(), "is not a valid RFC-5321 address") {
-			App.WrongFormatResponse(w, r)
+			App.BadRequestResponse(w, r, ErrEmailWrongFormat)
 			return
 		}
 		App.ServerErrorResponse(w, r, err)
@@ -87,7 +87,7 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		var malformedreq *MalformedReq
 		if errors.As(err, &malformedreq) {
-			App.ErrorResponse(w, r, malformedreq.StatusCode, malformedreq.Msg)
+			App.BadRequestResponse(w, r, err)
 		} else {
 			App.ServerErrorResponse(w, r, err)
 		}
@@ -98,7 +98,7 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	name := signUpVerifyData.Name
 	username := signUpVerifyData.Username
 	if !validate.All(name, username, code, password) {
-		App.WrongFormatResponse(w, r)
+		App.BadRequestResponse(w, r, ErrSignUpWrongFormat)
 		return
 	}
 	accessToken, err := db.SignUp(name, username, password, code, r.Context())

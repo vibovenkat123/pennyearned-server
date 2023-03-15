@@ -25,6 +25,7 @@ func Connect(log *zap.Logger) (helpers.DatabaseType, helpers.RedisType) {
 			zap.Error(helpers.RedisConvertErr),
 		)
 	}
+	log.Info("Attempting to connect...")
 	rdb, redisErr := ConnectRedis()
 	if redisErr != nil {
 		log.Error("Failed to connect to redis",
@@ -63,7 +64,6 @@ func ConnectPostgres() (*helpers.DatabaseType, error) {
 	usersDBInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		helpers.DBInfo.Host, helpers.DBInfo.Port, helpers.DBInfo.User, helpers.DBInfo.Password, helpers.DBInfo.Dbname)
-	fmt.Println("Attempting to connect...")
 	helpers.DB, err = sqlx.Open("postgres", usersDBInfo)
 	if err != nil {
 		return nil, err

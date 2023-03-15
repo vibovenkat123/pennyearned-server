@@ -12,6 +12,7 @@ import (
 	"github.com/go-chi/chi/v5"
 	"go.uber.org/zap"
 )
+
 var log *zap.Logger
 
 func SetLogger(logger *zap.Logger) {

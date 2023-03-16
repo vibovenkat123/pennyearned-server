@@ -32,12 +32,12 @@ type Schema struct {
 	Alter  string
 }
 type Expense struct {
-	ID          string `db:"id"`
-	OwnerID     string `db:"owner_id"`
-	Name        string `db:"name"`
-	Spent       int    `db:"spent"`
-	DateCreated string `db:"date_created"`
-	DateUpdated string `db:"date_updated"`
+	ID          string `db:"id" json:"id"`
+	OwnerID     string `db:"owner_id" json:"owner_id"`
+	Name        string `db:"name" json:"name"`
+	Spent       int    `db:"spent" json:"spent"`
+	DateCreated string `db:"date_created" json:"date_created"`
+	DateUpdated string `db:"date_updated" json:"date_updated"`
 }
 type DatabaseType = *sqlx.DB
 

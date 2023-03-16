@@ -29,7 +29,7 @@ func SetLogger(logger *zap.Logger) {
 }
 
 type NewExpenseData struct {
-	OwnerID string `json:"ownerid"`
+	OwnerID string `json:"owner_id"`
 	Name    string `json:"name"`
 	Spent   int    `json:"spent"`
 }

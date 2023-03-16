@@ -1,5 +1,5 @@
 {
     "name": "water",
     "spent": 1000,
-    "ownerid": "uuid_here"
+    "owner_id": "uuid_here"
 }

@@ -44,13 +44,13 @@ type Params struct {
 }
 
 type User struct {
-	ID          string `db:"id"`
-	Name        string `db:"name"`
-	Email       string `db:"email"`
-	Username    string `db:"username"`
-	Password    string `db:"password"`
-	DateCreated string `db:"date_created"`
-	DateUpdated string `db:"date_updated"`
+	ID          string `db:"id" json:"id"`
+	Name        string `db:"name" json:"name,omitempty"`
+	Email       string `db:"email" json:"email"`
+	Username    string `db:"username" json:"username"`
+	Password    string `db:"password" json:"password"`
+	DateCreated string `db:"date_created" json:"date_created"`
+	DateUpdated string `db:"date_updated" json:"date_updated"`
 }
 type DatabaseType = *sqlx.DB
 type RedisType = *redis.Client

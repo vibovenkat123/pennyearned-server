@@ -80,7 +80,6 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 		App.BadRequestResponse(w, r, err)
 		return
 	}
-
 	ownerid := newExpenseData.OwnerID
 	name := newExpenseData.Name
 	spent := newExpenseData.Spent

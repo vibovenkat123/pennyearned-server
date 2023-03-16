@@ -1,9 +1,6 @@
 # The Server For Pennyearned
 
-This repository contains the backend and apis for PennyEarned
+## Pennyeared is a simple, secure service to help manage your budgets
 
-Both the frontend and the backend are in active development
-
-If you have any questions, feel free to contact me at <vibovenkat@gmail.com>
-
-The Frontend Website is at <https://pennyearned.vercel.app>
+Instead of stealing your credit card info and gathering data about you, pennyearned just helps you set your budgets and manage them
+in a simple yet elegant manner

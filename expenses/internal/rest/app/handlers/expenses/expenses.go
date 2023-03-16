@@ -57,22 +57,19 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 
 	id := chi.URLParam(r, "id")
 	name := updateExpenseData.Name
-	inputSpent := updateExpenseData.Spent
-	original, err := db.GetExpenseById(id)
-	var spent int
-	if len(name) <= 0 {
-		name = original.Name
+	spent := updateExpenseData.Spent
+	expense, err := db.GetExpenseById(id)
+	if name != nil {
+		expense.Name = *name
 	}
-	if inputSpent <= 0 {
-		spent = original.Spent
-	} else {
-		spent = inputSpent
+	if spent != nil {
+		expense.Spent  = *spent
 	}
-	if good := validate.All(id, name, spent); !good {
+	if good := validate.All(id, expense.Name, expense.Spent); !good {
 		App.BadRequestResponse(w, r, ErrExpenseInvalid)
 		return
 	}
-	updatedExpense, err := db.UpdateExpense(id, name, spent)
+	updatedExpense, err := db.UpdateExpense(id, expense.Name, expense.Spent)
 	if err != nil {
 		App.NotFoundResponse(w, r)
 		return

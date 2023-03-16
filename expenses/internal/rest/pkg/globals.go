@@ -8,8 +8,8 @@ import (
 )
 
 type UpdateExpenseData struct {
-	Name  string `json:"name"`
-	Spent int    `json:"spent"`
+	Name  *string `json:"name"`
+	Spent *int    `json:"spent"`
 }
 
 type Application struct {

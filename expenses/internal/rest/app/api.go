@@ -29,7 +29,6 @@ func Expose(local bool) {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 	r.Route("/v1/api/expense", expenseRouter)
-	r.Route("/v1/api/user", userRouter)
 	if local {
 		handler := cors.Default().Handler(r)
 		App.Log.Info("Starting server",
@@ -62,6 +61,7 @@ func UserIDRouter(r chi.Router) {
 func expenseRouter(r chi.Router) {
 	r.Route("/{id}", ExpenseIDRouter)
 	r.Post("/", handlers.NewExpense)
+	r.Route("/user", userRouter)
 }
 func ExpenseIDRouter(r chi.Router) {
 	r.Get("/", handlers.GetByID)

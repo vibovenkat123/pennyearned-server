@@ -43,11 +43,6 @@ type Params struct {
 	KeyLength   uint32
 }
 
-type Schema struct {
-	Create string
-	Drop   string
-	Alter  string
-}
 type User struct {
 	ID          string `db:"id"`
 	Name        string `db:"name"`

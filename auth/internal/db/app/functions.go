@@ -220,22 +220,6 @@ func comparePasswordAndHash(password string, encodedHash string) (matches bool, 
 	return false, nil
 }
 
-// apply changes to db (no breaking ones)
-func Migrate() {
-	log.Info("Migrating...")
-	helpers.DB.MustExec(helpers.DefaultSchema.Create)
-	ExecMultiple(helpers.DB, helpers.DefaultSchema.Alter)
-	log.Info("Migrated!!")
-}
-
-// WARNING: THIS FUNCTION RESETS THE DATABASE
-func ResetToSchema() {
-	log.Info("Resetting...")
-	ExecMultiple(helpers.DB, helpers.DefaultSchema.Drop)
-	helpers.DB.MustExec(helpers.DefaultSchema.Create)
-	ExecMultiple(helpers.DB, helpers.DefaultSchema.Alter)
-	log.Info("Resetted!!")
-}
 func ExecMultiple(e helpers.DatabaseType, query string) {
 	statements := strings.Split(query, "\n")
 	if len(strings.Trim(statements[len(statements)-1], " \n\t\r")) == 0 {

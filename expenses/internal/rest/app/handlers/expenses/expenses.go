@@ -1,7 +1,6 @@
 package expenses
 
 import (
-	"errors"
 	"github.com/go-chi/chi/v5"
 	"main/expenses/internal/db/app"
 	. "main/expenses/internal/rest/pkg"
@@ -46,12 +45,7 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	var updateExpenseData UpdateExpenseData
 	err := App.ReadJSON(w, r, &updateExpenseData)
 	if err != nil {
-		var malformedreq *MalformedReq
-		if errors.As(err, &malformedreq) {
-			App.BadRequestResponse(w, r, err)
-		} else {
-			App.ServerErrorResponse(w, r, err)
-		}
+		App.BadRequestResponse(w, r, err)
 		return
 	}
 
@@ -63,7 +57,7 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 		expense.Name = *name
 	}
 	if spent != nil {
-		expense.Spent  = *spent
+		expense.Spent = *spent
 	}
 	if good := validate.All(id, expense.Name, expense.Spent); !good {
 		App.BadRequestResponse(w, r, ErrExpenseInvalid)
@@ -83,12 +77,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	var newExpenseData NewExpenseData
 	err := App.ReadJSON(w, r, &newExpenseData)
 	if err != nil {
-		var malformedreq *MalformedReq
-		if errors.As(err, &malformedreq) {
-			App.BadRequestResponse(w, r, err)
-		} else {
-			App.ServerErrorResponse(w, r, err)
-		}
+		App.BadRequestResponse(w, r, err)
 		return
 	}
 
@@ -96,12 +85,7 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	name := newExpenseData.Name
 	spent := newExpenseData.Spent
 	if err != nil {
-		var malformedreq *MalformedReq
-		if errors.As(err, &malformedreq) {
-			App.BadRequestResponse(w, r, err)
-		} else {
-			App.ServerErrorResponse(w, r, err)
-		}
+		App.BadRequestResponse(w, r, err)
 		return
 	}
 	good := validate.All(ownerid, name, spent)

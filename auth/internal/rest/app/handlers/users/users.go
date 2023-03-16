@@ -1,7 +1,6 @@
 package users
 
 import (
-	"errors"
 	"main/auth/internal/db/app"
 	dbGlobals "main/auth/internal/db/pkg"
 	. "main/auth/internal/rest/pkg"
@@ -28,12 +27,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	var signInData SignInData
 	err := App.ReadJSON(w, r, &signInData)
 	if err != nil {
-		var malformedreq *MalformedReq
-		if errors.As(err, &malformedreq) {
-			App.BadRequestResponse(w, r, err)
-		} else {
-			App.ServerErrorResponse(w, r, err)
-		}
+		App.BadRequestResponse(w, r, err)
 		return
 	}
 	email := signInData.Email
@@ -60,12 +54,7 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 	var verifyData VerifyData
 	err := App.ReadJSON(w, r, &verifyData)
 	if err != nil {
-		var malformedreq *MalformedReq
-		if errors.As(err, &malformedreq) {
-			App.BadRequestResponse(w, r, err)
-		} else {
-			App.ServerErrorResponse(w, r, err)
-		}
+		App.ServerErrorResponse(w, r, err)
 		return
 	}
 	email := verifyData.Email
@@ -85,12 +74,7 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	var signUpVerifyData SignUpVerifyData
 	err := App.ReadJSON(w, r, &signUpVerifyData)
 	if err != nil {
-		var malformedreq *MalformedReq
-		if errors.As(err, &malformedreq) {
-			App.BadRequestResponse(w, r, err)
-		} else {
-			App.ServerErrorResponse(w, r, err)
-		}
+		App.BadRequestResponse(w, r, err)
 		return
 	}
 	code := chi.URLParam(r, "code")

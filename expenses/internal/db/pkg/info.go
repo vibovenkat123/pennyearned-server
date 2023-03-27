@@ -8,7 +8,6 @@ import (
 var dbHost string
 var envPort string
 var port int
-var err error
 var DBInfo Info
 var dbUser string
 var dbName string

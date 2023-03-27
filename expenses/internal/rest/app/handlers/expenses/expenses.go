@@ -1,11 +1,13 @@
 package expenses
 
 import (
-	"github.com/go-chi/chi/v5"
 	"main/expenses/internal/db/app"
+	dbHelpers "main/expenses/internal/db/pkg"
 	. "main/expenses/internal/rest/pkg"
 	"main/expenses/pkg/validate"
 	"net/http"
+
+	"github.com/go-chi/chi/v5"
 )
 
 func GetByID(w http.ResponseWriter, r *http.Request) {
@@ -53,6 +55,16 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	name := updateExpenseData.Name
 	spent := updateExpenseData.Spent
 	expense, err := db.GetExpenseById(id)
+
+	if err != nil {
+		if err == dbHelpers.ErrExpenseNotFound {
+			App.NotFoundResponse(w, r)
+		} else {
+			App.ServerErrorResponse(w, r, err)
+		}
+		return
+	}
+
 	if name != nil {
 		expense.Name = *name
 	}

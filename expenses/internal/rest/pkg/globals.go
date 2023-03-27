@@ -13,10 +13,9 @@ type UpdateExpenseData struct {
 }
 
 type Application struct {
-	Log *zap.Logger
+	Log  *zap.Logger
 	Conf Config
 }
-
 
 type Config struct {
 	Port int
@@ -39,7 +38,7 @@ type Envelope map[string]any
 
 var ConvertErr error
 var Local bool
-var err error
+
 // the default key the envelope uses
 var topKey = "expense"
 

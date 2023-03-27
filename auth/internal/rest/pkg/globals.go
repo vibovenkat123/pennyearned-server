@@ -8,7 +8,7 @@ import (
 )
 
 type Application struct {
-	Log *zap.Logger
+	Log  *zap.Logger
 	Conf Config
 }
 
@@ -17,6 +17,7 @@ type Config struct {
 }
 
 var App *Application = &Application{}
+
 func SetLogger(logger *zap.Logger) {
 	App.Log = logger
 }
@@ -50,6 +51,7 @@ type UserAccessRes struct {
 // the top key that the envelope uses by default
 var topKey = "user"
 var Local bool
+
 func init() {
 	var envPort string
 	Local = os.Getenv("GO_ENV") == "local"

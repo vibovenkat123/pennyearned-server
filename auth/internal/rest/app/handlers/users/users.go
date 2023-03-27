@@ -11,17 +11,19 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func Success(w http.ResponseWriter, text string) {
-	w.WriteHeader(200)
-	w.Write([]byte(text))
-}
-func PartialSuccess(w http.ResponseWriter, text string) {
+func PartialSuccess(w http.ResponseWriter, text string, r *http.Request) {
 	w.WriteHeader(202)
-	w.Write([]byte(text))
+	_, err := w.Write([]byte(text))
+	if err != nil {
+		App.LogError(err, r)
+	}
 }
-func SuccessfullyDeleted(w http.ResponseWriter, text string) {
+func SuccessfullyDeleted(w http.ResponseWriter, text string, r *http.Request) {
 	w.WriteHeader(204)
-	w.Write([]byte(text))
+	_, err := w.Write([]byte(text))
+	if err != nil {
+		App.LogError(err, r)
+	}
 }
 func SignIn(w http.ResponseWriter, r *http.Request) {
 	var signInData SignInData
@@ -68,7 +70,7 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 		App.ServerErrorResponse(w, r, err)
 		return
 	}
-	PartialSuccess(w, http.StatusText(202))
+	PartialSuccess(w, http.StatusText(202), r)
 }
 func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	var signUpVerifyData SignUpVerifyData
@@ -126,5 +128,5 @@ func SignOut(w http.ResponseWriter, r *http.Request) {
 		App.NotFoundResponse(w, r)
 		return
 	}
-	SuccessfullyDeleted(w, http.StatusText(204))
+	SuccessfullyDeleted(w, http.StatusText(204), r)
 }

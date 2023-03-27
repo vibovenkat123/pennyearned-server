@@ -27,12 +27,12 @@ var (
 	ErrPassNotMatch        = errors.New("Password is invalid")
 	ErrEmailNotFound       = errors.New("Email not found")
 	ErrAlreadyFound        = errors.New("Email or Username already found")
-	ErrUsernameTooShort    = errors.New(fmt.Sprintf("Username must be bigger than %v character(s)", minUsernameLength))
-	ErrUsernameTooLong     = errors.New(fmt.Sprintf("Username must be smaller than %v character(s)", maxUsernameLength))
-	ErrPasswordTooShort    = errors.New(fmt.Sprintf("Password must be bigger than %v character(s)", minPasswordLength))
-	ErrPasswordTooLong     = errors.New(fmt.Sprintf("Password must be smaller than %v character(s)", maxPasswordLength))
-	ErrNameTooShort        = errors.New(fmt.Sprintf("Name must be bigger than %v character(s)", minNameLength))
-	ErrNameTooLong         = errors.New(fmt.Sprintf("Name must be smaller than %v character(s)", maxNameLength))
+	ErrUsernameTooShort    = fmt.Errorf("Username must be bigger than %v character(s)", minUsernameLength)
+	ErrUsernameTooLong     = fmt.Errorf("Username must be smaller than %v character(s)", maxUsernameLength)
+	ErrPasswordTooShort    = fmt.Errorf("Password must be bigger than %v character(s)", minPasswordLength)
+	ErrPasswordTooLong     = fmt.Errorf("Password must be smaller than %v character(s)", maxPasswordLength)
+	ErrNameTooShort        = fmt.Errorf("Name must be bigger than %v character(s)", minNameLength)
+	ErrNameTooLong         = fmt.Errorf("Name must be smaller than %v character(s)", maxNameLength)
 )
 
 type Params struct {

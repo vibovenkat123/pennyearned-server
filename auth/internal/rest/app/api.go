@@ -16,8 +16,8 @@ import (
 	"time"
 )
 
-var env string
 var adapter *chiadapter.ChiLambda
+
 func Expose(local bool) {
 	r := chi.NewRouter()
 	r.NotFound(http.HandlerFunc(App.NotFoundResponse))
@@ -33,7 +33,12 @@ func Expose(local bool) {
 		App.Log.Info("Starting server",
 			zap.String("Port", fmt.Sprintf("%v", App.Conf.Port)),
 		)
-		http.ListenAndServe(fmt.Sprintf(":%v", App.Conf.Port), handler)
+		err := http.ListenAndServe(fmt.Sprintf(":%v", App.Conf.Port), handler)
+		if err != nil {
+			App.Log.Error("Error starting server",
+				zap.Error(err),
+			)
+		}
 	} else {
 		App.Log.Info("Starting server on lambda")
 		adapter = chiadapter.New(r)

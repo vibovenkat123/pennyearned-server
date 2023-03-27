@@ -1,14 +1,14 @@
 package apiHelpers
 
 import (
+	"errors"
 	"fmt"
 	"go.uber.org/zap"
 	"net/http"
-	"errors"
 )
 
 var (
-	ErrInvalidID = errors.New("The ID provided is not the valid format for a id")
+	ErrInvalidID      = errors.New("The ID provided is not the valid format for a id")
 	ErrExpenseInvalid = errors.New("The parameters provided for creating/updating a expense are invalid")
 )
 

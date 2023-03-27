@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	"go.uber.org/zap"
 )
 
 type MalformedReq struct {
@@ -69,6 +71,11 @@ func (app *Application) WriteJSON(w http.ResponseWriter, status int, data Envelo
 	// Add the "Content-Type: application/json" header, then write the status code and // JSON response.
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	w.Write(js)
+	_, err = w.Write(js)
+	if err != nil {
+		App.Log.Error("Error writing json",
+			zap.Error(err),
+		)
+	}
 	return nil
 }

@@ -2,13 +2,13 @@ package db
 
 // imports
 import (
-	"fmt"
 	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/subtle"
 	"database/sql"
 	"encoding/base64"
+	"fmt"
 	"html/template"
 	helpers "main/auth/internal/db/pkg"
 	mathrand "math/rand"
@@ -75,8 +75,11 @@ func SendEmail(to []string, ctx context.Context) error {
 			return err
 		}
 	}
-	tmpt.Execute(&body, data)
-	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, fromEmail, to, body.Bytes())
+	err := tmpt.Execute(&body, data)
+	if err != nil {
+		return err
+	}
+	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, fromEmail, to, body.Bytes())
 	if err != nil {
 		return err
 	}

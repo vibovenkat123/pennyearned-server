@@ -11,14 +11,6 @@ type IDResponse struct {
 }
 
 var (
-	minNameLength     = 1
-	maxNameLength     = 20
-	minUsernameLength = 2
-	maxUsernameLength = 30
-	minPasswordLength = 8
-	maxPasswordLength = 20
-)
-var (
 	ErrEmailInvalid     = errors.New("Email is invalid")
 	ErrExpensesNotFound = errors.New("Expenses not found")
 	ErrExpenseNotFound  = errors.New("Expense not found")

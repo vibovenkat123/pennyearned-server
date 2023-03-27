@@ -1,14 +1,14 @@
 package apiHelpers
 
 import (
+	"errors"
 	"fmt"
 	"go.uber.org/zap"
 	"net/http"
-	"errors"
 )
 
 var (
-	ErrEmailWrongFormat error = errors.New("The email provided is not the valid format")
+	ErrEmailWrongFormat  error = errors.New("The email provided is not the valid format")
 	ErrSignUPWrongFormat error = errors.New("The parameters passed to sign up are not the valid format")
 )
 

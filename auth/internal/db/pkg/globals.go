@@ -67,8 +67,8 @@ var P = &Params{
 
 type Info struct {
 	Host     string
-	Port     int
 	User     string
 	Password string
 	Dbname   string
+	Port     int
 }

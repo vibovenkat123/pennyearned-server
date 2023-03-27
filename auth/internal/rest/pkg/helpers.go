@@ -9,8 +9,8 @@ import (
 )
 
 type MalformedReq struct {
-	StatusCode int
 	Msg        string
+	StatusCode int
 }
 
 // a basic error log

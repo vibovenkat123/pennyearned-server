@@ -81,6 +81,58 @@ pub async fn get(
 }
 
 #[axum_macros::debug_handler]
+pub async fn delete(
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<state_struct>>,
+    Path(id): Path<String>,
+) -> Result<StatusCode, StatusCode> {
+    info!("Incoming request from address {}", addr);
+    if !validate_id(id.clone()) {
+        debug!("ID is not valid");
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    info!(
+        id,
+        "addr={}, {}", addr, "checking if expense exists to delete"
+    );
+    let _ = match sqlx::query!(
+        r#"
+        SELECT *
+          FROM expenses
+          WHERE id=$1
+        "#,
+        id
+    )
+    .fetch_one(&state.pool)
+    .await
+    {
+        Ok(val) => val,
+        Err(e) => match e {
+            sqlx::Error::RowNotFound => {
+                error!(id, "addr={}, {}", addr, "expense not found");
+                return Err(StatusCode::NOT_FOUND);
+            }
+            _ => {
+                error!("{e}");
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
+            }
+        },
+    };
+    info!(id, "addr={}, {}", addr, "deleting specific expense");
+    sqlx::query!(
+        r#"
+        DELETE
+          FROM expenses
+          WHERE id=$1
+        "#,
+        id
+    )
+    .execute(&state.pool)
+    .await
+    .unwrap();
+    Ok(StatusCode::NO_CONTENT)
+}
+#[axum_macros::debug_handler]
 pub async fn get_by_user_id(
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<state_struct>>,
@@ -88,10 +140,11 @@ pub async fn get_by_user_id(
 ) -> Result<Json<Vec<Expense>>, StatusCode> {
     info!("Incoming request from address {}", addr);
     if !validate_id(id.clone()) {
+        debug!("ID is not valid");
         return Err(StatusCode::BAD_REQUEST);
     }
     info!(id, "addr={}, {}", addr, "getting all expenses for user");
-    let expense: Vec<Expense>  = match sqlx::query_as!(
+    let expense: Vec<Expense> = match sqlx::query_as!(
         Expense,
         r#"
         SELECT *
@@ -187,11 +240,7 @@ pub async fn update(
         return Err(StatusCode::BAD_REQUEST);
     }
     info!("{} {}", addr, "Getting original expense details");
-    let original: Expense = match sqlx::query_as!(
-        Expense,
-        "SELECT * FROM expenses WHERE id=$1",
-        id
-     )
+    let original: Expense = match sqlx::query_as!(Expense, "SELECT * FROM expenses WHERE id=$1", id)
         .fetch_one(&state.pool)
         .await
     {

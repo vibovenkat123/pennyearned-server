@@ -2,7 +2,7 @@ use std::{net::SocketAddr, sync::Arc};
 
 use crate::api::handlers;
 use axum::{
-    routing::{get, post, put},
+    routing::{delete, get, post, put},
     Router,
 };
 use sqlx::{Pool, Postgres};
@@ -30,12 +30,13 @@ fn app(state: Arc<State>) -> Router {
     debug!("Creating the router");
     let router = Router::new()
         .route("/v1/api/expense/:id", get(handlers::expenses::get))
+        .route("/v1/api/expense/:id", put(handlers::expenses::update))
+        .route("/v1/api/expense/:id", delete(handlers::expenses::delete))
         .route(
             "/v1/api/expenses/user/:id",
             get(handlers::expenses::get_by_user_id),
         )
         .route("/v1/api/expense", post(handlers::expenses::new))
-        .route("/v1/api/expenses/:id", put(handlers::expenses::update))
         .with_state(state);
     debug!("Created router; router={:?}", router);
     router

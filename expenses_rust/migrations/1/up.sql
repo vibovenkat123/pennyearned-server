@@ -1,0 +1,8 @@
+CREATE TABLE expenses (
+    id TEXT DEFAULT gen_random_uuid() NOT NULL PRIMARY KEY,
+    owner_id TEXT NOT NULL,
+    NAME VARCHAR(255) NOT NULL,
+    spent INTEGER NOT NULL DEFAULT 0,
+    date_created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+    date_updated TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);

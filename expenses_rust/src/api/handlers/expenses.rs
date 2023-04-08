@@ -1,12 +1,12 @@
 use axum::{
-    extract::{self, Path, State, ConnectInfo},
+    extract::{self, ConnectInfo, Path, State},
     http::StatusCode,
     Json,
 };
 use chrono::serde::ts_seconds::serialize as to_ts;
 use chrono::DateTime;
 use serde::{Deserialize, Serialize};
-use std::{sync::Arc, net::SocketAddr};
+use std::{net::SocketAddr, sync::Arc};
 use tracing::debug;
 use tracing::error;
 use tracing::info;

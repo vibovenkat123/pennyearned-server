@@ -1,4 +1,4 @@
-use std::{sync::Arc, net::SocketAddr};
+use std::{net::SocketAddr, sync::Arc};
 
 use crate::api::handlers;
 use axum::{
@@ -6,7 +6,7 @@ use axum::{
     Router,
 };
 use sqlx::{Pool, Postgres};
-use tracing::{info, warn, debug};
+use tracing::{debug, info, warn};
 
 pub struct State {
     pub pool: Pool<Postgres>,
@@ -20,9 +20,7 @@ pub async fn init(pool: Pool<Postgres>) -> Result<(), ()> {
     }
     info!(PORT, "Starting web server");
     axum::Server::bind(&format!("0.0.0.0:{}", PORT).parse().unwrap())
-        .serve(
-            app(shared_state).into_make_service_with_connect_info::<SocketAddr>()
-         )
+        .serve(app(shared_state).into_make_service_with_connect_info::<SocketAddr>())
         .await
         .unwrap();
     Ok(())

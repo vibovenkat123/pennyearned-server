@@ -1,7 +1,7 @@
 all: clean test build
-clean: 
+clean:
 	@./scripts/clean.sh
-test: 
+test:
 	@./scripts/test.sh
 build:
 	@./scripts/build.sh

@@ -46,7 +46,8 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	accessTokenResponse := UserAccessRes{
 		AccessToken: *accessToken,
 	}
-	err = App.WriteJSON(w, http.StatusOK, App.DefaultEnvelope(accessTokenResponse), nil)
+	err = App.WriteJSON(w, http.StatusOK,
+		App.DefaultEnvelope(accessTokenResponse), nil)
 	if err != nil {
 		App.ServerErrorResponse(w, r, err)
 	}

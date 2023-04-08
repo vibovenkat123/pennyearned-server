@@ -53,10 +53,17 @@ pub async fn get(
         return Err(StatusCode::BAD_REQUEST);
     }
     info!(id, "addr={}, {}", addr, "getting specific expense");
-    let expense: Expense = match sqlx::query_as::<_, Expense>("SELECT * FROM expenses WHERE id=$1")
-        .bind(id.clone())
-        .fetch_one(&state.pool)
-        .await
+    let expense: Expense = match sqlx::query_as!(
+        Expense,
+        r#"
+        SELECT *
+          FROM expenses
+          WHERE id=$1
+        "#,
+        id
+    )
+    .fetch_one(&state.pool)
+    .await
     {
         Ok(val) => val,
         Err(e) => match e {
@@ -84,10 +91,17 @@ pub async fn get_by_user_id(
         return Err(StatusCode::BAD_REQUEST);
     }
     info!(id, "addr={}, {}", addr, "getting all expenses for user");
-    let expense: Vec<Expense> = match sqlx::query_as("SELECT * FROM expenses where owner_id=$1")
-        .bind(id.clone())
-        .fetch_all(&state.pool)
-        .await
+    let expense: Vec<Expense>  = match sqlx::query_as!(
+        Expense,
+        r#"
+        SELECT *
+          FROM expenses
+          WHERE owner_id=$1
+        "#,
+        id
+    )
+    .fetch_all(&state.pool)
+    .await
     {
         Ok(val) => val,
         Err(e) => match e {
@@ -143,22 +157,24 @@ pub async fn new(
     let id = Uuid::new_v4().to_string();
     debug!(id, "Generated new uuid");
     info!("addr={}, {}", addr, "Creating new expense");
-    sqlx::query(r#"
-                INSERT INTO expenses (owner_id, name, spent, id)
-                VALUES ($1, $2, $3, $4);
-                "#)
-        .bind(owner_id)
-        .bind(name)
-        .bind(spent)
-        .bind(id)
-        .execute(&state.pool)
-        .await
-        .unwrap();
+    sqlx::query!(
+        r#"
+        INSERT INTO expenses (owner_id, name, spent, id)
+          VALUES ($1, $2, $3, $4);
+        "#,
+        owner_id,
+        name,
+        spent,
+        id
+    )
+    .execute(&state.pool)
+    .await
+    .unwrap();
     Ok(StatusCode::CREATED)
 }
 
 #[axum_macros::debug_handler]
-pub async fn update (
+pub async fn update(
     ConnectInfo(addr): ConnectInfo<SocketAddr>,
     State(state): State<Arc<state_struct>>,
     Path(id): Path<String>,
@@ -171,8 +187,11 @@ pub async fn update (
         return Err(StatusCode::BAD_REQUEST);
     }
     info!("{} {}", addr, "Getting original expense details");
-    let original: Expense = match sqlx::query_as::<_, Expense>("SELECT * FROM expenses WHERE id=$1")
-        .bind(id.clone())
+    let original: Expense = match sqlx::query_as!(
+        Expense,
+        "SELECT * FROM expenses WHERE id=$1",
+        id
+     )
         .fetch_one(&state.pool)
         .await
     {
@@ -188,22 +207,26 @@ pub async fn update (
             }
         },
     };
-    info!("{} {}", addr, "Checking if the json values are there or not, and updating them if so");
+    info!(
+        "{} {}",
+        addr, "Checking if the json values are there or not, and updating them if so"
+    );
     let name = payload.name.clone().unwrap_or(original.name);
     let spent = payload.spent.clone().unwrap_or(original.spent);
     info!("addr={}, {}", addr, "Updating expense");
     debug!(id, "With id");
-    sqlx::query(r#"
+    sqlx::query!(
+        r#"
         UPDATE expenses
-        SET date_updated = now(), name = $1, spent = $2
-        WHERE id=$3;
-        "#)
-        .bind(name)
-        .bind(spent)
-        .bind(id)
-        .execute(&state.pool)
-        .await
-        .unwrap();
+          SET date_updated = now(), name = $1, spent = $2
+          WHERE id=$3;
+        "#,
+        name,
+        spent,
+        id
+    )
+    .execute(&state.pool)
+    .await
+    .unwrap();
     Ok(StatusCode::OK)
 }
-

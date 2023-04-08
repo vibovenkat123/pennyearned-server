@@ -12,7 +12,7 @@ use tracing::error;
 use tracing::info;
 use uuid::Uuid;
 
-#[derive(Serialize, sqlx::FromRow)]
+#[derive(Serialize, sqlx::FromRow, Debug)]
 pub struct Expense {
     id: String,
     owner_id: String,
@@ -27,6 +27,11 @@ pub struct Expense {
 #[derive(Deserialize)]
 pub struct NewExpense {
     owner_id: Option<String>,
+    name: Option<String>,
+    spent: Option<i32>,
+}
+#[derive(Deserialize)]
+pub struct UpdateExpense {
     name: Option<String>,
     spent: Option<i32>,
 }
@@ -106,7 +111,7 @@ pub async fn new(
     extract::Json(payload): extract::Json<NewExpense>,
 ) -> Result<StatusCode, StatusCode> {
     info!("Incoming request from address {}", addr);
-    debug!("Validating all the json payloads");
+    info!("Validating all the json payloads");
     let owner_id = match payload.owner_id {
         Some(ref val) => val,
         None => {
@@ -131,12 +136,17 @@ pub async fn new(
         }
     };
     if !validate_id(owner_id.clone()) {
+        error!("Owner ID is not in valid format");
         return Err(StatusCode::BAD_REQUEST);
     }
+    info!("Generating new uuid");
     let id = Uuid::new_v4().to_string();
     debug!(id, "Generated new uuid");
     info!("addr={}, {}", addr, "Creating new expense");
-    sqlx::query("INSERT INTO expenses (owner_id, name, spent, id) VALUES ($1, $2, $3, $4)")
+    sqlx::query(r#"
+                INSERT INTO expenses (owner_id, name, spent, id)
+                VALUES ($1, $2, $3, $4);
+                "#)
         .bind(owner_id)
         .bind(name)
         .bind(spent)
@@ -146,3 +156,54 @@ pub async fn new(
         .unwrap();
     Ok(StatusCode::CREATED)
 }
+
+#[axum_macros::debug_handler]
+pub async fn update (
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+    State(state): State<Arc<state_struct>>,
+    Path(id): Path<String>,
+    extract::Json(payload): extract::Json<UpdateExpense>,
+) -> Result<StatusCode, StatusCode> {
+    info!("Incoming request from address {}", addr);
+    info!("{} {}", addr, "Validating id");
+    if !validate_id(id.clone()) {
+        error!("{} {}", addr, "ID is not in valid format");
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    info!("{} {}", addr, "Getting original expense details");
+    let original: Expense = match sqlx::query_as::<_, Expense>("SELECT * FROM expenses WHERE id=$1")
+        .bind(id.clone())
+        .fetch_one(&state.pool)
+        .await
+    {
+        Ok(val) => val,
+        Err(e) => match e {
+            sqlx::Error::RowNotFound => {
+                error!("addr={}, {}", addr, "expense not found");
+                return Err(StatusCode::NOT_FOUND);
+            }
+            _ => {
+                error!("addr={}, {e}", addr);
+                return Err(StatusCode::INTERNAL_SERVER_ERROR);
+            }
+        },
+    };
+    info!("{} {}", addr, "Checking if the json values are there or not, and updating them if so");
+    let name = payload.name.clone().unwrap_or(original.name);
+    let spent = payload.spent.clone().unwrap_or(original.spent);
+    info!("addr={}, {}", addr, "Updating expense");
+    debug!(id, "With id");
+    sqlx::query(r#"
+        UPDATE expenses
+        SET date_updated = now(), name = $1, spent = $2
+        WHERE id=$3;
+        "#)
+        .bind(name)
+        .bind(spent)
+        .bind(id)
+        .execute(&state.pool)
+        .await
+        .unwrap();
+    Ok(StatusCode::OK)
+}
+

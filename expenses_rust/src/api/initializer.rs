@@ -1,29 +1,43 @@
-use std::sync::Arc;
+use std::{sync::Arc, net::SocketAddr};
 
 use crate::api::handlers;
-use axum::{routing::get, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use sqlx::{Pool, Postgres};
+use tracing::{info, warn, debug};
 
 pub struct State {
     pub pool: Pool<Postgres>,
 }
-
+const PORT: &str = "8009";
 pub async fn init(pool: Pool<Postgres>) -> Result<(), ()> {
     let state = State { pool: pool.clone() };
     let shared_state = Arc::new(state);
-    axum::Server::bind(&"0.0.0.0:8009".parse().unwrap())
-        .serve(app(shared_state).into_make_service())
+    if PORT.is_empty() {
+        warn!(PORT, "port is empty")
+    }
+    info!(PORT, "Starting web server");
+    axum::Server::bind(&format!("0.0.0.0:{}", PORT).parse().unwrap())
+        .serve(
+            app(shared_state).into_make_service_with_connect_info::<SocketAddr>()
+         )
         .await
         .unwrap();
     Ok(())
 }
 
 fn app(state: Arc<State>) -> Router {
-    Router::new()
+    debug!("Creating the router");
+    let router = Router::new()
         .route("/v1/api/expense/:id", get(handlers::expenses::get))
         .route(
             "/v1/api/expenses/user/:id",
             get(handlers::expenses::get_by_user_id),
         )
-        .with_state(state)
+        .route("/v1/api/expense", post(handlers::expenses::new))
+        .with_state(state);
+    debug!("Created router; router={:?}", router);
+    router
 }

@@ -21,5 +21,9 @@ pub async fn init(pool: Pool<Postgres>) -> Result<(), ()> {
 fn app(state: Arc<State>) -> Router {
     Router::new()
         .route("/v1/api/expense/:id", get(handlers::expenses::get))
+        .route(
+            "/v1/api/expenses/user/:id",
+            get(handlers::expenses::get_by_user_id),
+        )
         .with_state(state)
 }

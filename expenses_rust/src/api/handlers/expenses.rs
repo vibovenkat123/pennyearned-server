@@ -32,11 +32,37 @@ pub async fn get(
     Path(id): Path<String>,
 ) -> Result<Json<Expense>, StatusCode> {
     if !validate_id(id.clone()) {
-        return Err(StatusCode::BAD_REQUEST)
+        return Err(StatusCode::BAD_REQUEST);
     }
     let expense: Expense = match sqlx::query_as::<_, Expense>("SELECT * FROM expenses WHERE id=$1")
         .bind(id.clone())
         .fetch_one(&state.pool)
+        .await
+    {
+        Ok(val) => val,
+        Err(e) => match e {
+            sqlx::Error::RowNotFound => {
+                return Err(StatusCode::NOT_FOUND);
+            }
+            _ => {
+                panic!("{e}");
+            }
+        },
+    };
+    Ok(Json(expense))
+}
+
+#[axum_macros::debug_handler]
+pub async fn get_by_user_id(
+    State(state): State<Arc<state_struct>>,
+    Path(id): Path<String>,
+) -> Result<Json<Vec<Expense>>, StatusCode> {
+    if !validate_id(id.clone()) {
+        return Err(StatusCode::BAD_REQUEST);
+    }
+    let expense: Vec<Expense> = match sqlx::query_as("SELECT * FROM expenses where owner_id=$1")
+        .bind(id.clone())
+        .fetch_all(&state.pool)
         .await
     {
         Ok(val) => val,

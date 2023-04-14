@@ -8,9 +8,13 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
 )
 
 func GetByID(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
 	id := chi.URLParam(r, "id")
 	if good := validate.ID(id); !good {
 		App.BadRequestResponse(w, r, ErrInvalidID)
@@ -27,6 +31,9 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
 	ownerid := chi.URLParam(r, "id")
 	if good := validate.ID(ownerid); !good {
 		App.BadRequestResponse(w, r, ErrInvalidID)
@@ -44,6 +51,9 @@ func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func UpdateExpense(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
 	var updateExpenseData UpdateExpenseData
 	err := App.ReadJSON(w, r, &updateExpenseData)
 	if err != nil {
@@ -86,6 +96,9 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func NewExpense(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
 	var newExpenseData NewExpenseData
 	err := App.ReadJSON(w, r, &newExpenseData)
 	if err != nil {
@@ -115,6 +128,9 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	}
 }
 func DeleteExpense(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
 	id := chi.URLParam(r, "id")
 	if good := validate.ID(id); !good {
 		App.BadRequestResponse(w, r, ErrInvalidID)

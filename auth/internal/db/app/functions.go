@@ -10,10 +10,9 @@ import (
 	"encoding/base64"
 	"fmt"
 	"html/template"
+	"io"
 	helpers "main/auth/internal/db/pkg"
-	mathrand "math/rand"
 	"net/smtp"
-	"strconv"
 	"strings"
 	"time"
 
@@ -33,6 +32,8 @@ var auth smtp.Auth
 var body bytes.Buffer
 var templateFile string
 
+var table = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
+
 type EmailData struct {
 	Code string
 }
@@ -51,16 +52,22 @@ func init() {
 func InitializeLogger(logger *zap.Logger) {
 	log = logger
 }
-func randomString(digits int, upperbound int) string {
-	result := ""
-	for i := 0; i < digits; i++ {
-		n := mathrand.Intn(upperbound)
-		result += strconv.Itoa(n)
+func EncodeToString(max int) string {
+	b := make([]byte, max)
+	n, err := io.ReadAtLeast(rand.Reader, b, max)
+	if n != max {
+		panic(err)
 	}
-	return result
+	for i := 0; i < len(b); i++ {
+		b[i] = table[int(b[i])%len(table)]
+	}
+	return string(b)
 }
+
 func SendEmail(to []string, ctx context.Context) error {
-	code := randomString(6, 9)
+	code := EncodeToString(6)
+	log.Info("Generated verification code")
+	log.Debug(code)
 	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	body.Write([]byte(fmt.Sprintf("Subject: %v is your verification code\n%s\n\n", code, mimeHeaders)))
 	data := EmailData{
@@ -79,6 +86,7 @@ func SendEmail(to []string, ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	log.Info("Sending mail")
 	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, fromEmail, to, body.Bytes())
 	if err != nil {
 		return err
@@ -110,12 +118,14 @@ func generateRandomBytes(n uint32) ([]byte, error) {
 	return b, nil
 }
 func GetByAccess(accessToken string, ctx context.Context) (string, error) {
+	log.Info("getting session (cookie)")
 	val, err := helpers.RDB.Get(ctx, fmt.Sprintf("session:%v", accessToken)).Result()
 	return val, err
 }
 func SignOut(accessToken string, ctx context.Context) (err error) {
 	// remove the accessToken
 	// check if the accessToken exists in database
+	log.Info("Checking if the access token exists")
 	_, err = helpers.RDB.Get(ctx, fmt.Sprintf("session:%v", accessToken)).Result()
 	if err != nil {
 		return err
@@ -127,9 +137,10 @@ func SignOut(accessToken string, ctx context.Context) (err error) {
 	}
 	return err
 }
-func SignIn(email string, password string, ctx context.Context) (accessToken *string, err error) {
+func SignIn(input string, password string, ctx context.Context) (accessToken *string, err error) {
 	user := helpers.User{}
-	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE email=$1", email)
+	log.Info("Getting the user")
+	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE email=$1 or username=$1", input)
 	// if the database returns no rows
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
@@ -154,24 +165,30 @@ func CreateAccessToken() (*string, time.Duration) {
 	return accessToken, time.Second * 86400
 }
 
-func SignUp(name string, username string, password string, code string, ctx context.Context) (accessToken *string, err error) {
+func SignUp(username string, password string, code string, ctx context.Context) (accessToken *string, err error) {
 	id := uuid.New().String()
 	encodedHash, err := GenerateFromPassword(password, helpers.P)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("Getting the access token")
 	email, err := helpers.RDB.Get(ctx, fmt.Sprintf("code:%v", code)).Result()
+	log.Debug("Got the email",
+		zap.String("email", email),
+	)
 	if email == "" {
 		return nil, helpers.ErrInvalidCode
 	}
 	if err != nil {
 		return nil, err
 	}
-	_, err = helpers.DB.Exec("INSERT INTO users (name, username, email, password, id) VALUES ($1, $2, $3, $4, $5)", name, username, email, encodedHash, id)
+	log.Info("Creating new user")
+	_, err = helpers.DB.Exec("INSERT INTO users (username, email, password, id) VALUES ($1, $2, $3, $4)", username, email, encodedHash, id)
 	if err != nil {
 		return nil, err
 	}
 	accessToken, expireTime := CreateAccessToken()
+	log.Info("Creating new session")
 	err = helpers.RDB.Set(ctx, fmt.Sprintf("session:%v", *accessToken), id, expireTime).Err()
 	return accessToken, err
 }

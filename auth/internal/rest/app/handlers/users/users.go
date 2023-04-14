@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
+	"go.uber.org/zap"
 )
 
 func PartialSuccess(w http.ResponseWriter, text string, r *http.Request) {
@@ -26,7 +27,12 @@ func SuccessfullyDeleted(w http.ResponseWriter, text string, r *http.Request) {
 	}
 }
 func SignIn(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
+	App.Log.Info("Signing in");
 	var signInData SignInData
+	App.Log.Info("Reading JSON")
 	err := App.ReadJSON(w, r, &signInData)
 	if err != nil {
 		App.BadRequestResponse(w, r, err)
@@ -40,6 +46,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	}
 	accessToken, err := db.SignIn(email, password, r.Context())
 	if err != nil {
+		App.Log.Info("The user was not found")
 		App.NotFoundResponse(w, r)
 		return
 	}
@@ -49,12 +56,20 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	err = App.WriteJSON(w, http.StatusOK,
 		App.DefaultEnvelope(accessTokenResponse), nil)
 	if err != nil {
+		App.Log.Error("Error while signing in",
+			zap.Error(err),
+		)
 		App.ServerErrorResponse(w, r, err)
 	}
 }
 
 func SendVerification(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
+	App.Log.Info("Sending verification")
 	var verifyData VerifyData
+	App.Log.Info("Reading JSON")
 	err := App.ReadJSON(w, r, &verifyData)
 	if err != nil {
 		App.ServerErrorResponse(w, r, err)
@@ -62,33 +77,48 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 	}
 	email := verifyData.Email
 	to := []string{email}
+	App.Log.Info("Sending email")
 	err = db.SendEmail(to, r.Context())
 	if err != nil {
 		if strings.Contains(err.Error(), "is not a valid RFC-5321 address") {
+			App.Log.Info("The email is not valid")
 			App.BadRequestResponse(w, r, ErrEmailWrongFormat)
 			return
 		}
+		App.Log.Error("Error while sending verification",
+			zap.Error(err),
+		)
 		App.ServerErrorResponse(w, r, err)
 		return
 	}
 	PartialSuccess(w, http.StatusText(202), r)
 }
 func SignUpVerify(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
+	App.Log.Info("Signing up and verifying")
 	var signUpVerifyData SignUpVerifyData
+	App.Log.Info("Reading JSON")
 	err := App.ReadJSON(w, r, &signUpVerifyData)
 	if err != nil {
 		App.BadRequestResponse(w, r, err)
 		return
 	}
+	App.Log.Info("Reading verify code")
 	code := chi.URLParam(r, "code")
 	password := signUpVerifyData.Password
-	name := signUpVerifyData.Name
 	username := signUpVerifyData.Username
-	if !validate.All(name, username, code, password) {
+	App.Log.Info("Validating code, username, and pass")
+	if !validate.All(username, code, password) {
 		App.BadRequestResponse(w, r, ErrSignUPWrongFormat)
 		return
 	}
-	accessToken, err := db.SignUp(name, username, password, code, r.Context())
+	App.Log.Info("Signing up")
+	accessToken, err := db.SignUp(username, password, code, r.Context())
+	App.Log.Debug("Signed Up",
+		zap.String("Access token", *accessToken),
+	)
 	if err != nil {
 		if err == dbGlobals.ErrInvalidCode {
 			App.NotFoundResponse(w, r)
@@ -102,11 +132,17 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	}
 	err = App.WriteJSON(w, http.StatusCreated, App.DefaultEnvelope(accessTokenResponse), nil)
 	if err != nil {
+		App.Log.Error("Error while signing up",
+			zap.Error(err),
+		)
 		App.ServerErrorResponse(w, r, err)
 		return
 	}
 }
 func GetByCookie(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
 	cookieID := chi.URLParam(r, "id")
 	val, err := db.GetByAccess(cookieID, r.Context())
 	if err != nil {
@@ -118,11 +154,17 @@ func GetByCookie(w http.ResponseWriter, r *http.Request) {
 	}
 	err = App.WriteJSON(w, http.StatusOK, App.DefaultEnvelope(userIDResponse), nil)
 	if err != nil {
+		App.Log.Error("Cannot get cookie",
+			zap.Error(err),
+		)
 		App.ServerErrorResponse(w, r, err)
 		return
 	}
 }
 func SignOut(w http.ResponseWriter, r *http.Request) {
+	App.Log.Info("Got request",
+		zap.String("IP", r.RemoteAddr),
+	)
 	accessToken := chi.URLParam(r, "id")
 	err := db.SignOut(accessToken, r.Context())
 	if err != nil {

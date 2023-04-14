@@ -14,23 +14,18 @@ func TestValidCases(t *testing.T) {
 	username := "bob123"
 	code := "123456"
 	password := "12345678"
-	good := All(name, username, code, password)
+	good := All(username, code, password)
 	if !good {
 		t.Fatalf(`All(%v, %v, %v, %v) returned %t with good cases, wanted it to return %t`, name, username, code, password, good, !good)
 	}
 }
 
 func TestInvalidCases(t *testing.T) {
-	t.Run("Invalid Name", TestInvalidName)
 	t.Run("Invalid Password", TestInvalidPassword)
 	t.Run("Invalid Code", TestInvalidCode)
 	t.Run("Invalid Username", TestInvalidUsername)
 }
 
-func TestInvalidName(t *testing.T) {
-	t.Run("Name too short", TestNameTooShort)
-	t.Run("Name too long", TestNameTooLong)
-}
 
 func TestInvalidUsername(t *testing.T) {
 	t.Run("Username too short", TestUsernameTooShort)
@@ -82,18 +77,3 @@ func TestUsernameTooShort(t *testing.T) {
 	}
 }
 
-func TestNameTooLong(t *testing.T) {
-	name := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
-	good := Name(name)
-	if good {
-		t.Fatalf(`Name(%v) with a wrong name case returned %t, wanted return %t`, name, good, !good)
-	}
-}
-
-func TestNameTooShort(t *testing.T) {
-	name := ""
-	good := Name(name)
-	if good {
-		t.Fatalf(`Name(%v) with a wrong name case returned %t, wanted return %t`, name, good, !good)
-	}
-}

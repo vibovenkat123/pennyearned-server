@@ -18,7 +18,7 @@ services:
     restart: always
     ports:
       - "${redis_port}:6379"
-    command: redis-server --save 20 1 --loglevel warning --requirepass ${redis_password}
+    command: redis-server --requirepass ${redis_password}
     volumes:
       - pennyearnedRedis:/data
 volumes:

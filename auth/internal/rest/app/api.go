@@ -19,6 +19,7 @@ import (
 var adapter *chiadapter.ChiLambda
 
 func Expose(local bool) {
+	App.Log.Debug("Creating new router")
 	r := chi.NewRouter()
 	r.NotFound(http.HandlerFunc(App.NotFoundResponse))
 	r.MethodNotAllowed(http.HandlerFunc(App.MethodNotAllowedResponse))

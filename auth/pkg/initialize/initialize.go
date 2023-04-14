@@ -11,14 +11,7 @@ var Logger *zap.Logger
 
 func init() {
 	Logger, _ = zap.NewProduction()
-	defer func() {
-		err := Logger.Sync()
-		if err != nil {
-			Logger.Error("Error syncing logger",
-				zap.Error(err),
-			)
-		}
-	}()
+	defer Logger.Sync()
 }
 func Initialize() {
 	// connect to database

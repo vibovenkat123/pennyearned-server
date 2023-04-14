@@ -182,6 +182,7 @@ func SignUp(username string, password string, code string, ctx context.Context) 
 	if err != nil {
 		return nil, err
 	}
+
 	log.Info("Creating new user")
 	_, err = helpers.DB.Exec("INSERT INTO users (username, email, password, id) VALUES ($1, $2, $3, $4)", username, email, encodedHash, id)
 	if err != nil {
@@ -190,6 +191,11 @@ func SignUp(username string, password string, code string, ctx context.Context) 
 	accessToken, expireTime := CreateAccessToken()
 	log.Info("Creating new session")
 	err = helpers.RDB.Set(ctx, fmt.Sprintf("session:%v", *accessToken), id, expireTime).Err()
+	if err != nil {
+		return accessToken, err
+	}
+	log.Info("Deleting existing code")
+	err = helpers.RDB.Del(ctx, fmt.Sprintf("code:%v", code)).Err()
 	return accessToken, err
 }
 

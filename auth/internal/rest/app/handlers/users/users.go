@@ -38,13 +38,13 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 		App.BadRequestResponse(w, r, err)
 		return
 	}
-	email := signInData.Email
+	username := signInData.Username
 	password := signInData.Password
-	if !validate.Password(password) {
+	if !validate.Password(password) || !validate.Username(username) {
 		App.NotFoundResponse(w, r)
 		return
 	}
-	accessToken, err := db.SignIn(email, password, r.Context())
+	accessToken, err := db.SignIn(username, password, r.Context())
 	if err != nil {
 		App.Log.Info("The user was not found")
 		App.NotFoundResponse(w, r)
@@ -116,10 +116,9 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	}
 	App.Log.Info("Signing up")
 	accessToken, err := db.SignUp(username, password, code, r.Context())
-	App.Log.Debug("Signed Up",
-		zap.String("Access token", *accessToken),
-	)
+	App.Log.Info("Signed Up")
 	if err != nil {
+		App.Log.Error(err.Error())
 		if err == dbGlobals.ErrInvalidCode {
 			App.NotFoundResponse(w, r)
 			return
@@ -144,15 +143,12 @@ func GetByCookie(w http.ResponseWriter, r *http.Request) {
 		zap.String("IP", r.RemoteAddr),
 	)
 	cookieID := chi.URLParam(r, "id")
-	val, err := db.GetByAccess(cookieID, r.Context())
+	user, err := db.GetByAccess(cookieID, r.Context())
 	if err != nil {
 		App.NotFoundResponse(w, r)
 		return
 	}
-	userIDResponse := UserIDRes{
-		ID: val,
-	}
-	err = App.WriteJSON(w, http.StatusOK, App.DefaultEnvelope(userIDResponse), nil)
+	err = App.WriteJSON(w, http.StatusOK, App.DefaultEnvelope(user), nil)
 	if err != nil {
 		App.Log.Error("Cannot get cookie",
 			zap.Error(err),

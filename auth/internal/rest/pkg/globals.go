@@ -23,8 +23,9 @@ func SetLogger(logger *zap.Logger) {
 }
 
 type SignInData struct {
-	Email    string `json:"email"`
+	Username string `json:"username"`
 	Password string `json:"password"`
+	Email string `json:"email"`
 }
 
 type SignUpVerifyData struct {
@@ -37,10 +38,6 @@ type Envelope map[string]any
 
 type VerifyData struct {
 	Email string `json:"email"`
-}
-
-type UserIDRes struct {
-	ID string `json:"id"`
 }
 
 type UserAccessRes struct {

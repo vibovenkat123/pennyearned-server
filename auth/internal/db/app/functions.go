@@ -65,15 +65,18 @@ func EncodeToString(max int) string {
 }
 
 func SendEmail(to []string, ctx context.Context) error {
-	code := EncodeToString(6)
-	log.Info("Generated verification code")
-	log.Debug(code)
-	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body.Write([]byte(fmt.Sprintf("Subject: %v is your verification code\n%s\n\n", code, mimeHeaders)))
-	data := EmailData{
-		Code: code,
-	}
 	for _, email := range to {
+		code := EncodeToString(6)
+		log.Info("Generated verification code")
+		log.Debug(code)
+
+		// create a new body buffer for each email
+		body := bytes.NewBuffer(nil)
+		mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
+		body.Write([]byte(fmt.Sprintf("Subject: %v is your verification code\n%s\n\n", code, mimeHeaders)))
+		data := EmailData{
+			Code: code,
+		}
 		err := helpers.RDB.Set(ctx, fmt.Sprintf("code:%v", code), email, time.Second*1800).Err()
 		if err != nil {
 			log.Error("Error setting code in the redis",
@@ -81,15 +84,15 @@ func SendEmail(to []string, ctx context.Context) error {
 			)
 			return err
 		}
-	}
-	err := tmpt.Execute(&body, data)
-	if err != nil {
-		return err
-	}
-	log.Info("Sending mail")
-	err = smtp.SendMail(smtpHost+":"+smtpPort, auth, fromEmail, to, body.Bytes())
-	if err != nil {
-		return err
+		err = tmpt.Execute(body, data)
+		if err != nil {
+			return err
+		}
+		log.Info("Sending mail")
+		err = smtp.SendMail(smtpHost+":"+smtpPort, auth, fromEmail, []string{email}, body.Bytes())
+		if err != nil {
+			return err
+			}
 	}
 	return nil
 }
@@ -117,10 +120,19 @@ func generateRandomBytes(n uint32) ([]byte, error) {
 
 	return b, nil
 }
-func GetByAccess(accessToken string, ctx context.Context) (string, error) {
+func GetByAccess(accessToken string, ctx context.Context) (helpers.User, error) {
+	user := helpers.User{}
 	log.Info("getting session (cookie)")
 	val, err := helpers.RDB.Get(ctx, fmt.Sprintf("session:%v", accessToken)).Result()
-	return val, err
+	if err != nil {
+		log.Error(err.Error())
+		return user, err
+	}
+	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE id=$1", val)
+	if err != nil {
+		log.Error(err.Error())
+	}
+	return user, err
 }
 func SignOut(accessToken string, ctx context.Context) (err error) {
 	// remove the accessToken
@@ -137,10 +149,10 @@ func SignOut(accessToken string, ctx context.Context) (err error) {
 	}
 	return err
 }
-func SignIn(input string, password string, ctx context.Context) (accessToken *string, err error) {
+func SignIn(username string, password string, ctx context.Context) (accessToken *string, err error) {
 	user := helpers.User{}
 	log.Info("Getting the user")
-	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE email=$1 or username=$1", input)
+	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE username=$1", username)
 	// if the database returns no rows
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err

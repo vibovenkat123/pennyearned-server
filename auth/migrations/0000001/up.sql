@@ -1,9 +1,8 @@
 CREATE TABLE IF NOT EXISTS users (
-    id TEXT PRIMARY KEY NOT NULL,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    budget INTEGER DEFAULT 0 NOT NULL;
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password TEXT NOT NULL,
-    date_created DATETIME DEFAULT now(),
-    date_updated DATETIME DEFAULT now()
+    id varchar(36) PRIMARY KEY NOT NULL,
+    username varchar(255) NOT NULL UNIQUE,
+    email varchar(255) NOT NULL UNIQUE,
+    password varchar(255) NOT NULL,
+    date_created DATETIME DEFAULT NOW(),
+    date_updated DATETIME DEFAULT NOW()
 );

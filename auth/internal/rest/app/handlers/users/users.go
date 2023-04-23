@@ -121,11 +121,13 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	accessToken, err := db.SignUp(username, password, code, r.Context())
 	App.Log.Info("Signed Up")
 	if err != nil {
-		App.Log.Error(err.Error())
 		if err == dbGlobals.ErrInvalidCode {
 			App.NotFoundResponse(w, r)
 			return
 		}
+		App.Log.Error("The username is already there/email",
+			zap.Error(err),
+		)
 		App.ConflictResponse(w, r)
 		return
 	}
@@ -134,7 +136,7 @@ func SignUpVerify(w http.ResponseWriter, r *http.Request) {
 	}
 	err = App.WriteJSON(w, http.StatusCreated, App.DefaultEnvelope(accessTokenResponse), nil)
 	if err != nil {
-		App.Log.Error("Error while signing up",
+		App.Log.Error("Error writing json",
 			zap.Error(err),
 		)
 		App.ServerErrorResponse(w, r, err)

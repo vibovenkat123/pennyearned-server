@@ -30,7 +30,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	App.Log.Info("Got request",
 		zap.String("IP", r.RemoteAddr),
 	)
-	App.Log.Info("Signing in");
+	App.Log.Info("Signing in")
 	var signInData SignInData
 	App.Log.Info("Reading JSON")
 	err := App.ReadJSON(w, r, &signInData)
@@ -56,7 +56,7 @@ func SignIn(w http.ResponseWriter, r *http.Request) {
 	err = App.WriteJSON(w, http.StatusOK,
 		App.DefaultEnvelope(accessTokenResponse), nil)
 	if err != nil {
-		App.Log.Error("Error while signing in",
+		App.Log.Error("Error while writing json",
 			zap.Error(err),
 		)
 		App.ServerErrorResponse(w, r, err)
@@ -72,6 +72,9 @@ func SendVerification(w http.ResponseWriter, r *http.Request) {
 	App.Log.Info("Reading JSON")
 	err := App.ReadJSON(w, r, &verifyData)
 	if err != nil {
+		App.Log.Error("Error while reading json",
+			zap.Error(err),
+		)
 		App.ServerErrorResponse(w, r, err)
 		return
 	}

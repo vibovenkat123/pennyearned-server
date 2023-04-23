@@ -35,9 +35,5 @@ type DatabaseType = *sqlx.DB
 var DB DatabaseType
 
 type Info struct {
-	Host     string
-	User     string
-	Password string
-	Dbname   string
-	Port     int
+	Url string
 }

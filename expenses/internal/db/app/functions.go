@@ -19,7 +19,9 @@ func InitializeLogger(logger *zap.Logger) {
 
 func NewExpense(ownerid string, name string, spent int) (helpers.IDResponse, error) {
 	id := uuid.New().String()
-	_, err := helpers.DB.Exec("INSERT INTO expenses (owner_id, name, spent, id) VALUES ($1, $2, $3, $4)", ownerid, name, spent, id)
+	_, err := helpers.DB.Exec(`INSERT INTO expenses (owner_id, name, spent, id)
+								VALUES (?, ?, ?, ?);`,
+		ownerid, name, spent, id)
 	response := helpers.IDResponse{
 		ID: id,
 	}
@@ -31,11 +33,15 @@ func DeleteExpense(id string) error {
 	if _, err := GetExpenseById(id); err != nil {
 		return err
 	}
-	_, err = helpers.DB.Exec(`DELETE FROM expenses WHERE id=$1`, id)
+	_, err = helpers.DB.Exec(`DELETE FROM expenses WHERE id=?`, id)
 	return err
 }
 func UpdateExpense(id string, name string, spent int) (helpers.IDResponse, error) {
-	_, err := helpers.DB.Exec(`UPDATE expenses SET date_updated=now(), name=$1, spent=$2 WHERE id=$3`, name, spent, id)
+	_, err := helpers.DB.Exec(`UPDATE expenses
+								SET date_updated=NOW(), name=?, spent=?
+								WHERE id=?`,
+		name, spent, id)
+
 	response := helpers.IDResponse{
 		ID: id,
 	}
@@ -60,7 +66,7 @@ func ResetToSchema() {
 }
 func GetExpenseById(expenseId string) (helpers.Expense, error) {
 	expense := helpers.Expense{}
-	err := helpers.DB.Get(&expense, "SELECT * FROM expenses where id=$1", expenseId)
+	err := helpers.DB.Get(&expense, `SELECT * FROM expenses where id=?`, expenseId)
 	if err == sql.ErrNoRows {
 		return expense, helpers.ErrExpenseNotFound
 	}
@@ -68,7 +74,7 @@ func GetExpenseById(expenseId string) (helpers.Expense, error) {
 }
 func GetExpensesByOwnerId(ownerid string) ([]helpers.Expense, error) {
 	expenses := []helpers.Expense{}
-	err := helpers.DB.Select(&expenses, "SELECT * FROM expenses where owner_id=$1", ownerid)
+	err := helpers.DB.Select(&expenses, `SELECT * FROM expenses where owner_id=?`, ownerid)
 	if len(expenses) <= 0 || err == sql.ErrNoRows {
 		return expenses, helpers.ErrExpensesNotFound
 	}

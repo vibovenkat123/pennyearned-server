@@ -5,14 +5,9 @@ import (
 	"strconv"
 )
 
-var envPort string
-var port int
 var envRedisPort string
 var redisPort int
-var dbHost string
-var dbUser string
-var dbPass string
-var dbName string
+var mySqlUrl string
 var redisHost string
 var redisPass string
 var redisName string
@@ -23,23 +18,14 @@ var RedisConvertErr error
 
 func init() {
 	if os.Getenv("GO_ENV") == "local" {
-		envPort = os.Getenv("USERS_POSTGRES_PORT")
-		dbUser = os.Getenv("USERS_POSTGRES_USER")
-		dbHost = os.Getenv("USERS_POSTGRES_HOST")
+		mySqlUrl = os.Getenv("USERS_MYSQL_URL")
 		envRedisPort = os.Getenv("USERS_REDIS_PORT")
-		dbPass = os.Getenv("USERS_POSTGRES_PASSWORD")
-		dbName = os.Getenv("USERS_POSTGRES_DATABASE")
 		redisHost = os.Getenv("USERS_REDIS_HOST")
 		redisPass = os.Getenv("USERS_REDIS_PASSWORD")
 	}
-	port, ConvertErr = strconv.Atoi(envPort)
 	redisPort, RedisConvertErr = strconv.Atoi(envRedisPort)
 	DBInfo = Info{
-		Host:     dbHost,
-		Port:     port,
-		User:     dbUser,
-		Password: dbPass,
-		Dbname:   dbName,
+		Url: mySqlUrl,
 	}
 	RedisInfo = Info{
 		Host:     redisHost,

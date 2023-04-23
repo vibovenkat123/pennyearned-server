@@ -1,0 +1,4 @@
+issues:
+  exclude-rules:
+    - path: pkg/initialize/initialize.go
+      text: "Error return value of `Logger.Sync` is not checked"

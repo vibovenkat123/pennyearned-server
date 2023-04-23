@@ -42,7 +42,7 @@ var Local bool
 // the default key the envelope uses
 var topKey = "expense"
 
-func init() {
+func Initialize() {
 	var envPort string
 	Local = os.Getenv("GO_ENV") == "local"
 	if Local {

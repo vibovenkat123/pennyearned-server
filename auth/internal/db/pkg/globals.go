@@ -50,6 +50,7 @@ type User struct {
 	Password    string `db:"password" json:"password"`
 	DateCreated string `db:"date_created" json:"date_created"`
 	DateUpdated string `db:"date_updated" json:"date_updated"`
+	Budget      int    `db:"budget" json:"budget"`
 }
 type DatabaseType = *sqlx.DB
 type RedisType = *redis.Client
@@ -65,6 +66,7 @@ var P = &Params{
 }
 
 type Info struct {
+	Url      string
 	Host     string
 	User     string
 	Password string

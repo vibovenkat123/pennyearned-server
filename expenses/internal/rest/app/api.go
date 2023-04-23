@@ -19,6 +19,7 @@ import (
 var adapter *chiadapter.ChiLambda
 
 func Expose(local bool) {
+	App.Log.Info("Creating router")
 	r := chi.NewRouter()
 	r.NotFound(http.HandlerFunc(App.NotFoundResponse))
 	r.MethodNotAllowed(http.HandlerFunc(App.MethodNotAllowedResponse))
@@ -45,8 +46,12 @@ func Expose(local bool) {
 	}
 }
 func StartAPI() {
+	App.Log.Info("Exposing API",
+		zap.Bool("Is Local", Local),
+	)
 	Expose(Local)
 	if !Local {
+		App.Log.Info("Starting lambda")
 		lambda.Start(Handler)
 	}
 }

@@ -46,8 +46,12 @@ func Expose(local bool) {
 	}
 }
 func StartAPI() {
+	App.Log.Info("Exposing API",
+		zap.Bool("Is Local", Local),
+	)
 	Expose(Local)
 	if !Local {
+		App.Log.Info("Starting lambda")
 		lambda.Start(Handler)
 	}
 }

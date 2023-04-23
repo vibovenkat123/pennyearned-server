@@ -26,7 +26,6 @@ func TestInvalidCases(t *testing.T) {
 	t.Run("Invalid Username", TestInvalidUsername)
 }
 
-
 func TestInvalidUsername(t *testing.T) {
 	t.Run("Username too short", TestUsernameTooShort)
 	t.Run("Username too long", TestUsernameTooLong)
@@ -76,4 +75,3 @@ func TestUsernameTooShort(t *testing.T) {
 		t.Fatalf(`Username(%v) with a wrong username case returned %t, wanted return %t`, username, good, !good)
 	}
 }
-

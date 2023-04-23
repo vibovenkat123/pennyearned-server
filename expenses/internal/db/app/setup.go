@@ -4,26 +4,21 @@ import (
 	"fmt"
 	helpers "main/expenses/internal/db/pkg"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 	"go.uber.org/zap"
 )
 
 func Connect(log *zap.Logger) (helpers.DatabaseType, error) {
-	if helpers.ConvertErr != nil {
-		log.Error("The port variable is not a valid int",
-			zap.Error(helpers.ConvertErr),
-		)
-	}
 	var err error
-	expensesDBInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		helpers.DBInfo.Host, helpers.DBInfo.Port, helpers.DBInfo.User, helpers.DBInfo.Password, helpers.DBInfo.Dbname)
-	log.Info("Attempting to connect...")
-	helpers.DB, err = sqlx.Open("postgres", expensesDBInfo)
+	log.Info("Attempting to connect...",
+		zap.String("URL", helpers.DBInfo.Url),
+	)
+	helpers.DB, err = sqlx.Open("mysql", helpers.DBInfo.Url)
 	if err != nil {
 		return nil, err
 	}
+	log.Info("Pinging database")
 	err = helpers.DB.Ping()
 	if err != nil {
 		return nil, err

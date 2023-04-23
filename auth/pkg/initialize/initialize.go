@@ -1,19 +1,20 @@
 package initialize
 
 import (
-	"go.uber.org/zap"
 	database "main/auth/internal/db/app"
 	api "main/auth/internal/rest/app"
 	apiGlobals "main/auth/internal/rest/pkg"
+
+	"go.uber.org/zap"
 )
 
 var Logger *zap.Logger
 
-func init() {
+func Initialize() {
 	Logger, _ = zap.NewProduction()
 	defer Logger.Sync()
-}
-func Initialize() {
+	// init the logger
+	database.InitializeLogger(Logger)
 	// connect to database
 	db, _ := database.Connect(Logger)
 	// check if we successfully connected
@@ -23,8 +24,8 @@ func Initialize() {
 			zap.Error(err),
 		)
 	}
-	database.InitializeLogger(Logger)
 	// expose endpoints
 	apiGlobals.SetLogger(Logger)
+	apiGlobals.Initialize()
 	api.StartAPI()
 }

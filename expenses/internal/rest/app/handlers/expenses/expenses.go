@@ -27,6 +27,9 @@ func GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 	err = App.WriteJSON(w, http.StatusOK, App.DefaultEnvelope(expense), nil)
 	if err != nil {
+		App.Log.Error("Got error while writing json",
+			zap.Error(err),
+		)
 		App.ServerErrorResponse(w, r, err)
 	}
 }
@@ -46,6 +49,9 @@ func GetByOwnerID(w http.ResponseWriter, r *http.Request) {
 	}
 	err = App.WriteJSON(w, http.StatusOK, Envelope{"expenses": ownerExpenses}, nil)
 	if err != nil {
+		App.Log.Error("Got error while writing json",
+			zap.Error(err),
+		)
 		App.ServerErrorResponse(w, r, err)
 		return
 	}
@@ -70,6 +76,9 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 		if err == dbHelpers.ErrExpenseNotFound {
 			App.NotFoundResponse(w, r)
 		} else {
+			App.Log.Error("Got error while getting expense",
+				zap.Error(err),
+			)
 			App.ServerErrorResponse(w, r, err)
 		}
 		return
@@ -92,6 +101,9 @@ func UpdateExpense(w http.ResponseWriter, r *http.Request) {
 	}
 	err = App.WriteJSON(w, http.StatusOK, App.DefaultEnvelope(updatedExpense), nil)
 	if err != nil {
+		App.Log.Error("Got error while writing json",
+			zap.Error(err),
+		)
 		App.ServerErrorResponse(w, r, err)
 	}
 }
@@ -124,6 +136,9 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	}
 	err = App.WriteJSON(w, http.StatusCreated, App.DefaultEnvelope(newExpense), nil)
 	if err != nil {
+		App.Log.Error("Got error while writing json",
+			zap.Error(err),
+		)
 		App.ServerErrorResponse(w, r, err)
 	}
 }

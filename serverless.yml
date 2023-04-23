@@ -16,7 +16,7 @@ functions:
     handler: auth/bin/server
     events:
       - http:
-          path: v1/api/user/session/{id}
+          path: /v1/api/user/session/{id}
           method: delete
   verifyemail:
     handler: auth/bin/server
@@ -70,5 +70,5 @@ functions:
     handler: expenses/bin/server
     events:
       - http:
-          path: v1/api/user/{id}/expenses
+          path: v1/api/expense/user/{id}/expenses
           method: get

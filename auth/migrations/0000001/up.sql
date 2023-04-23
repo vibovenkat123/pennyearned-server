@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS users (
-    id text DEFAULT gen_random_uuid() PRIMARY KEY,
-    username varchar(255) NOT NULL UNIQUE,
-    email varchar(255) NOT NULL UNIQUE,
-    password text NOT NULL,
-    date_created TIMESTAMP DEFAULT now(),
-    date_updated TIMESTAMP DEFAULT now()
+    id TEXT PRIMARY KEY NOT NULL,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    budget INTEGER DEFAULT 0 NOT NULL;
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    date_created DATETIME DEFAULT now(),
+    date_updated DATETIME DEFAULT now()
 );

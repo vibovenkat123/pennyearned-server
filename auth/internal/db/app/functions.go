@@ -29,7 +29,6 @@ var emailPassword string
 var smtpHost string
 var smtpPort string
 var auth smtp.Auth
-var body bytes.Buffer
 var templateFile string
 
 var table = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
@@ -92,7 +91,7 @@ func SendEmail(to []string, ctx context.Context) error {
 		err = smtp.SendMail(smtpHost+":"+smtpPort, auth, fromEmail, []string{email}, body.Bytes())
 		if err != nil {
 			return err
-			}
+		}
 	}
 	return nil
 }
@@ -107,7 +106,7 @@ func GenerateFromPassword(pwd string, p *helpers.Params) (encodedHash string, er
 	b64Salt := base64.RawStdEncoding.EncodeToString(salt)
 	b64Hash := base64.RawStdEncoding.EncodeToString(hash)
 
-	encodedHash = fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, p.Memory, p.Iterations, p.Parallelism, b64Salt, b64Hash)
+	encodedHash = fmt.Sprintf("argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, p.Memory, p.Iterations, p.Parallelism, b64Salt, b64Hash)
 	return encodedHash, nil
 }
 
@@ -128,7 +127,7 @@ func GetByAccess(accessToken string, ctx context.Context) (helpers.User, error) 
 		log.Error(err.Error())
 		return user, err
 	}
-	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE id=$1", val)
+	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE id=?", val)
 	if err != nil {
 		log.Error(err.Error())
 	}
@@ -152,7 +151,7 @@ func SignOut(accessToken string, ctx context.Context) (err error) {
 func SignIn(username string, password string, ctx context.Context) (accessToken *string, err error) {
 	user := helpers.User{}
 	log.Info("Getting the user")
-	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE username=$1", username)
+	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE username=?", username)
 	// if the database returns no rows
 	if err != nil && err != sql.ErrNoRows {
 		return nil, err
@@ -196,7 +195,7 @@ func SignUp(username string, password string, code string, ctx context.Context) 
 	}
 
 	log.Info("Creating new user")
-	_, err = helpers.DB.Exec("INSERT INTO users (username, email, password, id) VALUES ($1, $2, $3, $4)", username, email, encodedHash, id)
+	_, err = helpers.DB.Exec("INSERT INTO users (username, email, password, id) VALUES (?, ?, ?, ?)", username, email, encodedHash, id)
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +211,7 @@ func SignUp(username string, password string, code string, ctx context.Context) 
 }
 
 func decodeHash(encodedHash string) (p *helpers.Params, salt, hash []byte, err error) {
-	vals := strings.Split(encodedHash, "$")
+	vals := strings.Split(encodedHash, "")
 	if len(vals) != 6 {
 		return nil, nil, nil, helpers.ErrInvalidHash
 	}

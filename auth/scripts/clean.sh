@@ -1,2 +1,2 @@
 #!/bin/sh
-rm -rf ./bin/server
+rm -rf $1

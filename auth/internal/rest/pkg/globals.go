@@ -25,7 +25,6 @@ func SetLogger(logger *zap.Logger) {
 type SignInData struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Email string `json:"email"`
 }
 
 type SignUpVerifyData struct {
@@ -48,7 +47,7 @@ type UserAccessRes struct {
 var topKey = "user"
 var Local bool
 
-func init() {
+func Initialize() {
 	var envPort string
 	Local = os.Getenv("GO_ENV") == "local"
 	if Local {

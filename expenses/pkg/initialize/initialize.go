@@ -9,18 +9,9 @@ import (
 
 var Logger *zap.Logger
 
-func init() {
-	Logger, _ = zap.NewProduction()
-	defer func() {
-		err := Logger.Sync()
-		if err != nil {
-			Logger.Error("Error syncing logger",
-				zap.Error(err),
-			)
-		}
-	}()
-}
 func Initialize() {
+	Logger, _ = zap.NewProduction()
+	defer Logger.Sync()
 	// connect to database
 	db, err := database.Connect(Logger)
 	if err != nil {
@@ -38,6 +29,7 @@ func Initialize() {
 	database.InitializeLogger(Logger)
 	// migrate (add columns and tables)
 	apiGlobals.SetLogger(Logger)
+	apiGlobals.Initialize()
 	// expose endpoints
 	api.StartAPI()
 }

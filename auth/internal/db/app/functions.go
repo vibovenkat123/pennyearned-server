@@ -76,6 +76,7 @@ func SendEmail(to []string, ctx context.Context) error {
 		data := EmailData{
 			Code: code,
 		}
+		log.Info(code)
 		err := helpers.RDB.Set(ctx, fmt.Sprintf("code:%v", code), email, time.Second*1800).Err()
 		if err != nil {
 			log.Error("Error setting code in the redis",
@@ -105,8 +106,7 @@ func GenerateFromPassword(pwd string, p *helpers.Params) (encodedHash string, er
 	hash := argon2.IDKey([]byte(pwd), salt, p.Iterations, p.Memory, p.Parallelism, p.KeyLength)
 	b64Salt := base64.RawStdEncoding.EncodeToString(salt)
 	b64Hash := base64.RawStdEncoding.EncodeToString(hash)
-
-	encodedHash = fmt.Sprintf("argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, p.Memory, p.Iterations, p.Parallelism, b64Salt, b64Hash)
+	encodedHash = fmt.Sprintf("$argon2id$v=%d$m=%d,t=%d,p=%d$%s$%s", argon2.Version, p.Memory, p.Iterations, p.Parallelism, b64Salt, b64Hash)
 	return encodedHash, nil
 }
 
@@ -150,7 +150,9 @@ func SignOut(accessToken string, ctx context.Context) (err error) {
 }
 func SignIn(username string, password string, ctx context.Context) (accessToken *string, err error) {
 	user := helpers.User{}
-	log.Info("Getting the user")
+	log.Info("Getting the user",
+		zap.String("username", username),
+	)
 	err = helpers.DB.Get(&user, "SELECT * FROM users WHERE username=?", username)
 	// if the database returns no rows
 	if err != nil && err != sql.ErrNoRows {
@@ -160,6 +162,7 @@ func SignIn(username string, password string, ctx context.Context) (accessToken 
 	matches, err := comparePasswordAndHash(password, user.Password)
 	if err != nil || !matches {
 		if !matches {
+			log.Error("The password is invalid")
 			err = helpers.ErrPassNotMatch
 		}
 		return nil, err
@@ -211,7 +214,7 @@ func SignUp(username string, password string, code string, ctx context.Context) 
 }
 
 func decodeHash(encodedHash string) (p *helpers.Params, salt, hash []byte, err error) {
-	vals := strings.Split(encodedHash, "")
+	vals := strings.Split(encodedHash, "$")
 	if len(vals) != 6 {
 		return nil, nil, nil, helpers.ErrInvalidHash
 	}
@@ -250,6 +253,7 @@ func comparePasswordAndHash(password string, encodedHash string) (matches bool, 
 		return false, err
 	}
 	inputHash := argon2.IDKey([]byte(password), salt, helpers.P.Iterations, helpers.P.Memory, helpers.P.Parallelism, helpers.P.KeyLength)
+	fmt.Println(inputHash)
 
 	if subtle.ConstantTimeCompare(hash, inputHash) == 1 {
 		return true, nil

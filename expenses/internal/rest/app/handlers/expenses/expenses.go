@@ -120,10 +120,6 @@ func NewExpense(w http.ResponseWriter, r *http.Request) {
 	ownerid := newExpenseData.OwnerID
 	name := newExpenseData.Name
 	spent := newExpenseData.Spent
-	if err != nil {
-		App.BadRequestResponse(w, r, err)
-		return
-	}
 	good := validate.All(ownerid, name, spent)
 	if !good {
 		App.BadRequestResponse(w, r, ErrExpenseInvalid)

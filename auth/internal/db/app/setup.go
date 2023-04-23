@@ -60,6 +60,7 @@ func ConnectRedis() (*helpers.RedisType, error) {
 		Addr:     addr,
 		Password: helpers.RedisInfo.Password,
 		DB:       dbNumber,
+		Username: "default",
 	})
 	log.Info("Pinging redis")
 	err = helpers.RDB.Ping(ctx).Err()

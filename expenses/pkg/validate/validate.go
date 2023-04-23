@@ -12,5 +12,5 @@ func Name(name string) bool {
 }
 
 func Spent(spent int) bool {
-	return spent > 0
+	return spent >= 0
 }

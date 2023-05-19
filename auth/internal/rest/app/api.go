@@ -3,6 +3,11 @@ package api
 import (
 	"context"
 	"fmt"
+	handlers "main/auth/internal/rest/app/handlers/users"
+	. "main/auth/internal/rest/pkg"
+	"net/http"
+	"time"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/awslabs/aws-lambda-go-api-proxy/chi"
@@ -10,10 +15,6 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/rs/cors"
 	"go.uber.org/zap"
-	handlers "main/auth/internal/rest/app/handlers/users"
-	. "main/auth/internal/rest/pkg"
-	"net/http"
-	"time"
 )
 
 var adapter *chiadapter.ChiLambda

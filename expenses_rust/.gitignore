@@ -1,5 +1,0 @@
-target/
-.env.*
-.env
-test.json
-node_modules
